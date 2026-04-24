@@ -981,8 +981,9 @@ function preencherGrupos(){
     el("dataDiario").value = hoje;
     el("busca").addEventListener("input", aplicarFiltros);
     el("ordenarPor").addEventListener("change", aplicarFiltros);
+    
     el("grupoSelect").addEventListener("change", async ()=>{
-      if(el("grupoSelect").value !== "__manual__") await carregarGrupoSelecionado();
+      await carregarGrupoSelecionado();
     });
 
     ["metaKcal","metaProteina","metaCarbo","metaLipideos","pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>{
