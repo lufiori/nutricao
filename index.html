@@ -103,6 +103,32 @@
     .objective-card{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;cursor:pointer}
     .objective-card.active{background:var(--primary-soft);border-color:#b7e2c1}
     .objective-card strong{display:block}
+
+    .nutri-visual-card{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.05);padding:18px;margin-top:16px}
+    .nutri-visual-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+    .nutri-visual-title{font-weight:700;font-size:16px;line-height:1.35}
+    .base-calc-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+    .base-calc-box input{width:96px!important;padding:8px 10px!important;border-radius:10px!important}
+    .macro-visual-grid{display:grid;grid-template-columns:1.1fr 240px;gap:18px;align-items:center}
+    .macro-lines{display:grid;gap:12px}
+    .macro-line{display:grid;grid-template-columns:120px 1fr 70px;gap:10px;align-items:center}
+    .macro-name{font-size:13px;color:#374151;font-weight:700}
+    .macro-percent{height:28px;border-radius:8px;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;min-width:54px}
+    .macro-grams{font-size:14px;color:#374151;font-weight:700;text-align:left}
+    .donut-wrap{display:grid;place-items:center;gap:10px}
+    .macro-donut{width:150px;height:150px;border-radius:50%;background:conic-gradient(#b01263 0 0%, #0f8f8c 0 0%, #6675df 0 100%);position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+    .macro-donut::after{content:"";position:absolute;inset:31px;background:#fff;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line)}
+    .donut-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center;z-index:1;font-size:12px;color:var(--muted);font-weight:700}
+    .donut-center strong{display:block;color:var(--text);font-size:18px;margin-bottom:2px}
+    .donut-legend{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--muted)}
+    .legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:-1px}
+    .nutri-table-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+    .nutri-cell{min-height:56px}
+    .nutri-cell-label{font-size:12px;color:var(--muted);margin-bottom:5px}
+    .nutri-cell-value{font-size:14px;color:var(--text);font-weight:700;line-height:1.35}
+    .nutri-lock{font-size:16px;color:#9ca3af}
+    @media (max-width: 900px){.macro-visual-grid{grid-template-columns:1fr}.nutri-table-grid{grid-template-columns:repeat(2,1fr)}.macro-line{grid-template-columns:1fr 70px 70px}}
+    @media (max-width: 520px){.nutri-table-grid{grid-template-columns:1fr}.macro-line{grid-template-columns:1fr}.macro-percent{justify-content:flex-start;padding-left:10px}.macro-grams{text-align:left}}
     @media (max-width: 1460px){
       .page{grid-template-columns:1fr}
       .metric-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}
@@ -266,6 +292,48 @@
 <div class="muted">g</div>
 </div>
 </div>
+
+<div class="nutri-visual-card" id="nutriVisualCard">
+  <div class="nutri-visual-head">
+    <div>
+      <div class="muted" style="font-size:13px">Informações nutricionais</div>
+      <div class="nutri-visual-title" id="nutriVisualTitulo">Quantidade de calorias em cada 100 grama(s).</div>
+      <div style="margin-top:10px"><strong>Total: <span id="nutriTotalKcal">0 kcal</span></strong></div>
+    </div>
+    <div class="base-calc-box">
+      <span>Base de cálculo:</span>
+      <input type="number" id="baseCalcGramas" value="100" min="1" step="1">
+      <strong>gramas</strong>
+    </div>
+  </div>
+
+  <div class="macro-visual-grid">
+    <div class="macro-lines">
+      <div class="macro-line">
+        <div class="macro-name">Carboidratos</div>
+        <div class="macro-percent" id="macroCarboPct" style="background:#b01263">0%</div>
+        <div class="macro-grams" id="macroCarboGramas">0 g</div>
+      </div>
+      <div class="macro-line">
+        <div class="macro-name">Proteínas</div>
+        <div class="macro-percent" id="macroProteinaPct" style="background:#0f8f8c">0%</div>
+        <div class="macro-grams" id="macroProteinaGramas">0 g</div>
+      </div>
+      <div class="macro-line">
+        <div class="macro-name">Lipídeos</div>
+        <div class="macro-percent" id="macroLipideosPct" style="background:#6675df">0%</div>
+        <div class="macro-grams" id="macroLipideosGramas">0 g</div>
+      </div>
+    </div>
+    <div class="donut-wrap">
+      <div class="macro-donut" id="macroDonut"><div class="donut-center"><div><strong id="donutKcal">0</strong>kcal</div></div></div>
+      <div class="donut-legend"><span><i class="legend-dot" style="background:#b01263"></i>Carboidratos</span><span><i class="legend-dot" style="background:#0f8f8c"></i>Proteínas</span><span><i class="legend-dot" style="background:#6675df"></i>Lipídeos</span></div>
+    </div>
+  </div>
+  <div class="section-title">Tabela nutricional</div>
+  <div class="nutri-table-grid" id="nutriTabelaVisual"></div>
+</div>
+
 <div class="section-title">Resumo rápido</div>
 <div class="detail-table"><table><tbody id="tblResumoRapido"></tbody></table></div>
 <div class="grid-2" style="margin-top:16px">
@@ -585,6 +653,69 @@ function aplicarFiltros(){
 
   function linha(k, v){ return `<tr><th style="width:55%">${k}</th><td>${v}</td></tr>`; }
 
+  function valorOuTraco(v, casas=2, sufixo=""){
+    if(v === null || v === undefined || v === "") return '<span class="nutri-lock">▢</span>';
+    const x = Number(v);
+    if(!Number.isFinite(x) || x === 0) return '<span class="nutri-lock">▢</span>';
+    return fmt(x, casas) + (sufixo ? ' ' + sufixo : '');
+  }
+
+  function atualizarGraficoAlimento(){
+    if(!alimentoSelecionado || !el("baseCalcGramas")) return;
+    const a = alimentoSelecionado;
+    const gramas = Math.max(1, Number(el("baseCalcGramas").value) || 100);
+    const fator = gramas / 100;
+    const kcal = num(a.energia_kcal) * fator;
+    const carboG = num(a.carboidrato_g) * fator;
+    const protG = num(a.proteina_g) * fator;
+    const lipG = num(a.lipideos_g) * fator;
+    const carboKcal = carboG * 4;
+    const protKcal = protG * 4;
+    const lipKcal = lipG * 9;
+    const macroTotal = carboKcal + protKcal + lipKcal;
+    const pctCarbo = macroTotal > 0 ? (carboKcal / macroTotal) * 100 : 0;
+    const pctProt = macroTotal > 0 ? (protKcal / macroTotal) * 100 : 0;
+    const pctLip = macroTotal > 0 ? (lipKcal / macroTotal) * 100 : 0;
+    const endCarbo = pctCarbo;
+    const endProt = pctCarbo + pctProt;
+    el("nutriVisualTitulo").innerHTML = `Quantidade de calorias em cada ${fmt0(gramas)} grama(s) de <strong>${a.descricao_alimento || "alimento"}</strong>.`;
+    el("nutriTotalKcal").textContent = `${fmt(kcal,0)} kcal`;
+    el("donutKcal").textContent = fmt(kcal,0);
+    el("macroCarboPct").textContent = `${fmt(pctCarbo,2)}%`;
+    el("macroProteinaPct").textContent = `${fmt(pctProt,2)}%`;
+    el("macroLipideosPct").textContent = `${fmt(pctLip,2)}%`;
+    el("macroCarboGramas").textContent = `${fmt(carboG,2)} g`;
+    el("macroProteinaGramas").textContent = `${fmt(protG,2)} g`;
+    el("macroLipideosGramas").textContent = `${fmt(lipG,2)} g`;
+    el("macroDonut").style.background = `conic-gradient(#b01263 0 ${endCarbo}%, #0f8f8c ${endCarbo}% ${endProt}%, #6675df ${endProt}% 100%)`;
+    const itens = [
+      ["Energia", `${fmt(kcal,0)} kcal<br>${fmt(num(a.energia_kj)*fator,0)} kJ`],
+      ["Carboidratos", `${fmt(carboG,2)} g`],
+      ["Proteínas", `${fmt(protG,2)} g`],
+      ["Lipídeos", `${fmt(lipG,2)} g`],
+      ["Colesterol", valorOuTraco(num(a.colesterol_mg)*fator,2,"mg")],
+      ["Fibra Alimentar", valorOuTraco(num(a.fibra_alimentar_g)*fator,2,"g")],
+      ["Ferro", valorOuTraco(num(a.ferro_mg)*fator,2,"mg")],
+      ["Cálcio", valorOuTraco(num(a.calcio_mg)*fator,2,"mg")],
+      ["Sódio", valorOuTraco(num(a.sodio_mg)*fator,2,"mg")],
+      ["Magnésio", valorOuTraco(num(a.magnesio_mg)*fator,2,"mg")],
+      ["Potássio", valorOuTraco(num(a.potassio_mg)*fator,2,"mg")],
+      ["Manganês", valorOuTraco(num(a.manganes_mg)*fator,3,"mg")],
+      ["Fósforo", valorOuTraco(num(a.fosforo_mg)*fator,2,"mg")],
+      ["Cobre", valorOuTraco(num(a.cobre_mg)*fator,3,"mg")],
+      ["Zinco", valorOuTraco(num(a.zinco_mg)*fator,2,"mg")],
+      ["Cinzas", valorOuTraco(num(a.cinzas_g)*fator,2,"g")],
+      ["Retinol", valorOuTraco(num(a.retinol_mcg)*fator,2,"mcg")],
+      ["Tiamina", valorOuTraco(num(a.tiamina_mg)*fator,3,"mg")],
+      ["Riboflavina", valorOuTraco(num(a.riboflavina_mg)*fator,3,"mg")],
+      ["Piridoxina", valorOuTraco(num(a.piridoxina_mg)*fator,3,"mg")],
+      ["Niacina", valorOuTraco(num(a.niacina_mg)*fator,3,"mg")],
+      ["Vitamina C", valorOuTraco(num(a.vitamina_c_mg)*fator,2,"mg")],
+      ["Umidade", valorOuTraco(num(a.umidade_percentual)*fator,2,"%")]
+    ];
+    el("nutriTabelaVisual").innerHTML = itens.map(([label, value]) => `<div class="nutri-cell"><div class="nutri-cell-label">${label}:</div><div class="nutri-cell-value">${value}</div></div>`).join("");
+  }
+
   function selecionarAlimento(a){
     alimentoSelecionado = a;
     el("detalheVazio").classList.add("hidden");
@@ -595,6 +726,8 @@ function aplicarFiltros(){
     el("detProteina").textContent = fmt(a.proteina_g,1);
     el("detCarbo").textContent = fmt(a.carboidrato_g,1);
     el("detLipideos").textContent = fmt(a.lipideos_g,1);
+    if(el("baseCalcGramas")) el("baseCalcGramas").value = 100;
+    atualizarGraficoAlimento();
 
     el("tblResumoRapido").innerHTML = [
       linha("Umidade (%)", fmt(a.umidade_percentual,2)),
@@ -983,6 +1116,7 @@ function aplicarFiltros(){
     el("cancelarModalBtn").addEventListener("click", fecharModal);
     el("confirmarAdicionarBtn").addEventListener("click", confirmarAdicionar);
     el("modalGramas").addEventListener("input", atualizarPreviewModal);
+    if(el("baseCalcGramas")) el("baseCalcGramas").addEventListener("input", atualizarGraficoAlimento);
     el("modalRefeicao").addEventListener("change", atualizarPreviewModal);
     el("modalOverlay").addEventListener("click", (e)=>{ if(e.target === el("modalOverlay")) fecharModal(); });
   }
