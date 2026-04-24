@@ -122,17 +122,21 @@
         <h1>NutriTACO Dashboard</h1>
         <div>Perfil, metas automáticas, refeições e ficha completa do alimento</div>
       </div>
-      
       <div class="toolbar">
-        <button class="btn-outline" onclick="mostrarTela('telaDashboard')">Dashboard</button>
-        <button class="btn-outline" onclick="mostrarTela('telaBusca')">Alimentos</button>
-        <button class="btn-outline" onclick="mostrarTela('telaDiario')">Diário</button>
+        <button class="btn-outline" id="exportarBtn">Exportar Diário</button>
+        <label class="btn-outline" style="display:inline-flex;align-items:center;gap:8px;">
+          Importar Diário
+          <input type="file" id="importarDiarioInput" accept=".json,application/json" class="hidden">
+        </label>
+        <label class="btn-outline" style="display:inline-flex;align-items:center;gap:8px;">
+          Carregar base completa
+          <input type="file" id="importarBaseCompletaInput" accept=".json,application/json" class="hidden">
+        </label>
       </div>
-      
     </div>
   </div>
 
-  <div id="telaDashboard" class="page">
+  <div class="page">
     <div class="card">
       <h2>Perfil e objetivos</h2>
       <div class="profile-box">
@@ -1038,28 +1042,7 @@ function aplicarFiltros(){
     await carregarManifesto();
   }
 
-
-
-function mostrarTela(tela){
-  const cards = document.querySelectorAll('.page .card');
-
-  // esconde todos
-  cards.forEach(c => c.style.display = "none");
-
-  // mostra só o desejado
-  if(tela === "busca") cards[0].style.display = "block";
-  if(tela === "dashboard") cards[1].style.display = "block";
-  if(tela === "diario") cards[2].style.display = "block";
-}
-
-
-  
   init();
-
-
-
-mostrarTela('dashboard');
-  
 })();
 </script>
 </body>
