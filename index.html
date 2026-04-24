@@ -182,12 +182,40 @@
         </div>
       </div>
 
-      <div class="section-title">Grupos e busca</div>
-      <div>
-        <div class="label">Buscar alimento</div>
-        <input class="search-input" id="busca" type="text" placeholder="Ex.: arroz, banana, frango..." />
-      </div>
+<!-- APENAS A PARTE ALTERADA -->
+<!-- SUBSTITUA ESTE BLOCO NO SEU HTML -->
 
+<div class="section-title">Grupos e busca</div>
+<div>
+  <div class="label">Buscar alimento</div>
+  <input class="search-input" id="busca" type="text" placeholder="Ex.: arroz, banana, frango..." />
+</div>
+
+<div class="grid-2" style="margin-top:12px">
+  <div>
+    <div class="label">Grupo</div>
+    <select id="grupoSelect"></select>
+  </div>
+  <div>
+    <div class="label">Ordenar por</div>
+    <select id="ordenarPor">
+      <option value="nome">Nome (A-Z)</option>
+      <option value="energiaAsc">Energia (menor para maior)</option>
+      <option value="energiaDesc">Energia (maior para menor)</option>
+      <option value="proteinaDesc">Proteína (maior para menor)</option>
+    </select>
+  </div>
+</div>
+
+<div id="statusBase" class="status"></div>
+
+<!-- REMOVIDO -->
+<!-- <div class="group-list" id="listaGrupos"></div> -->
+
+<div class="muted" id="contadorAlimentos" style="margin-top:12px">0 alimentos encontrados</div>
+<div class="food-list" id="listaAlimentos"></div>
+
+      
       <div class="grid-2" style="margin-top:12px">
         <div>
           <div class="label">Grupo</div>
