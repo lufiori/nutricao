@@ -182,40 +182,35 @@
         </div>
       </div>
 
-<!-- APENAS A PARTE ALTERADA -->
-<!-- SUBSTITUA ESTE BLOCO NO SEU HTML -->
+      <div class="section-title">Grupos e busca</div>
+      <div>
+        <div class="label">Buscar alimento</div>
+        <input class="search-input" id="busca" type="text" placeholder="Ex.: arroz, banana, frango..." />
+      </div>
 
-<div class="section-title">Grupos e busca</div>
-<div>
-  <div class="label">Buscar alimento</div>
-  <input class="search-input" id="busca" type="text" placeholder="Ex.: arroz, banana, frango..." />
-</div>
+      <div class="grid-2" style="margin-top:12px">
+        <div>
+          <div class="label">Grupo</div>
+          <select id="grupoSelect"></select>
+        </div>
+        <div>
 
-<div class="grid-2" style="margin-top:12px">
-  <div>
-    <div class="label">Grupo</div>
-    <select id="grupoSelect"></select>
-  </div>
-  <div>
-    <div class="label">Ordenar por</div>
-    <select id="ordenarPor">
-      <option value="nome">Nome (A-Z)</option>
-      <option value="energiaAsc">Energia (menor para maior)</option>
-      <option value="energiaDesc">Energia (maior para menor)</option>
-      <option value="proteinaDesc">Proteína (maior para menor)</option>
-    </select>
-  </div>
-</div>
+          <div class="label">Ordenar por</div>
+          <select id="ordenarPor">
+            <option value="nome">Nome (A-Z)</option>
+            <option value="energiaAsc">Energia (menor para maior)</option>
+            <option value="energiaDesc">Energia (maior para menor)</option>
+            <option value="proteinaDesc">Proteína (maior para menor)</option>
+          </select>
+        </div>
+      </div>
 
-<div id="statusBase" class="status"></div>
+      <div id="statusBase" class="status"></div>
+      <div class="group-list" id="listaGrupos"></div>
+      <div class="muted" id="contadorAlimentos" style="margin-top:12px">0 alimentos encontrados</div>
+      <div class="food-list" id="listaAlimentos"></div>
+    </div>
 
-<!-- REMOVIDO -->
-<!-- <div class="group-list" id="listaGrupos"></div> -->
-
-<div class="muted" id="contadorAlimentos" style="margin-top:12px">0 alimentos encontrados</div>
-<div class="food-list" id="listaAlimentos"></div>
-
-     
     <div class="card">
       <div class="grid-4">
         <div class="metric green-soft">
@@ -518,10 +513,25 @@
     });
   }
 
-function preencherGrupos(){
-  el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
-    .concat(manifesto.grupos.map(g=>`<option value="${g.arquivo}">${g.grupo}</option>`)).join("");
-}
+  function preencherGrupos(){
+    el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
+      .concat(manifesto.grupos.map(g=>`<option value="${g.arquivo}">${g.grupo}</option>`)).join("");
+
+    el("listaGrupos").innerHTML = ['<div class="group-item" data-arquivo="__todos__"><div><strong>Todos os grupos</strong><div class="muted">Busca em toda a base</div></div><span class="pill">'+manifesto.total_alimentos+'</span></div>']
+      .concat(manifesto.grupos.map(g=>`<div class="group-item" data-arquivo="${g.arquivo}">
+        <div><strong>${g.grupo}</strong><div class="muted">${g.primeiros_alimentos.slice(0,3).join(" • ")}</div></div>
+        <span class="pill">${g.total_alimentos}</span>
+      </div>`)).join("");
+
+    Array.from(el("listaGrupos").querySelectorAll(".group-item")).forEach(node=>{
+      node.addEventListener("click", async ()=>{
+        el("grupoSelect").value = node.dataset.arquivo;
+        atualizarGrupoAtivoVisual();
+        await carregarGrupoSelecionado();
+      });
+    });
+    atualizarGrupoAtivoVisual();
+  }
 
   function atualizarGrupoAtivoVisual(){
     const atual = el("grupoSelect").value;
@@ -959,9 +969,8 @@ function preencherGrupos(){
     el("dataDiario").value = hoje;
     el("busca").addEventListener("input", aplicarFiltros);
     el("ordenarPor").addEventListener("change", aplicarFiltros);
-    
     el("grupoSelect").addEventListener("change", async ()=>{
-      await carregarGrupoSelecionado();
+      if(el("grupoSelect").value !== "__manual__") await carregarGrupoSelecionado();
     });
 
     ["metaKcal","metaProteina","metaCarbo","metaLipideos","pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>{
