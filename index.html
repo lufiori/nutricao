@@ -492,18 +492,26 @@
     return await res.json();
   }
 
-  async function carregarManifesto(){
-    try{
-      manifesto = await fetchJson("manifesto_taco.json");
-      preencherGrupos();
-      await carregarGrupoSelecionado();
-      setStatus(`Base carregada. ${manifesto.total_alimentos} alimentos em ${manifesto.total_grupos} grupos.`, "ok");
-    }catch(err){
-      setStatus("Não foi possível abrir automaticamente os arquivos JSON. Use o botão 'Carregar base completa' e selecione o arquivo taco_completo.json.", "error");
-    }
-  }
+  
 
-  function renderObjetivos(){
+async function carregarManifesto(){
+  try{
+    const data = await fetchJson("taco_completo.json");
+    baseAtual = Array.isArray(data) ? data : (data.alimentos || []);
+
+    preencherGruposSimples();
+
+    setStatus(`Base carregada: ${baseAtual.length} alimentos.`, "ok");
+
+    aplicarFiltros();
+  }catch(err){
+    setStatus("Erro ao carregar taco_completo.json.", "error");
+  }
+}
+
+  
+  
+function renderObjetivos(){
     el("objetivos").innerHTML = objetivos.map(o => `
       <div class="objective-card ${o.id===objetivoAtual?'active':''}" data-id="${o.id}">
         <strong>${o.nome}</strong>
@@ -520,26 +528,12 @@
     });
   }
 
-  function preencherGrupos(){
-    el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
-      .concat(manifesto.grupos.map(g=>`<option value="${g.arquivo}">${g.grupo}</option>`)).join("");
+function preencherGrupos(){
+  el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
+    .concat(manifesto.grupos.map(g=>`<option value="${g.arquivo}">${g.grupo}</option>`)).join("");
+}
 
-    el("listaGrupos").innerHTML = ['<div class="group-item" data-arquivo="__todos__"><div><strong>Todos os grupos</strong><div class="muted">Busca em toda a base</div></div><span class="pill">'+manifesto.total_alimentos+'</span></div>']
-      .concat(manifesto.grupos.map(g=>`<div class="group-item" data-arquivo="${g.arquivo}">
-        <div><strong>${g.grupo}</strong><div class="muted">${g.primeiros_alimentos.slice(0,3).join(" • ")}</div></div>
-        <span class="pill">${g.total_alimentos}</span>
-      </div>`)).join("");
-
-    Array.from(el("listaGrupos").querySelectorAll(".group-item")).forEach(node=>{
-      node.addEventListener("click", async ()=>{
-        el("grupoSelect").value = node.dataset.arquivo;
-        atualizarGrupoAtivoVisual();
-        await carregarGrupoSelecionado();
-      });
-    });
-    atualizarGrupoAtivoVisual();
-  }
-
+  
   function atualizarGrupoAtivoVisual(){
     const atual = el("grupoSelect").value;
     Array.from(el("listaGrupos").querySelectorAll(".group-item")).forEach(node=>{
@@ -567,26 +561,36 @@
     aplicarFiltros();
   }
 
-  function aplicarFiltros(){
-    const termo = el("busca").value.trim().toLowerCase();
-    const ordem = el("ordenarPor").value;
+  
+function aplicarFiltros(){
+  const termo = el("busca").value.trim().toLowerCase();
+  const ordem = el("ordenarPor").value;
+  const grupoSelecionado = el("grupoSelect").value;
 
-    let arr = (baseAtual || []).filter(a => !termo || String(a.descricao_alimento || "").toLowerCase().includes(termo));
+  let arr = (baseAtual || []).filter(a => {
+    const nome = String(a.descricao_alimento || "").toLowerCase();
+    const grupo = getGrupo(a);
 
-    if(ordem === "nome"){
-      arr.sort((a,b)=>String(a.descricao_alimento).localeCompare(String(b.descricao_alimento), 'pt-BR'));
-    }else if(ordem === "energiaAsc"){
-      arr.sort((a,b)=>num(a.energia_kcal) - num(b.energia_kcal));
-    }else if(ordem === "energiaDesc"){
-      arr.sort((a,b)=>num(b.energia_kcal) - num(a.energia_kcal));
-    }else if(ordem === "proteinaDesc"){
-      arr.sort((a,b)=>num(b.proteina_g) - num(a.proteina_g));
-    }
+    return (!termo || nome.includes(termo)) &&
+           (grupoSelecionado === "__todos__" || grupo === grupoSelecionado);
+  });
 
-    el("contadorAlimentos").textContent = `${arr.length} alimentos encontrados`;
-    renderListaAlimentos(arr.slice(0,150));
+  if(ordem === "nome"){
+    arr.sort((a,b)=>String(a.descricao_alimento).localeCompare(String(b.descricao_alimento), 'pt-BR'));
+  }else if(ordem === "energiaAsc"){
+    arr.sort((a,b)=>num(a.energia_kcal) - num(b.energia_kcal));
+  }else if(ordem === "energiaDesc"){
+    arr.sort((a,b)=>num(b.energia_kcal) - num(a.energia_kcal));
+  }else if(ordem === "proteinaDesc"){
+    arr.sort((a,b)=>num(b.proteina_g) - num(a.proteina_g));
   }
 
+  el("contadorAlimentos").textContent = `${arr.length} alimentos encontrados`;
+  renderListaAlimentos(arr.slice(0,150));
+}
+
+
+  
   function renderListaAlimentos(items){
     const alvo = el("listaAlimentos");
     if(!items.length){
@@ -976,10 +980,9 @@
     el("dataDiario").value = hoje;
     el("busca").addEventListener("input", aplicarFiltros);
     el("ordenarPor").addEventListener("change", aplicarFiltros);
-    el("grupoSelect").addEventListener("change", async ()=>{
-      if(el("grupoSelect").value !== "__manual__") await carregarGrupoSelecionado();
-    });
 
+    el("grupoSelect").addEventListener("change", aplicarFiltros);
+    
     ["metaKcal","metaProteina","metaCarbo","metaLipideos","pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>{
       el(id).addEventListener("input", ()=>{ atualizarDashboardPerfil(); salvarLocal(); renderResumo(); });
       el(id).addEventListener("change", ()=>{ atualizarDashboardPerfil(); salvarLocal(); renderResumo(); });
@@ -1018,6 +1021,16 @@
     editarItem: abrirModalEdicao
   };
 
+
+  function preencherGruposSimples(){
+    const gruposUnicos = [...new Set(baseAtual.map(a => getGrupo(a)))].sort();
+  
+    el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
+      .concat(gruposUnicos.map(g => `<option value="${g}">${g}</option>`))
+      .join("");
+  }
+  
+  
   async function init(){
     carregarLocal();
     renderObjetivos();
