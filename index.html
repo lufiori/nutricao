@@ -540,25 +540,10 @@
     });
   }
 
-  function preencherGrupos(){
-    el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
-      .concat(manifesto.grupos.map(g=>`<option value="${g.arquivo}">${g.grupo}</option>`)).join("");
-
-    el("listaGrupos").innerHTML = ['<div class="group-item" data-arquivo="__todos__"><div><strong>Todos os grupos</strong><div class="muted">Busca em toda a base</div></div><span class="pill">'+manifesto.total_alimentos+'</span></div>']
-      .concat(manifesto.grupos.map(g=>`<div class="group-item" data-arquivo="${g.arquivo}">
-        <div><strong>${g.grupo}</strong><div class="muted">${g.primeiros_alimentos.slice(0,3).join(" • ")}</div></div>
-        <span class="pill">${g.total_alimentos}</span>
-      </div>`)).join("");
-
-    Array.from(el("listaGrupos").querySelectorAll(".group-item")).forEach(node=>{
-      node.addEventListener("click", async ()=>{
-        el("grupoSelect").value = node.dataset.arquivo;
-        atualizarGrupoAtivoVisual();
-        await carregarGrupoSelecionado();
-      });
-    });
-    atualizarGrupoAtivoVisual();
-  }
+function preencherGrupos(){
+  el("grupoSelect").innerHTML = ['<option value="__todos__">Todos os grupos</option>']
+    .concat(manifesto.grupos.map(g=>`<option value="${g.arquivo}">${g.grupo}</option>`)).join("");
+}
 
   function atualizarGrupoAtivoVisual(){
     const atual = el("grupoSelect").value;
