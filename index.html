@@ -187,6 +187,27 @@
     .need-card.high .need-fill{background:#dc2626}
     .needs-note{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted);font-size:13px;line-height:1.45}
     @media (max-width: 1100px){.needs-grid{grid-template-columns:repeat(2,1fr)}}
+    
+    .family-profile-strip{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:end;margin-bottom:14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#f9fafb}
+    .quick-summary-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;background:#fff;box-shadow:var(--shadow)}
+    .semaphore-row{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:center}
+    .semaphore-badge{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-weight:800;text-align:center;border:6px solid #e5e7eb;background:#f9fafb;color:#374151}
+    .semaphore-badge.good{border-color:#22c55e;background:#ecfdf5;color:#166534}
+    .semaphore-badge.warn{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+    .semaphore-badge.high{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+    .suggestion-list{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+    .suggestion-item{border:1px solid var(--line);border-radius:12px;padding:10px;background:#f9fafb}
+    .simple-food-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;background:linear-gradient(180deg,#fff 0%,#fbfdfc 100%)}
+    .simple-food-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .simple-food-status{border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px}
+    .simple-food-status.good{background:#dcfce7;color:#166534}
+    .simple-food-status.warn{background:#fef3c7;color:#92400e}
+    .simple-food-status.high{background:#fee2e2;color:#991b1b}
+    .simple-food-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+    .simple-food-mini{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+    .details-toggle{margin-top:12px}
+    @media (max-width: 760px){.family-profile-strip{grid-template-columns:1fr}.semaphore-row{grid-template-columns:1fr}.simple-food-grid{grid-template-columns:1fr}}
+
     @media (max-width: 760px){.needs-grid{grid-template-columns:1fr}}
 
     @media (max-width: 1100px){.perfil-grid,.alimentos-grid{grid-template-columns:1fr}.tab-nav{grid-template-columns:1fr}}
@@ -197,7 +218,7 @@
 <div class="topbar-inner">
 <div class="brand">
 <h1>NutriTACO</h1>
-<div>Perfil, alimentos e diário organizados por guias</div>
+<div>Controle alimentar familiar, colesterol e necessidades nutricionais</div>
 </div>
 <div class="toolbar">
 <button class="btn-outline" id="exportarBtn">Exportar Diário</button>
@@ -222,6 +243,16 @@
 </div>
 
 <div class="page"><section class="tab-panel active" id="tab-perfil"><div class="tab-grid perfil-grid"><div class="card"><h2>Perfil e objetivos</h2><div class="profile-box">
+<div class="family-profile-strip">
+  <div>
+    <div class="label">Perfil familiar</div>
+    <select id="perfilFamiliarSelect"></select>
+  </div>
+  <button class="btn-soft" id="salvarPerfilBtn" type="button">Salvar perfil</button>
+  <button class="btn-outline" id="novoPerfilBtn" type="button">Novo perfil</button>
+  <button class="btn-danger" id="excluirPerfilBtn" type="button">Excluir</button>
+</div>
+
 <div class="grid-2">
 <div>
 <div class="label">Peso (kg)</div>
@@ -346,6 +377,23 @@
 </div>
 </div>
 
+<div class="simple-food-card" id="fichaSimplesCard">
+  <div class="simple-food-top">
+    <div>
+      <h3 style="margin:0">Leitura simples do alimento</h3>
+      <div class="muted" id="simpleFoodText" style="margin-top:6px">Selecione um alimento para receber uma orientação rápida.</div>
+    </div>
+    <span class="simple-food-status good" id="simpleFoodStatus">Boa escolha</span>
+  </div>
+  <div class="simple-food-grid">
+    <div class="simple-food-mini"><div class="label">Colesterol</div><strong id="simpleColesterol">0 mg</strong></div>
+    <div class="simple-food-mini"><div class="label">Fibras</div><strong id="simpleFibra">0 g</strong></div>
+    <div class="simple-food-mini"><div class="label">Gorduras</div><strong id="simpleLipideos">0 g</strong></div>
+  </div>
+  <div class="suggestion-list" id="simpleFoodSugestoes"></div>
+  <button class="btn-outline details-toggle" id="toggleDetalhesBtn" type="button">Ocultar detalhes técnicos</button>
+</div>
+
 <div class="nutri-visual-card" id="nutriVisualCard">
   <div class="nutri-visual-head">
     <div>
@@ -415,6 +463,7 @@
   <div class="heart-note" id="foodColesterolNota">Selecione um alimento para ver a análise.</div>
 </div>
 
+<div id="detalhesTecnicosWrap">
 <div class="section-title">Resumo rápido</div>
 <div class="detail-table"><table><tbody id="tblResumoRapido"></tbody></table></div>
 <div class="grid-2" style="margin-top:16px">
@@ -425,6 +474,7 @@
 <div>
 <div class="section-title">Vitaminas</div>
 <div class="detail-table"><table><tbody id="tblVitaminas"></tbody></table></div>
+</div>
 </div>
 </div>
 <div style="margin-top:16px">
@@ -466,6 +516,18 @@
 <div class="summary-box"><strong id="totalCarbo">0</strong><br/><span class="muted">carboidrato (g)</span></div>
 <div class="summary-box"><strong id="totalLipideos">0</strong><br/><span class="muted">lipídeos (g)</span></div>
 </div>
+
+<div class="quick-summary-card" id="resumoInteligenteDia">
+  <div class="semaphore-row">
+    <div class="semaphore-badge good" id="semaforoDia">BOM</div>
+    <div>
+      <h3 style="margin:0" id="resumoDiaTitulo">Resumo inteligente do dia</h3>
+      <div class="muted" id="resumoDiaTexto" style="margin-top:6px">Lance alimentos para receber uma leitura simples do dia.</div>
+      <div class="suggestion-list" id="sugestoesDia"></div>
+    </div>
+  </div>
+</div>
+
 <div class="cholesterol-card">
   <div class="cholesterol-head">
     <div>
@@ -1455,6 +1517,274 @@ function aplicarFiltros(){
   }
   
   
+
+  // ===== PERFIS FAMILIARES =====
+  let perfisFamilia = [];
+  let perfilAtualId = "principal";
+  let diariosFamilia = {};
+
+  function perfilPadrao(){
+    return {
+      id:"principal",
+      nome:"Meu perfil",
+      pesoKg: el("pesoKg")?.value || "80",
+      alturaCm: el("alturaCm")?.value || "175",
+      idade: el("idade")?.value || "30",
+      sexo: el("sexo")?.value || "masculino",
+      atividade: el("atividade")?.value || "1.55",
+      objetivo: objetivoAtual || "manter_peso",
+      metaKcal: el("metaKcal")?.value || "2000",
+      metaProteina: el("metaProteina")?.value || "120",
+      metaCarbo: el("metaCarbo")?.value || "250",
+      metaLipideos: el("metaLipideos")?.value || "70"
+    };
+  }
+
+  function carregarPerfisFamilia(){
+    try{ perfisFamilia = JSON.parse(localStorage.getItem("nutritaco_perfis_familia_v1") || "[]"); }
+    catch(e){ perfisFamilia = []; }
+    try{ diariosFamilia = JSON.parse(localStorage.getItem("nutritaco_diarios_familia_v1") || "{}"); }
+    catch(e){ diariosFamilia = {}; }
+
+    perfilAtualId = localStorage.getItem("nutritaco_perfil_atual_v1") || "principal";
+    if(!perfisFamilia.length){
+      perfisFamilia = [perfilPadrao()];
+      diariosFamilia.principal = diarioPorData || {};
+    }
+    if(!perfisFamilia.find(p => p.id === perfilAtualId)){
+      perfilAtualId = perfisFamilia[0].id;
+    }
+    if(!diariosFamilia[perfilAtualId]) diariosFamilia[perfilAtualId] = {};
+    diarioPorData = diariosFamilia[perfilAtualId];
+    aplicarPerfilNaTela(perfisFamilia.find(p => p.id === perfilAtualId));
+    renderPerfilSelect();
+  }
+
+  function salvarPerfisFamilia(){
+    diariosFamilia[perfilAtualId] = diarioPorData;
+    localStorage.setItem("nutritaco_perfis_familia_v1", JSON.stringify(perfisFamilia));
+    localStorage.setItem("nutritaco_diarios_familia_v1", JSON.stringify(diariosFamilia));
+    localStorage.setItem("nutritaco_perfil_atual_v1", perfilAtualId);
+  }
+
+  function lerPerfilDaTela(){
+    const atual = perfisFamilia.find(p => p.id === perfilAtualId) || perfilPadrao();
+    return {
+      ...atual,
+      pesoKg: el("pesoKg").value,
+      alturaCm: el("alturaCm").value,
+      idade: el("idade").value,
+      sexo: el("sexo").value,
+      atividade: el("atividade").value,
+      objetivo: objetivoAtual,
+      metaKcal: el("metaKcal").value,
+      metaProteina: el("metaProteina").value,
+      metaCarbo: el("metaCarbo").value,
+      metaLipideos: el("metaLipideos").value
+    };
+  }
+
+  function aplicarPerfilNaTela(p){
+    if(!p) return;
+    el("pesoKg").value = p.pesoKg || 80;
+    el("alturaCm").value = p.alturaCm || 175;
+    el("idade").value = p.idade || 30;
+    el("sexo").value = p.sexo || "masculino";
+    el("atividade").value = p.atividade || "1.55";
+    objetivoAtual = p.objetivo || "manter_peso";
+    el("metaKcal").value = p.metaKcal || 2000;
+    el("metaProteina").value = p.metaProteina || 120;
+    el("metaCarbo").value = p.metaCarbo || 250;
+    el("metaLipideos").value = p.metaLipideos || 70;
+    renderObjetivos();
+    atualizarDashboardPerfil();
+  }
+
+  function renderPerfilSelect(){
+    if(!el("perfilFamiliarSelect")) return;
+    el("perfilFamiliarSelect").innerHTML = perfisFamilia.map(p => `<option value="${p.id}">${p.nome}</option>`).join("");
+    el("perfilFamiliarSelect").value = perfilAtualId;
+  }
+
+  function trocarPerfil(id){
+    const atual = perfisFamilia.findIndex(p => p.id === perfilAtualId);
+    if(atual >= 0) perfisFamilia[atual] = lerPerfilDaTela();
+    diariosFamilia[perfilAtualId] = diarioPorData;
+
+    perfilAtualId = id;
+    if(!diariosFamilia[perfilAtualId]) diariosFamilia[perfilAtualId] = {};
+    diarioPorData = diariosFamilia[perfilAtualId];
+    aplicarPerfilNaTela(perfisFamilia.find(p => p.id === perfilAtualId));
+    renderPerfilSelect();
+    salvarPerfisFamilia();
+    renderMealTabs();
+    renderRefeicoes();
+    renderResumo();
+    if(typeof renderNecessidades === "function") renderNecessidades();
+  }
+
+  function salvarPerfilAtual(){
+    const idx = perfisFamilia.findIndex(p => p.id === perfilAtualId);
+    if(idx >= 0) perfisFamilia[idx] = lerPerfilDaTela();
+    salvarPerfisFamilia();
+  }
+
+  function criarNovoPerfil(){
+    const nome = prompt("Nome do novo perfil familiar:", "Novo perfil");
+    if(!nome) return;
+    salvarPerfilAtual();
+    const id = "perfil_" + Date.now();
+    const novo = {...perfilPadrao(), id, nome};
+    perfisFamilia.push(novo);
+    diariosFamilia[id] = {};
+    trocarPerfil(id);
+  }
+
+  function excluirPerfilAtual(){
+    if(perfisFamilia.length <= 1){
+      alert("É necessário manter pelo menos um perfil.");
+      return;
+    }
+    const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
+    if(!confirm(`Excluir o perfil "${perfil?.nome || "selecionado"}" e o diário dele?`)) return;
+    delete diariosFamilia[perfilAtualId];
+    perfisFamilia = perfisFamilia.filter(p => p.id !== perfilAtualId);
+    perfilAtualId = perfisFamilia[0].id;
+    diarioPorData = diariosFamilia[perfilAtualId] || {};
+    aplicarPerfilNaTela(perfisFamilia[0]);
+    renderPerfilSelect();
+    salvarPerfisFamilia();
+    renderRefeicoes();
+    renderResumo();
+    if(typeof renderNecessidades === "function") renderNecessidades();
+  }
+
+  const _salvarLocalBase = salvarLocal;
+  salvarLocal = function(){
+    _salvarLocalBase();
+    if(perfisFamilia && perfisFamilia.length){
+      salvarPerfilAtual();
+    }
+  };
+
+  // ===== RESUMO INTELIGENTE E SUGESTÕES =====
+  function gerarSugestoesDia(total){
+    const sugestoes = [];
+    const metaCol = 200;
+    const metaFibra = 25;
+    const metaLip = Math.max(1, Number(el("metaLipideos").value) || 70);
+
+    if(total.colesterol > metaCol){
+      sugestoes.push("Colesterol alimentar alto hoje: prefira nas próximas refeições opções vegetais, frutas, aveia, feijão, lentilha e carnes mais magras.");
+    }
+    if(total.fibra < metaFibra * 0.6){
+      sugestoes.push("Fibras baixas: tente incluir aveia, fruta com casca, verduras, feijão ou leguminosas.");
+    }
+    if(total.lipideos > metaLip){
+      sugestoes.push("Gorduras acima da meta: reduza frituras, queijos gordos, embutidos e porções muito oleosas no restante do dia.");
+    }
+    if(!sugestoes.length){
+      sugestoes.push("Dia bem encaminhado: mantenha alimentos naturais, boas fibras e moderação nas gorduras.");
+    }
+    return sugestoes;
+  }
+
+  function atualizarResumoInteligenteDia(total){
+    if(!el("semaforoDia")) return;
+    const metaCol = 200;
+    const metaFibra = 25;
+    const metaLip = Math.max(1, Number(el("metaLipideos").value) || 70);
+
+    let nivel = "good", badge = "BOM", titulo = "Dia favorável para controle";
+    let texto = "As escolhas do dia estão equilibradas para colesterol, considerando os dados disponíveis da TACO.";
+
+    if(total.colesterol > metaCol || total.lipideos > metaLip * 1.15){
+      nivel = "high"; badge = "ATENÇÃO"; titulo = "Dia pede cuidado";
+      texto = "O diário passou de pontos importantes para colesterol/gorduras. Ajuste as próximas refeições com mais fibras e menos alimentos gordurosos.";
+    }else if(total.colesterol > metaCol * 0.75 || total.fibra < metaFibra * 0.6 || total.lipideos > metaLip * 0.9){
+      nivel = "warn"; badge = "MODERAR"; titulo = "Dia em observação";
+      texto = "Ainda dá para equilibrar o dia. O melhor ajuste agora é aumentar fibras e moderar gorduras.";
+    }
+
+    el("semaforoDia").className = "semaphore-badge " + nivel;
+    el("semaforoDia").textContent = badge;
+    el("resumoDiaTitulo").textContent = titulo;
+    el("resumoDiaTexto").textContent = texto;
+    el("sugestoesDia").innerHTML = gerarSugestoesDia(total).map(s => `<div class="suggestion-item">${s}</div>`).join("");
+  }
+
+  const _atualizarResumoColesterolDiaBase = atualizarResumoColesterolDia;
+  atualizarResumoColesterolDia = function(total){
+    _atualizarResumoColesterolDiaBase(total);
+    atualizarResumoInteligenteDia(total);
+  };
+
+  function atualizarFichaSimplesAlimento(){
+    if(!alimentoSelecionado || !el("simpleFoodStatus")) return;
+    const a = alimentoSelecionado;
+    const gramas = Math.max(1, Number(el("baseCalcGramas")?.value) || 100);
+    const fator = gramas / 100;
+    const colesterol = num(a.colesterol_mg) * fator;
+    const fibra = num(a.fibra_alimentar_g) * fator;
+    const lipideos = num(a.lipideos_g) * fator;
+    const c = classificarColesterolAlimento(a, gramas);
+
+    const nivelClasse = c.nivel === "low" ? "good" : c.nivel === "medium" ? "warn" : "high";
+    const statusTxt = nivelClasse === "good" ? "Boa escolha" : nivelClasse === "warn" ? "Moderação" : "Atenção";
+
+    el("simpleFoodStatus").className = "simple-food-status " + nivelClasse;
+    el("simpleFoodStatus").textContent = statusTxt;
+    el("simpleFoodText").textContent = c.nota;
+    el("simpleColesterol").textContent = fmt(colesterol,1) + " mg";
+    el("simpleFibra").textContent = fmt(fibra,1) + " g";
+    el("simpleLipideos").textContent = fmt(lipideos,1) + " g";
+
+    const sug = [];
+    if(nivelClasse === "high"){
+      sug.push("Sugestão: use porção menor ou troque por alimento com mais fibras e menos gorduras.");
+      sug.push("Boas alternativas frequentes: frutas, aveia, feijão, lentilha, verduras, peixe grelhado ou frango sem pele.");
+    }else if(nivelClasse === "warn"){
+      sug.push("Sugestão: pode entrar na rotina, mas observe a porção e o restante do dia.");
+      sug.push("Combine com alimentos ricos em fibras para ajudar no controle do colesterol.");
+    }else{
+      sug.push("Boa escolha para uma alimentação mais cuidadosa com colesterol.");
+    }
+    el("simpleFoodSugestoes").innerHTML = sug.map(s => `<div class="suggestion-item">${s}</div>`).join("");
+  }
+
+  const _atualizarPainelColesterolAlimentoBase = atualizarPainelColesterolAlimento;
+  atualizarPainelColesterolAlimento = function(){
+    _atualizarPainelColesterolAlimentoBase();
+    atualizarFichaSimplesAlimento();
+  };
+
+  function bindExtrasFamilia(){
+    if(el("perfilFamiliarSelect")){
+      el("perfilFamiliarSelect").addEventListener("change", e => trocarPerfil(e.target.value));
+    }
+    if(el("salvarPerfilBtn")){
+      el("salvarPerfilBtn").addEventListener("click", ()=>{
+        const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
+        const novoNome = prompt("Nome do perfil:", perfil?.nome || "Perfil");
+        if(novoNome) perfil.nome = novoNome;
+        salvarPerfilAtual();
+        renderPerfilSelect();
+        alert("Perfil salvo com sucesso.");
+      });
+    }
+    if(el("novoPerfilBtn")) el("novoPerfilBtn").addEventListener("click", criarNovoPerfil);
+    if(el("excluirPerfilBtn")) el("excluirPerfilBtn").addEventListener("click", excluirPerfilAtual);
+    if(el("toggleDetalhesBtn")){
+      el("toggleDetalhesBtn").addEventListener("click", ()=>{
+        const bloco = el("detalhesTecnicosWrap");
+        if(!bloco) return;
+        bloco.classList.toggle("hidden");
+        el("toggleDetalhesBtn").textContent = bloco.classList.contains("hidden") ? "Ver todos os nutrientes" : "Ocultar detalhes técnicos";
+      });
+    }
+  }
+
+
   async function init(){
     setupTabs();
     carregarLocal();
