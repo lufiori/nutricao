@@ -215,6 +215,11 @@
     .recipe-small{font-size:13px;color:var(--muted);line-height:1.45;margin-top:8px}
     .recipe-toolbar{display:grid;grid-template-columns:1fr 180px 180px;gap:12px;margin-top:14px}
     .recipe-warning{border:1px solid #fcd34d;background:#fffbeb;color:#92400e;border-radius:14px;padding:12px;margin-top:14px;font-size:14px}
+    
+    .chol-filter-active{background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;font-weight:800}
+    .chol-filter-note{margin-top:10px;padding:10px 12px;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;border-radius:12px;font-size:13px;display:none}
+    .chol-filter-note.show{display:block}
+
     @media (max-width: 1100px){.recipes-grid{grid-template-columns:1fr 1fr}.recipe-toolbar{grid-template-columns:1fr}}
     @media (max-width: 760px){.recipes-grid{grid-template-columns:1fr}.recipe-actions{grid-template-columns:1fr}}
 
@@ -265,13 +270,27 @@
 <div>
 <div class="label">Ordenar por</div>
 <select id="ordenarPor">
-<option value="nome">Nome (A-Z)</option>
-<option value="energiaAsc">Energia (menor para maior)</option>
-<option value="energiaDesc">Energia (maior para menor)</option>
-<option value="proteinaDesc">Proteína (maior para menor)</option>
+  <option value="nome">Nome (A–Z)</option>
+  <option value="energiaAsc">Energia ↑</option>
+  <option value="energiaDesc">Energia ↓</option>
+  <option value="proteinaDesc">Proteína ↓</option>
+  <option value="colesterolAsc">Colesterol ↑</option>
+  <option value="colesterolDesc">Colesterol ↓</option>
+  <option value="fibraDesc">Fibras ↓</option>
+  <option value="lipideosDesc">Lipídeos ↓</option>
+  <option value="vitcDesc">Vitamina C ↓</option>
+  <option value="calcioDesc">Cálcio ↓</option>
+  <option value="ferroDesc">Ferro ↓</option>
 </select>
 </div>
-</div><div class="status" id="statusBase"></div><div class="muted" id="contadorAlimentos" style="margin-top:12px">0 alimentos encontrados</div><div class="food-list" id="listaAlimentos"></div></div><div class="card"><div id="detalheVazio" style="margin-top:16px">
+</div><div class="inline" style="margin-top:12px">
+  <button class="btn-soft" id="melhoresColesterolBtn" type="button">❤️ Melhores para colesterol</button>
+  <button class="btn-outline" id="limparFiltroColesterolBtn" type="button">Limpar filtro especial</button>
+</div>
+<div class="chol-filter-note" id="notaFiltroColesterol">
+  Filtro ativo: priorizando alimentos com baixo colesterol, boas fibras e menor teor de lipídeos.
+</div>
+<div class="status" id="statusBase"></div><div class="muted" id="contadorAlimentos" style="margin-top:12px">0 alimentos encontrados</div><div class="food-list" id="listaAlimentos"></div></div><div class="card"><div id="detalheVazio" style="margin-top:16px">
 <h2>Ficha do alimento</h2>
 <div class="muted">Clique em um alimento para abrir a ficha completa e adicionar na refeição desejada.</div>
 </div><div class="hidden" id="detalheAlimento" style="margin-top:16px">
@@ -728,6 +747,7 @@
   let refeicaoAtiva = "cafe_da_manha";
   let objetivoAtual = "manter_peso";
   let editandoItem = null;
+  let filtroMelhoresColesterol = false;
 
   function num(v){ const x = Number(v); return Number.isFinite(x) ? x : 0; }
   function fmt(v, casas=2){
@@ -751,6 +771,56 @@
       || a.categoria
       || "Não informado";
   }
+
+  function scoreColesterolAlimento(a){
+    const colesterol = num(a.colesterol_mg);
+    const fibra = num(a.fibra_alimentar_g);
+    const lipideos = num(a.lipideos_g);
+    const kcal = num(a.energia_kcal);
+
+    let score = 0;
+
+    // Quanto menor o colesterol, melhor.
+    if(colesterol === 0) score += 35;
+    else if(colesterol <= 5) score += 25;
+    else if(colesterol <= 20) score += 10;
+    else if(colesterol > 80) score -= 30;
+    else if(colesterol > 40) score -= 15;
+
+    // Fibra ajuda muito no controle do colesterol.
+    if(fibra >= 6) score += 35;
+    else if(fibra >= 3) score += 25;
+    else if(fibra >= 1.5) score += 12;
+
+    // Menos gordura total é melhor para triagem simples.
+    if(lipideos <= 1.5) score += 20;
+    else if(lipideos <= 5) score += 10;
+    else if(lipideos > 20) score -= 25;
+    else if(lipideos > 12) score -= 12;
+
+    // Evita alimentos muito calóricos quando há alternativa.
+    if(kcal > 450) score -= 8;
+
+    return score;
+  }
+
+  function alimentoBomParaColesterol(a){
+    const grupo = getGrupo(a);
+    if(grupo === "Alimentos preparados") return false;
+
+    const colesterol = num(a.colesterol_mg);
+    const fibra = num(a.fibra_alimentar_g);
+    const lipideos = num(a.lipideos_g);
+
+    // Critério prático: baixo colesterol e gordura moderada,
+    // ou alimento rico em fibras com colesterol baixo.
+    return (
+      (colesterol <= 5 && lipideos <= 10) ||
+      (colesterol <= 20 && fibra >= 2 && lipideos <= 15)
+    );
+  }
+
+
   function setStatus(msg, kind){
     const box = el("statusBase");
     box.className = "status " + kind;
@@ -886,9 +956,41 @@ function aplicarFiltros(){
            (grupoSelecionado === "__todos__" || grupo === grupoSelecionado);
   });
 
-  if(ordem === "nome"){
-    arr.sort((a,b)=>String(a.descricao_alimento).localeCompare(String(b.descricao_alimento), 'pt-BR'));
-  }else if(ordem === "energiaAsc"){
+  
+if(ordem === "nome"){
+  arr.sort((a,b)=>String(a.descricao_alimento).localeCompare(String(b.descricao_alimento), 'pt-BR'));
+
+}else if(ordem === "energiaAsc"){
+  arr.sort((a,b)=>num(a.energia_kcal) - num(b.energia_kcal));
+
+}else if(ordem === "energiaDesc"){
+  arr.sort((a,b)=>num(b.energia_kcal) - num(a.energia_kcal));
+
+}else if(ordem === "proteinaDesc"){
+  arr.sort((a,b)=>num(b.proteina_g) - num(a.proteina_g));
+
+}else if(ordem === "colesterolAsc"){
+  arr.sort((a,b)=>num(a.colesterol_mg) - num(b.colesterol_mg));
+
+}else if(ordem === "colesterolDesc"){
+  arr.sort((a,b)=>num(b.colesterol_mg) - num(a.colesterol_mg));
+
+}else if(ordem === "fibraDesc"){
+  arr.sort((a,b)=>num(b.fibra_alimentar_g) - num(a.fibra_alimentar_g));
+
+}else if(ordem === "lipideosDesc"){
+  arr.sort((a,b)=>num(b.lipideos_g) - num(a.lipideos_g));
+
+}else if(ordem === "vitcDesc"){
+  arr.sort((a,b)=>num(b.vitamina_c_mg) - num(a.vitamina_c_mg));
+
+}else if(ordem === "calcioDesc"){
+  arr.sort((a,b)=>num(b.calcio_mg) - num(a.calcio_mg));
+
+}else if(ordem === "ferroDesc"){
+  arr.sort((a,b)=>num(b.ferro_mg) - num(a.ferro_mg));
+}
+else if(ordem === "energiaAsc"){
     arr.sort((a,b)=>num(a.energia_kcal) - num(b.energia_kcal));
   }else if(ordem === "energiaDesc"){
     arr.sort((a,b)=>num(b.energia_kcal) - num(a.energia_kcal));
@@ -912,7 +1014,7 @@ function aplicarFiltros(){
       <div class="food-item" data-idx="${i}">
         <div>
           <div class="food-name">${a.descricao_alimento}</div>
-          <div class="food-sub">${getGrupo(a)} • ${fmt(a.energia_kcal,1)} kcal • P ${fmt(a.proteina_g,1)} g • C ${fmt(a.carboidrato_g,1)} g • G ${fmt(a.lipideos_g,1)} g</div>
+          <div class="food-sub">${getGrupo(a)} • ${fmt(a.energia_kcal,1)} kcal • P ${fmt(a.proteina_g,1)} g • C ${fmt(a.carboidrato_g,1)} g • G ${fmt(a.lipideos_g,1)} g • Fibra ${fmt(a.fibra_alimentar_g,1)} g • Col. ${fmt(a.colesterol_mg,0)} mg</div>
         </div>
         <button class="btn-outline">Abrir</button>
       </div>
@@ -1649,10 +1751,32 @@ function aplicarFiltros(){
     renderResumo();
   }
 
+
+  function atualizarVisualFiltroColesterol(){
+    const btn = el("melhoresColesterolBtn");
+    const nota = el("notaFiltroColesterol");
+    if(btn) btn.classList.toggle("chol-filter-active", filtroMelhoresColesterol);
+    if(nota) nota.classList.toggle("show", filtroMelhoresColesterol);
+  }
+
+  function ativarMelhoresColesterol(){
+    filtroMelhoresColesterol = true;
+    atualizarVisualFiltroColesterol();
+    aplicarFiltros();
+  }
+
+  function limparMelhoresColesterol(){
+    filtroMelhoresColesterol = false;
+    atualizarVisualFiltroColesterol();
+    aplicarFiltros();
+  }
+
   function bind(){
     el("dataDiario").value = hoje;
     el("busca").addEventListener("input", aplicarFiltros);
     el("ordenarPor").addEventListener("change", aplicarFiltros);
+    if(el("melhoresColesterolBtn")) el("melhoresColesterolBtn").addEventListener("click", ativarMelhoresColesterol);
+    if(el("limparFiltroColesterolBtn")) el("limparFiltroColesterolBtn").addEventListener("click", limparMelhoresColesterol);
 
     el("grupoSelect").addEventListener("change", aplicarFiltros);
     
@@ -1718,7 +1842,9 @@ function aplicarFiltros(){
     removerItem,
     editarItem: abrirModalEdicao,
     adicionarReceita,
-    verReceita
+    verReceita,
+    ativarMelhoresColesterol,
+    limparMelhoresColesterol
   };
 
 
@@ -2014,6 +2140,7 @@ function aplicarFiltros(){
     renderResumo();
     await carregarManifesto();
     renderReceitas();
+    atualizarVisualFiltroColesterol();
   }
 
   init();
