@@ -187,6 +187,26 @@
     .need-card.high .need-fill{background:#dc2626}
     .needs-note{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted);font-size:13px;line-height:1.45}
     @media (max-width: 1100px){.needs-grid{grid-template-columns:repeat(2,1fr)}}
+    
+    .missing-panel{border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;background:#ffffff;box-shadow:var(--shadow)}
+    .missing-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    .missing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+    .missing-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#f9fafb}
+    .missing-card.good{background:#ecfdf5;border-color:#86efac}
+    .missing-card.warn{background:#fffbeb;border-color:#fcd34d}
+    .missing-card.high{background:#fef2f2;border-color:#fecaca}
+    .missing-card h4{margin:0 0 8px;color:var(--muted);font-size:13px}
+    .missing-card .big{font-size:22px;font-weight:800}
+    .suggestion-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+    .suggestion-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+    .suggestion-card h4{margin:0 0 8px}
+    .suggestion-list-auto{display:grid;gap:8px;margin-top:10px}
+    .food-suggestion{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #edf0f2;border-radius:12px;padding:10px;background:#f9fafb}
+    .food-suggestion strong{font-size:14px}
+    .food-suggestion span{font-size:12px;color:var(--muted)}
+    .suggestion-note{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.45}
+    @media (max-width: 900px){.missing-grid,.suggestion-grid{grid-template-columns:1fr}}
+
     @media (max-width: 760px){.needs-grid{grid-template-columns:1fr}}
 
     @media (max-width: 1100px){.perfil-grid,.alimentos-grid{grid-template-columns:1fr}.tab-nav{grid-template-columns:1fr}}
@@ -511,6 +531,53 @@
   </div>
   <div class="heart-note" id="notaDiaColesterol">Lance os alimentos do dia para receber o resumo.</div>
 </div>
+
+<div class="missing-panel" id="painelFaltaDia">
+  <div class="missing-header">
+    <div>
+      <h3 style="margin:0">Falta no seu dia</h3>
+      <div class="muted">O app compara o que você já lançou com suas metas e sugere escolhas melhores.</div>
+    </div>
+    <span class="pill" id="statusFaltaDia">Aguardando diário</span>
+  </div>
+
+  <div class="missing-grid">
+    <div class="missing-card" id="missProteinaBox">
+      <h4>Proteína</h4>
+      <div class="big" id="missProteina">0 g</div>
+      <div class="muted" id="missProteinaTxt">faltando</div>
+    </div>
+    <div class="missing-card" id="missFibraBox">
+      <h4>Fibra</h4>
+      <div class="big" id="missFibra">0 g</div>
+      <div class="muted" id="missFibraTxt">faltando</div>
+    </div>
+    <div class="missing-card" id="missCalcioBox">
+      <h4>Cálcio</h4>
+      <div class="big" id="missCalcio">0 mg</div>
+      <div class="muted" id="missCalcioTxt">faltando</div>
+    </div>
+    <div class="missing-card" id="missVitCBox">
+      <h4>Vitamina C</h4>
+      <div class="big" id="missVitC">0 mg</div>
+      <div class="muted" id="missVitCTxt">faltando</div>
+    </div>
+  </div>
+
+  <div class="suggestion-grid">
+    <div class="suggestion-card">
+      <h4>🍽️ Sugestões para completar o dia</h4>
+      <div class="suggestion-list-auto" id="sugestoesCompletarDia"></div>
+      <div class="suggestion-note">Sugestões baseadas na base TACO e nas metas atuais. Ajuste as porções conforme orientação médica/nutricional.</div>
+    </div>
+    <div class="suggestion-card">
+      <h4>❤️ Melhor para colesterol</h4>
+      <div class="suggestion-list-auto" id="sugestoesColesterolDia"></div>
+      <div class="suggestion-note">Priorizamos alimentos com fibras e menor colesterol/lipídeos, quando esses dados estão disponíveis na TACO.</div>
+    </div>
+  </div>
+</div>
+
 <div class="macro-row">
 <div class="inline" style="justify-content:space-between"><span>Proteína</span><span id="pctProteinaTxt">0%</span></div>
 <div class="macro-bar"><div class="macro-fill" id="barProteina"></div></div>
@@ -698,6 +765,7 @@ async function carregarManifesto(){
     setStatus(`Base carregada: ${baseAtual.length} alimentos.`, "ok");
 
     aplicarFiltros();
+    atualizarFaltaDia();
   }catch(err){
     setStatus("Erro ao carregar taco_completo.json.", "error");
   }
@@ -954,6 +1022,146 @@ function aplicarFiltros(){
     atualizarCaixaClasse("boxDiaFibra", total.fibra >= metaFibra ? "low" : total.fibra >= metaFibra*0.6 ? "medium" : "high");
     atualizarCaixaClasse("boxDiaLipideos", total.lipideos > metaLip*1.15 ? "high" : total.lipideos > metaLip*0.85 ? "medium" : "low");
   }
+
+
+  function necessidadesBasicasParaSugestao(){
+    let fibra = 25, calcio = 1000, vitaminaC = 90;
+    try{
+      const idade = Number(el("idade").value) || 30;
+      const sexo = el("sexo").value || "masculino";
+      if(idade >= 51) calcio = 1200;
+      vitaminaC = sexo === "feminino" ? 75 : 90;
+      if(idade <= 18){
+        fibra = sexo === "feminino" ? 26 : 31;
+        calcio = 1300;
+        vitaminaC = idade <= 13 ? 45 : (sexo === "feminino" ? 65 : 75);
+      }
+    }catch(e){}
+    return {fibra, calcio, vitaminaC};
+  }
+
+  function resumoTotalDiaCompleto(){
+    const dia = getDia();
+    let todos = [];
+    refeicoes.forEach(r => todos = todos.concat(dia[r.id] || []));
+    const macros = totaisItens(todos);
+    const micros = totaisNutrientesDia ? totaisNutrientesDia() : {};
+    return {...macros, ...micros};
+  }
+
+  function classeFalta(valorFalta, meta){
+    if(valorFalta <= 0) return "good";
+    if(valorFalta <= meta * 0.25) return "warn";
+    return "high";
+  }
+
+  function setMissingCard(boxId, valueId, txtId, falta, meta, unidade, casas=1){
+    const box = el(boxId);
+    if(!box) return;
+    box.classList.remove("good","warn","high");
+    box.classList.add(classeFalta(falta, meta));
+    if(falta <= 0){
+      el(valueId).textContent = "ok";
+      el(txtId).textContent = "meta atingida";
+    }else{
+      el(valueId).textContent = fmt(falta, casas) + " " + unidade;
+      el(txtId).textContent = "faltando";
+    }
+  }
+
+  function topAlimentosPorNutriente(campo, minimoCampo, filtroExtra){
+    const lista = (baseAtual || [])
+      .filter(a => String(a.descricao_alimento || "").trim())
+      .filter(a => num(a[campo]) > 0)
+      .filter(a => !filtroExtra || filtroExtra(a))
+      .sort((a,b) => num(b[campo]) - num(a[campo]))
+      .slice(0,4);
+
+    return lista;
+  }
+
+  function renderFoodSuggestionList(alimentos, campo, unidade, casas=1){
+    if(!alimentos.length){
+      return `<div class="suggestion-note">Sem sugestões disponíveis no grupo carregado. Selecione “Todos os grupos” na aba Alimentos para ampliar as sugestões.</div>`;
+    }
+    return alimentos.map(a => `
+      <div class="food-suggestion">
+        <div>
+          <strong>${a.descricao_alimento}</strong><br>
+          <span>${getGrupo(a)}</span>
+        </div>
+        <span>${fmt(a[campo],casas)} ${unidade}/100g</span>
+      </div>
+    `).join("");
+  }
+
+  function atualizarFaltaDia(){
+    if(!el("painelFaltaDia")) return;
+
+    const total = resumoTotalDiaCompleto();
+    const metaProteina = Math.max(1, Number(el("metaProteina").value) || 120);
+    const refs = necessidadesBasicasParaSugestao();
+
+    const faltaProteina = Math.max(0, metaProteina - num(total.proteina));
+    const faltaFibra = Math.max(0, refs.fibra - num(total.fibra_alimentar_g));
+    const faltaCalcio = Math.max(0, refs.calcio - num(total.calcio_mg));
+    const faltaVitC = Math.max(0, refs.vitaminaC - num(total.vitamina_c_mg));
+
+    setMissingCard("missProteinaBox","missProteina","missProteinaTxt",faltaProteina,metaProteina,"g",1);
+    setMissingCard("missFibraBox","missFibra","missFibraTxt",faltaFibra,refs.fibra,"g",1);
+    setMissingCard("missCalcioBox","missCalcio","missCalcioTxt",faltaCalcio,refs.calcio,"mg",0);
+    setMissingCard("missVitCBox","missVitC","missVitCTxt",faltaVitC,refs.vitaminaC,"mg",0);
+
+    let status = "Dia equilibrado";
+    const faltasGrandes = [faltaProteina/metaProteina, faltaFibra/refs.fibra, faltaCalcio/refs.calcio, faltaVitC/refs.vitaminaC].filter(x => x > 0.4).length;
+    if(faltasGrandes >= 2) status = "Ainda falta completar";
+    else if(faltasGrandes === 1) status = "Quase equilibrado";
+    el("statusFaltaDia").textContent = status;
+
+    const sugestoes = [];
+    if(faltaProteina > metaProteina * 0.15){
+      sugestoes.push(`<div><strong>Mais proteína:</strong>${renderFoodSuggestionList(topAlimentosPorNutriente("proteina_g", 0), "proteina_g", "g", 1)}</div>`);
+    }
+    if(faltaFibra > refs.fibra * 0.15){
+      sugestoes.push(`<div><strong>Mais fibras:</strong>${renderFoodSuggestionList(topAlimentosPorNutriente("fibra_alimentar_g", 0), "fibra_alimentar_g", "g", 1)}</div>`);
+    }
+    if(faltaCalcio > refs.calcio * 0.20){
+      sugestoes.push(`<div><strong>Mais cálcio:</strong>${renderFoodSuggestionList(topAlimentosPorNutriente("calcio_mg", 0), "calcio_mg", "mg", 0)}</div>`);
+    }
+    if(faltaVitC > refs.vitaminaC * 0.20){
+      sugestoes.push(`<div><strong>Mais vitamina C:</strong>${renderFoodSuggestionList(topAlimentosPorNutriente("vitamina_c_mg", 0), "vitamina_c_mg", "mg", 0)}</div>`);
+    }
+    if(!sugestoes.length){
+      sugestoes.push(`<div class="suggestion-note">As principais metas selecionadas estão bem encaminhadas. Mantenha variedade no restante do dia.</div>`);
+    }
+    el("sugestoesCompletarDia").innerHTML = sugestoes.slice(0,3).join("");
+
+    const boasColesterol = (baseAtual || [])
+      .filter(a => String(a.descricao_alimento || "").trim())
+      .filter(a => num(a.fibra_alimentar_g) > 0 || num(a.colesterol_mg) === 0)
+      .filter(a => num(a.colesterol_mg) <= 5)
+      .filter(a => num(a.lipideos_g) <= 8 || num(a.fibra_alimentar_g) >= 2)
+      .sort((a,b) => (num(b.fibra_alimentar_g)*3 + (num(b.vitamina_c_mg)/20)) - (num(a.fibra_alimentar_g)*3 + (num(a.vitamina_c_mg)/20)))
+      .slice(0,6);
+
+    el("sugestoesColesterolDia").innerHTML = boasColesterol.length
+      ? boasColesterol.map(a => `
+        <div class="food-suggestion">
+          <div>
+            <strong>${a.descricao_alimento}</strong><br>
+            <span>${getGrupo(a)}</span>
+          </div>
+          <span>Fibra ${fmt(a.fibra_alimentar_g,1)}g • Col. ${fmt(a.colesterol_mg,0)}mg</span>
+        </div>
+      `).join("")
+      : `<div class="suggestion-note">Sem sugestões suficientes no grupo atual. Selecione “Todos os grupos” para melhorar as opções.</div>`;
+  }
+
+  const renderResumoOriginalFaltaDia = renderResumo;
+  renderResumo = function(){
+    renderResumoOriginalFaltaDia();
+    atualizarFaltaDia();
+  };
 
   function selecionarAlimento(a){
     alimentoSelecionado = a;
@@ -1372,6 +1580,7 @@ function aplicarFiltros(){
         el("grupoSelect").innerHTML = '<option value="__manual__">Base manual carregada</option>';
         preencherGruposSimples();
         aplicarFiltros();
+        atualizarFaltaDia();
         setStatus(`Base manual carregada com sucesso: ${baseAtual.length} alimentos.`, "ok");
       }catch(err){
         setStatus("O arquivo selecionado não é um JSON válido da base completa.", "error");
