@@ -228,7 +228,11 @@
     @media (max-width: 760px){.needs-grid{grid-template-columns:1fr}}
 
     @media (max-width: 1100px){.perfil-grid,.alimentos-grid{grid-template-columns:1fr}.tab-nav{grid-template-columns:1fr}}
+
+.simple-hidden{display:none}
+.toggle-simple{margin-top:10px}
 </style>
+
 </head>
 <body>
 <div class="topbar">
@@ -2145,6 +2149,13 @@ else if(ordem === "energiaAsc"){
 
   init();
 })();
+
+function toggleModoSimples(){
+  document.querySelectorAll('.advanced-section').forEach(el=>{
+    el.classList.toggle('simple-hidden');
+  });
+}
 </script>
+
 </body>
 </html>
