@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>NutriTACO</title><style>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Receitas rápidas</title><style>
 :root{
   --bg:#f6f7f9;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
   --primary:#2f8f46;--primary-soft:#eaf6ed;--blue-soft:#eef4ff;--amber-soft:#fff8eb;
@@ -46,8 +46,7 @@ th{background:#fafafa}.table-wrap{border:1px solid var(--line);border-radius:14p
 .macro-bar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.macro-fill{height:100%;background:var(--primary);width:0%}
 .footer{text-align:center;color:var(--muted);padding:0 16px 24px;font-size:12px}
 @media(max-width:1000px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.meal-tabs{grid-template-columns:1fr 1fr}.topbar-inner{align-items:flex-start}}
-</style></head><body>
-<script>
+</style></head><body><script>
 const refeicoes=[
 {id:"cafe_da_manha",nome:"Café da manhã"},{id:"almoco",nome:"Almoço"},{id:"jantar",nome:"Jantar"},{id:"lanches",nome:"Lanches"},{id:"ceia",nome:"Ceia"}
 ];
@@ -132,22 +131,18 @@ function header(active){
  <a class="${active==='necessidades'?'active':''}" href="necessidades.html">Necessidades</a>
  </nav></div></div>`
 }
-</script><script>document.write(header("index"));</script>
-<div class="page">
- <div class="card">
-  <h2>Bem-vindo ao NutriTACO</h2>
-  <p class="muted">App dividido em páginas para ficar mais leve, simples e fácil de manter.</p>
-  <div class="grid-4">
-    <div class="metric green-soft"><h4>Diário</h4><div class="big">🍽️</div><div class="muted">metas, refeições e colesterol</div></div>
-    <div class="metric blue-soft"><h4>Alimentos</h4><div class="big">🔎</div><div class="muted">busca, filtros e ficha completa</div></div>
-    <div class="metric amber-soft"><h4>Receitas</h4><div class="big">🥘</div><div class="muted">medidas caseiras</div></div>
-    <div class="metric violet-soft"><h4>Necessidades</h4><div class="big">💊</div><div class="muted">vitaminas e minerais</div></div>
-  </div>
-  <div class="inline" style="margin-top:18px">
-    <a class="btn" href="diario.html">Abrir diário</a>
-    <a class="btn-outline" href="alimentos.html">Buscar alimentos</a>
-    <a class="btn-soft" href="receitas.html">Adicionar receita</a>
-  </div>
- </div>
- <div class="card"><h3>Importante</h3><p class="muted">Para funcionar, deixe todos os arquivos HTML e o <strong>taco_completo.json</strong> na mesma pasta do servidor.</p></div>
-</div><div class="footer">Fonte: TACO - Tabela Brasileira de Composição de Alimentos</div></body></html>
+</script><script>document.write(header("receitas"));</script><div class="page"><div class="card"><h2>Receitas rápidas</h2><p class="muted">Medidas caseiras estimadas. O app lança os ingredientes no diário automaticamente.</p><div class="grid-3"><div><label>Buscar</label><input id="busca" oninput="renderReceitas()"></div><div><label>Refeição</label><select id="refeicao"></select></div><div><label>Porções</label><select id="porcoes" onchange="renderReceitas()"><option value="0.5">Meia</option><option value="1" selected>1 porção</option><option value="1.5">1,5</option><option value="2">2</option></select></div></div></div><div class="grid-3" id="lista"></div></div><script>
+const receitas=[
+{nome:"Arroz com feijão",cat:"Almoço/Jantar",ings:[["Arroz - tipo 1 - cozido","4 colheres de sopa de arroz cozido",100],["Feijão - carioca - cozido","1 concha pequena de feijão",86]]},
+{nome:"Mingau de aveia",cat:"Café/Lanche",ings:[["Aveia - flocos - crua","3 colheres de sopa de aveia",30],["Leite - de vaca - desnatado - UHT","1 copo de leite",200],["Banana - prata - crua","1 banana média",86]]},
+{nome:"Omelete simples",cat:"Café/Almoço",ings:[["Ovo - de galinha - inteiro - cozido/10minutos","2 ovos",100],["Tomate - com semente - cru","2 colheres de sopa de tomate",40],["Cebola - crua","1 colher de sopa de cebola",15]]},
+{nome:"Frango com arroz e salada",cat:"Almoço/Jantar",ings:[["Frango - peito - sem pele - grelhado","1 filé médio",100],["Arroz - tipo 1 - cozido","3 colheres de sopa",75],["Alface - crespa - crua","3 folhas",45],["Tomate - com semente - cru","1 tomate pequeno",80]]},
+{nome:"Iogurte com banana e aveia",cat:"Café/Lanche",ings:[["Iogurte - natural","1 pote",170],["Banana - prata - crua","1 banana média",86],["Aveia - flocos - crua","1 colher de sopa",10]]},
+{nome:"Salada básica",cat:"Almoço/Jantar",ings:[["Alface - crespa - crua","3 folhas",45],["Tomate - com semente - cru","1 tomate pequeno",80],["Cenoura - crua","2 colheres de sopa ralada",30]]}
+];
+function findFood(nome){return baseAtual.find(a=>String(a.descricao_alimento).toLowerCase()===nome.toLowerCase())||baseAtual.find(a=>String(a.descricao_alimento).toLowerCase().includes(nome.split(" - ")[0].toLowerCase()))}
+function calc(r,por=1){let t={kcal:0,proteina:0,carbo:0,lipideos:0,fibra:0,colesterol:0};r.ings.forEach(i=>{const a=findFood(i[0]);if(!a)return;const it=itemFromAlimento(a,i[2]*por);t.kcal+=it.kcal;t.proteina+=it.proteina_g;t.carbo+=it.carboidrato_g;t.lipideos+=it.lipideos_g;t.fibra+=it.fibra_alimentar_g;t.colesterol+=it.colesterol_mg});return t}
+function renderReceitas(){const termo=(el("busca").value||"").toLowerCase(), por=Number(el("porcoes").value)||1;const lista=receitas.filter(r=>!termo||r.nome.toLowerCase().includes(termo)||r.cat.toLowerCase().includes(termo));el("lista").innerHTML=lista.map((r,idx)=>{const t=calc(r,por);return `<div class="card"><h3>${r.nome}</h3><div class="muted">${r.cat}</div><div class="inline" style="margin:10px 0"><span class="pill">${fmt(t.kcal,0)} kcal</span><span class="pill">P ${fmt(t.proteina,1)}g</span><span class="pill">Fibra ${fmt(t.fibra,1)}g</span><span class="pill">Col. ${fmt(t.colesterol,0)}mg</span></div><ul>${r.ings.map(i=>`<li>${i[1]} <span class="muted">(${fmt0(i[2]*por)}g)</span></li>`).join("")}</ul><button class="btn" onclick="addReceita(${idx})">Adicionar receita</button></div>`}).join("")}
+function addReceita(idx){const r=receitas[idx], por=Number(el("porcoes").value)||1, ref=el("refeicao").value;let n=0;r.ings.forEach(i=>{const a=findFood(i[0]);if(a){const it=itemFromAlimento(a,i[2]*por);it.origem_receita=r.nome;it.medida_caseira=i[1];adicionarItemRefeicao(ref,it);n++}});alert(`Receita adicionada (${n} itens).`)}
+document.addEventListener("DOMContentLoaded",async()=>{el("refeicao").innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");await carregarBase();renderReceitas();});
+</script><div class="footer">Fonte: TACO</div></body></html>

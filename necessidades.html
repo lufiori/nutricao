@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>NutriTACO</title><style>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Necessidades</title><style>
 :root{
   --bg:#f6f7f9;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
   --primary:#2f8f46;--primary-soft:#eaf6ed;--blue-soft:#eef4ff;--amber-soft:#fff8eb;
@@ -46,8 +46,7 @@ th{background:#fafafa}.table-wrap{border:1px solid var(--line);border-radius:14p
 .macro-bar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.macro-fill{height:100%;background:var(--primary);width:0%}
 .footer{text-align:center;color:var(--muted);padding:0 16px 24px;font-size:12px}
 @media(max-width:1000px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.meal-tabs{grid-template-columns:1fr 1fr}.topbar-inner{align-items:flex-start}}
-</style></head><body>
-<script>
+</style></head><body><script>
 const refeicoes=[
 {id:"cafe_da_manha",nome:"Café da manhã"},{id:"almoco",nome:"Almoço"},{id:"jantar",nome:"Jantar"},{id:"lanches",nome:"Lanches"},{id:"ceia",nome:"Ceia"}
 ];
@@ -132,22 +131,9 @@ function header(active){
  <a class="${active==='necessidades'?'active':''}" href="necessidades.html">Necessidades</a>
  </nav></div></div>`
 }
-</script><script>document.write(header("index"));</script>
-<div class="page">
- <div class="card">
-  <h2>Bem-vindo ao NutriTACO</h2>
-  <p class="muted">App dividido em páginas para ficar mais leve, simples e fácil de manter.</p>
-  <div class="grid-4">
-    <div class="metric green-soft"><h4>Diário</h4><div class="big">🍽️</div><div class="muted">metas, refeições e colesterol</div></div>
-    <div class="metric blue-soft"><h4>Alimentos</h4><div class="big">🔎</div><div class="muted">busca, filtros e ficha completa</div></div>
-    <div class="metric amber-soft"><h4>Receitas</h4><div class="big">🥘</div><div class="muted">medidas caseiras</div></div>
-    <div class="metric violet-soft"><h4>Necessidades</h4><div class="big">💊</div><div class="muted">vitaminas e minerais</div></div>
-  </div>
-  <div class="inline" style="margin-top:18px">
-    <a class="btn" href="diario.html">Abrir diário</a>
-    <a class="btn-outline" href="alimentos.html">Buscar alimentos</a>
-    <a class="btn-soft" href="receitas.html">Adicionar receita</a>
-  </div>
- </div>
- <div class="card"><h3>Importante</h3><p class="muted">Para funcionar, deixe todos os arquivos HTML e o <strong>taco_completo.json</strong> na mesma pasta do servidor.</p></div>
-</div><div class="footer">Fonte: TACO - Tabela Brasileira de Composição de Alimentos</div></body></html>
+</script><script>document.write(header("necessidades"));</script><div class="page"><div class="card"><div class="inline" style="justify-content:space-between"><div><h2>Necessidades nutricionais</h2><p class="muted">Comparação do diário com referências gerais por idade/sexo informados no perfil.</p></div><input type="date" id="dataDiario" onchange="render()" style="max-width:180px"></div><div class="grid-3" id="cards" style="margin-top:14px"></div></div></div><script>
+function refs(){const p=getPerfil(), idade=num(p.idade)||30, sexo=p.sexo||"masculino";return [
+["Fibra","fibra",sexo==="feminino"?25:38,"g","min"],["Colesterol","colesterol",200,"mg","max"],["Cálcio","calcio",idade>=51?1200:1000,"mg","min"],["Ferro","ferro",sexo==="feminino"&&idade<51?18:8,"mg","min"],["Vitamina C","vitc",sexo==="feminino"?75:90,"mg","min"],["Sódio","sodio",2000,"mg","max"],["Potássio","potassio",sexo==="feminino"?2600:3400,"mg","min"],["Magnésio","magnesio",sexo==="feminino"?320:420,"mg","min"],["Zinco","zinco",sexo==="feminino"?8:11,"mg","min"]]}
+function render(){if(!el("dataDiario").value)el("dataDiario").value=hoje;const t=totaisDia();el("cards").innerHTML=refs().map(r=>{const val=t[r[1]]||0,meta=r[2],pct=meta?val/meta*100:0,ok=r[4]==="max"?val<=meta:val>=meta;let cls=ok?"green-soft":pct>=70?"amber-soft":"red-soft";if(r[4]==="max"&&pct>100)cls="red-soft";return `<div class="metric ${cls}"><h4>${r[0]}</h4><div class="big">${fmt(val,r[3]==="mg"?0:1)} ${r[3]}</div><div class="muted">Referência: ${fmt(meta,r[3]==="mg"?0:1)} ${r[3]} • ${fmt(pct,0)}%</div><div class="macro-bar" style="margin-top:8px"><div class="macro-fill" style="width:${Math.min(100,pct)}%"></div></div></div>`}).join("")}
+document.addEventListener("DOMContentLoaded",()=>{render()})
+</script><div class="footer">Não substitui orientação médica/nutricional.</div></body></html>

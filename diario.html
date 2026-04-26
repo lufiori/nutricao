@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>NutriTACO</title><style>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Diário alimentar</title><style>
 :root{
   --bg:#f6f7f9;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
   --primary:#2f8f46;--primary-soft:#eaf6ed;--blue-soft:#eef4ff;--amber-soft:#fff8eb;
@@ -132,22 +132,78 @@ function header(active){
  <a class="${active==='necessidades'?'active':''}" href="necessidades.html">Necessidades</a>
  </nav></div></div>`
 }
-</script><script>document.write(header("index"));</script>
+</script><script>document.write(header("diario"));</script>
 <div class="page">
  <div class="card">
-  <h2>Bem-vindo ao NutriTACO</h2>
-  <p class="muted">App dividido em páginas para ficar mais leve, simples e fácil de manter.</p>
-  <div class="grid-4">
-    <div class="metric green-soft"><h4>Diário</h4><div class="big">🍽️</div><div class="muted">metas, refeições e colesterol</div></div>
-    <div class="metric blue-soft"><h4>Alimentos</h4><div class="big">🔎</div><div class="muted">busca, filtros e ficha completa</div></div>
-    <div class="metric amber-soft"><h4>Receitas</h4><div class="big">🥘</div><div class="muted">medidas caseiras</div></div>
-    <div class="metric violet-soft"><h4>Necessidades</h4><div class="big">💊</div><div class="muted">vitaminas e minerais</div></div>
-  </div>
-  <div class="inline" style="margin-top:18px">
-    <a class="btn" href="diario.html">Abrir diário</a>
-    <a class="btn-outline" href="alimentos.html">Buscar alimentos</a>
-    <a class="btn-soft" href="receitas.html">Adicionar receita</a>
+  <h2>Diário alimentar</h2><div class="muted">Perfil, metas, resumo do dia e refeições na mesma tela.</div>
+  <div class="grid-2" style="margin-top:14px">
+   <div>
+    <h3>Perfil e objetivos</h3>
+    <div class="grid-2"><div><label>Peso (kg)</label><input id="pesoKg" type="number"></div><div><label>Altura (cm)</label><input id="alturaCm" type="number"></div><div><label>Idade</label><input id="idade" type="number"></div><div><label>Sexo</label><select id="sexo"><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div></div>
+    <label style="margin-top:10px">Atividade</label><select id="atividade"><option value="1.2">Sedentário</option><option value="1.375">Levemente ativo</option><option value="1.55">Moderadamente ativo</option><option value="1.725">Muito ativo</option><option value="1.9">Extremamente ativo</option></select>
+    <div id="objetivos" class="inline" style="margin-top:12px"></div>
+    <div class="inline" style="margin-top:12px"><button class="btn-soft" onclick="salvarPerfil()">Salvar perfil</button><button class="btn" onclick="aplicarMetas()">Calcular metas</button></div>
+   </div>
+   <div>
+    <div class="grid-4"><div class="metric green-soft"><h4>IMC</h4><div class="big" id="dashImc">0</div></div><div class="metric blue-soft"><h4>Gasto</h4><div class="big" id="dashGasto">0</div></div><div class="metric amber-soft"><h4>Meta</h4><div class="big" id="dashMeta">0</div></div><div class="metric violet-soft"><h4>Objetivo</h4><div class="big" id="dashObjetivo" style="font-size:18px">—</div></div></div>
+    <h3>Metas manuais</h3><div class="grid-4"><div><label>kcal</label><input id="metaKcal" type="number" oninput="salvarMetas()"></div><div><label>Proteína</label><input id="metaProteina" type="number" oninput="salvarMetas()"></div><div><label>Carbo</label><input id="metaCarbo" type="number" oninput="salvarMetas()"></div><div><label>Gorduras</label><input id="metaLipideos" type="number" oninput="salvarMetas()"></div></div>
+   </div>
   </div>
  </div>
- <div class="card"><h3>Importante</h3><p class="muted">Para funcionar, deixe todos os arquivos HTML e o <strong>taco_completo.json</strong> na mesma pasta do servidor.</p></div>
-</div><div class="footer">Fonte: TACO - Tabela Brasileira de Composição de Alimentos</div></body></html>
+ <div class="card"><div class="inline" style="justify-content:space-between"><div><h3>Resumo do dia</h3><div class="muted"><input type="date" id="dataDiario" onchange="renderDiario()"></div></div><button class="btn-danger" onclick="limparDia()">Limpar dia</button></div>
+  <div class="grid-4" style="margin-top:14px"><div class="metric blue-soft"><h4>Calorias</h4><div class="big" id="totalKcal">0</div></div><div class="metric green-soft"><h4>Proteína</h4><div class="big" id="totalProteina">0</div></div><div class="metric amber-soft"><h4>Carbo</h4><div class="big" id="totalCarbo">0</div></div><div class="metric red-soft"><h4>Gorduras</h4><div class="big" id="totalLipideos">0</div></div></div>
+  <div style="margin-top:12px"><div class="macro-bar"><div class="macro-fill" id="barKcal"></div></div><div class="muted" id="txtKcal"></div></div>
+  <div class="grid-3" style="margin-top:14px"><div class="metric green-soft" id="semaforo"><h4>Semáforo</h4><div class="big" id="semaforoTxt">BOM</div><div class="muted" id="semaforoMsg"></div></div><div class="metric"><h4>Colesterol alimentar</h4><div class="big"><span id="colesterolDia">0</span>mg</div></div><div class="metric"><h4>Fibra</h4><div class="big"><span id="fibraDia">0</span>g</div></div></div>
+ </div>
+ <div class="card"><h3>Falta no seu dia</h3><div id="faltaDia"></div></div>
+ <div class="card"><h3>Refeições</h3><div id="mealTabs"></div><div id="mealContainer"></div></div>
+</div><script>
+function initPerfil(){
+ const p={pesoKg:80,alturaCm:175,idade:30,sexo:"masculino",atividade:1.55,objetivo:"manter_peso",...getPerfil()};
+ ["pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>{if(el(id))el(id).value=p[id]});
+ renderObjetivos(p.objetivo||"manter_peso"); renderPerfilResumo();
+}
+function renderObjetivos(atual){
+ el("objetivos").innerHTML=objetivos.map(o=>`<button type="button" class="${o.id===atual?'btn':'btn-outline'}" onclick="setObjetivo('${o.id}')">${o.nome}</button>`).join("");
+}
+function setObjetivo(id){const p=getPerfil();p.objetivo=id;setPerfil(p);renderObjetivos(id);renderPerfilResumo()}
+function salvarPerfil(){
+ const p=getPerfil(); ["pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>p[id]=el(id).value);
+ setPerfil(p); renderPerfilResumo(); renderDiario();
+}
+function aplicarMetas(){
+ salvarPerfil(); const c=calcularPerfil(); const p=getPerfil();
+ p.metaKcal=Math.round(c.metaKcal);p.metaProteina=Math.round(c.metaProteina);p.metaCarbo=Math.round(c.metaCarbo);p.metaLipideos=Math.round(c.metaLipideos);
+ setPerfil(p); renderPerfilResumo(); renderDiario();
+}
+function renderPerfilResumo(){
+ const c=calcularPerfil(); const p=getPerfil();
+ el("dashImc").textContent=fmt(c.imc,1); el("dashGasto").textContent=fmt0(c.gasto); el("dashMeta").textContent=fmt0(c.metaKcal); el("dashObjetivo").textContent=c.obj.nome;
+ const metas=getMetas();
+ ["metaKcal","metaProteina","metaCarbo","metaLipideos"].forEach(id=>{if(el(id)) el(id).value=metas[id.replace("meta","").toLowerCase()]||p[id]||""});
+}
+function salvarMetas(){const p=getPerfil();["metaKcal","metaProteina","metaCarbo","metaLipideos"].forEach(id=>p[id]=el(id).value);setPerfil(p);renderDiario()}
+function renderMealTabs(){el("mealTabs").innerHTML=refeicoes.map(r=>`<button class="meal-tab ${r.id===refeicaoAtiva?'active':''}" onclick="refeicaoAtiva='${r.id}';renderMealTabs();renderRefeicoes()">${r.nome}</button>`).join("")}
+function renderRefeicoes(){
+ const dia=getDia(), itens=dia[refeicaoAtiva]||[], t=totaisItens(itens), ref=refeicoes.find(r=>r.id===refeicaoAtiva);
+ el("mealContainer").innerHTML=`<div class="card"><h3>${ref.nome}</h3><div class="muted">${fmt(t.kcal,1)} kcal • P ${fmt(t.proteina,1)}g • C ${fmt(t.carbo,1)}g • G ${fmt(t.lipideos,1)}g</div><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Qtd</th><th>kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr></thead><tbody>${itens.length?itens.map((it,i)=>`<tr><td>${it.nome}<br><span class="muted">${it.grupo||""}</span></td><td>${fmt0(it.quantidade_g)}g</td><td>${fmt(it.kcal,1)}</td><td>${fmt(it.proteina_g,1)}</td><td>${fmt(it.carboidrato_g,1)}</td><td>${fmt(it.lipideos_g,1)}</td><td><button class="btn-danger" onclick="removerItem('${refeicaoAtiva}',${i})">Excluir</button></td></tr>`).join(""):`<tr><td colspan="7" class="muted">Nenhum item nesta refeição.</td></tr>`}</tbody></table></div></div>`
+}
+function removerItem(ref,i){const dia=getDia();dia[ref].splice(i,1);saveDia(dia);renderDiario()}
+function renderDiario(){
+ if(el("dataDiario")&&!el("dataDiario").value)el("dataDiario").value=hoje;
+ const t=totaisDia(), metas=getMetas(); 
+ el("totalKcal").textContent=fmt(t.kcal,1);el("totalProteina").textContent=fmt(t.proteina,1);el("totalCarbo").textContent=fmt(t.carbo,1);el("totalLipideos").textContent=fmt(t.lipideos,1);
+ const pct=metas.kcal?Math.min(100,t.kcal/metas.kcal*100):0; el("barKcal").style.width=pct+"%"; el("txtKcal").textContent=`${fmt(t.kcal,1)} / ${fmt0(metas.kcal)} kcal`;
+ ["Proteina","Carbo","Lipideos"].forEach(n=>{});
+ el("colesterolDia").textContent=fmt(t.colesterol,1);el("fibraDia").textContent=fmt(t.fibra,1);
+ let status="BOM", cls="green-soft", msg="Dia bem encaminhado.";
+ if(t.colesterol>200||t.lipideos>metas.lipideos*1.15){status="ATENÇÃO";cls="red-soft";msg="Hoje pede cuidado: reduza gordura/colesterol e aumente fibras nas próximas refeições."}
+ else if(t.colesterol>150||t.fibra<15){status="MODERAR";cls="amber-soft";msg="Ainda dá para equilibrar: inclua mais fibras e modere alimentos gordurosos."}
+ el("semaforo").className="metric "+cls; el("semaforoTxt").textContent=status; el("semaforoMsg").textContent=msg;
+ const faltP=Math.max(0,metas.proteina-t.proteina), faltF=Math.max(0,25-t.fibra), faltCa=Math.max(0,1000-t.calcio), faltC=Math.max(0,90-t.vitc);
+ el("faltaDia").innerHTML=`<div class="grid-4"><div class="metric ${faltP?'amber-soft':'green-soft'}"><h4>Proteína</h4><div class="big">${faltP?fmt(faltP,1)+"g":"ok"}</div></div><div class="metric ${faltF?'amber-soft':'green-soft'}"><h4>Fibra</h4><div class="big">${faltF?fmt(faltF,1)+"g":"ok"}</div></div><div class="metric ${faltCa?'amber-soft':'green-soft'}"><h4>Cálcio</h4><div class="big">${faltCa?fmt0(faltCa)+"mg":"ok"}</div></div><div class="metric ${faltC?'amber-soft':'green-soft'}"><h4>Vitamina C</h4><div class="big">${faltC?fmt0(faltC)+"mg":"ok"}</div></div></div>`;
+ renderMealTabs();renderRefeicoes();
+}
+function limparDia(){if(confirm("Limpar o diário deste dia?")){const diario=getDiario();delete diario[getData()];setDiario(diario);renderDiario()}}
+document.addEventListener("DOMContentLoaded",()=>{initPerfil();renderDiario();});
+</script><div class="footer">Fonte: TACO</div></body></html>

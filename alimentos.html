@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>NutriTACO</title><style>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Alimentos</title><style>
 :root{
   --bg:#f6f7f9;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
   --primary:#2f8f46;--primary-soft:#eaf6ed;--blue-soft:#eef4ff;--amber-soft:#fff8eb;
@@ -46,7 +46,7 @@ th{background:#fafafa}.table-wrap{border:1px solid var(--line);border-radius:14p
 .macro-bar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.macro-fill{height:100%;background:var(--primary);width:0%}
 .footer{text-align:center;color:var(--muted);padding:0 16px 24px;font-size:12px}
 @media(max-width:1000px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.meal-tabs{grid-template-columns:1fr 1fr}.topbar-inner{align-items:flex-start}}
-</style></head><body>
+.donut{width:180px;height:180px;border-radius:50%;margin:auto;position:relative}.donut:after{content:"";position:absolute;inset:34px;background:white;border-radius:50%}</style></head><body>
 <script>
 const refeicoes=[
 {id:"cafe_da_manha",nome:"Café da manhã"},{id:"almoco",nome:"Almoço"},{id:"jantar",nome:"Jantar"},{id:"lanches",nome:"Lanches"},{id:"ceia",nome:"Ceia"}
@@ -132,22 +132,44 @@ function header(active){
  <a class="${active==='necessidades'?'active':''}" href="necessidades.html">Necessidades</a>
  </nav></div></div>`
 }
-</script><script>document.write(header("index"));</script>
-<div class="page">
- <div class="card">
-  <h2>Bem-vindo ao NutriTACO</h2>
-  <p class="muted">App dividido em páginas para ficar mais leve, simples e fácil de manter.</p>
-  <div class="grid-4">
-    <div class="metric green-soft"><h4>Diário</h4><div class="big">🍽️</div><div class="muted">metas, refeições e colesterol</div></div>
-    <div class="metric blue-soft"><h4>Alimentos</h4><div class="big">🔎</div><div class="muted">busca, filtros e ficha completa</div></div>
-    <div class="metric amber-soft"><h4>Receitas</h4><div class="big">🥘</div><div class="muted">medidas caseiras</div></div>
-    <div class="metric violet-soft"><h4>Necessidades</h4><div class="big">💊</div><div class="muted">vitaminas e minerais</div></div>
-  </div>
-  <div class="inline" style="margin-top:18px">
-    <a class="btn" href="diario.html">Abrir diário</a>
-    <a class="btn-outline" href="alimentos.html">Buscar alimentos</a>
-    <a class="btn-soft" href="receitas.html">Adicionar receita</a>
-  </div>
- </div>
- <div class="card"><h3>Importante</h3><p class="muted">Para funcionar, deixe todos os arquivos HTML e o <strong>taco_completo.json</strong> na mesma pasta do servidor.</p></div>
-</div><div class="footer">Fonte: TACO - Tabela Brasileira de Composição de Alimentos</div></body></html>
+</script><script>document.write(header("alimentos"));</script><div class="page">
+<div class="grid-2"><div class="card"><h2>Alimentos</h2><div class="grid-2"><div><label>Buscar</label><input id="busca" oninput="aplicarFiltros()" placeholder="arroz, feijão, banana..."></div><div><label>Grupo</label><select id="grupoSelect" onchange="aplicarFiltros()"></select></div><div><label>Ordenar por</label><select id="ordenarPor" onchange="aplicarFiltros()"><option value="nome">Nome A-Z</option><option value="energiaAsc">Energia ↑</option><option value="energiaDesc">Energia ↓</option><option value="proteinaDesc">Proteína ↓</option><option value="colesterolAsc">Colesterol ↑</option><option value="colesterolDesc">Colesterol ↓</option><option value="fibraDesc">Fibras ↓</option><option value="lipideosDesc">Lipídeos ↓</option><option value="vitcDesc">Vitamina C ↓</option><option value="calcioDesc">Cálcio ↓</option><option value="ferroDesc">Ferro ↓</option></select></div><div style="align-self:end"><button class="btn-soft" onclick="filtroCol=true;aplicarFiltros()">❤️ Melhores para colesterol</button><button class="btn-outline" onclick="filtroCol=false;aplicarFiltros()">Limpar</button></div></div><div id="statusBase" class="status"></div><div id="contador" class="muted" style="margin-top:12px"></div><div id="lista" class="food-list"></div></div>
+<div class="card"><div id="vazio"><h2>Ficha do alimento</h2><p class="muted">Clique em um alimento para abrir a ficha.</p></div><div id="detalhe" style="display:none"><h2 id="detNome"></h2><div id="detGrupo" class="muted"></div><div class="grid-2" style="margin-top:14px"><div><div class="donut" id="donut"></div><div id="macroTxt" class="muted" style="text-align:center;margin-top:10px"></div></div><div><div class="metric blue-soft"><h4>Energia</h4><div class="big"><span id="detKcal">0</span> kcal</div></div><div id="simple" style="margin-top:12px"></div></div></div><div class="card" style="margin-top:14px"><h3>Adicionar ao diário</h3><div class="grid-2"><div><label>Refeição</label><select id="refeicao"></select></div><div><label>Quantidade (g)</label><input id="gramas" type="number" value="100"></div></div><button class="btn" style="margin-top:12px" onclick="addAlimento()">Adicionar alimento</button></div><h3>Detalhes</h3><div class="table-wrap"><table><tbody id="tabela"></tbody></table></div></div></div></div>
+</div><script>
+let filtroCol=false;
+function preencherGrupos(){const grupos=[...new Set(baseAtual.map(getGrupo))].sort((a,b)=>a.localeCompare(b,"pt-BR"));el("grupoSelect").innerHTML='<option value="__todos__">Todos os grupos</option>'+grupos.map(g=>`<option value="${g}">${g}</option>`).join("")}
+function scoreCol(a){let s=0,c=num(a.colesterol_mg),f=num(a.fibra_alimentar_g),l=num(a.lipideos_g);if(c===0)s+=35;else if(c<=5)s+=25;else if(c>40)s-=20;if(f>=6)s+=35;else if(f>=3)s+=25;if(l<=2)s+=20;else if(l>15)s-=20;return s}
+function bomCol(a){return getGrupo(a)!=="Alimentos preparados"&&((num(a.colesterol_mg)<=5&&num(a.lipideos_g)<=10)||(num(a.colesterol_mg)<=20&&num(a.fibra_alimentar_g)>=2))}
+function aplicarFiltros(){
+ const termo=el("busca").value.toLowerCase(),grupo=el("grupoSelect").value,ordem=el("ordenarPor").value;
+ let arr=baseAtual.filter(a=>(!termo||String(a.descricao_alimento||"").toLowerCase().includes(termo))&&(grupo==="__todos__"||getGrupo(a)===grupo));
+ if(filtroCol)arr=arr.filter(bomCol).sort((a,b)=>scoreCol(b)-scoreCol(a));
+ else if(ordem==="nome")arr.sort((a,b)=>String(a.descricao_alimento).localeCompare(String(b.descricao_alimento),"pt-BR"));
+ else if(ordem==="energiaAsc")arr.sort((a,b)=>num(a.energia_kcal)-num(b.energia_kcal));
+ else if(ordem==="energiaDesc")arr.sort((a,b)=>num(b.energia_kcal)-num(a.energia_kcal));
+ else if(ordem==="proteinaDesc")arr.sort((a,b)=>num(b.proteina_g)-num(a.proteina_g));
+ else if(ordem==="colesterolAsc")arr.sort((a,b)=>num(a.colesterol_mg)-num(b.colesterol_mg));
+ else if(ordem==="colesterolDesc")arr.sort((a,b)=>num(b.colesterol_mg)-num(a.colesterol_mg));
+ else if(ordem==="fibraDesc")arr.sort((a,b)=>num(b.fibra_alimentar_g)-num(a.fibra_alimentar_g));
+ else if(ordem==="lipideosDesc")arr.sort((a,b)=>num(b.lipideos_g)-num(a.lipideos_g));
+ else if(ordem==="vitcDesc")arr.sort((a,b)=>num(b.vitamina_c_mg)-num(a.vitamina_c_mg));
+ else if(ordem==="calcioDesc")arr.sort((a,b)=>num(b.calcio_mg)-num(a.calcio_mg));
+ else if(ordem==="ferroDesc")arr.sort((a,b)=>num(b.ferro_mg)-num(a.ferro_mg));
+ el("contador").textContent=arr.length+" alimentos encontrados";
+ el("lista").innerHTML=arr.slice(0,160).map((a,i)=>`<div class="food-item" onclick="selecionar(${baseAtual.indexOf(a)})"><div><div class="food-name">${a.descricao_alimento}</div><div class="food-sub">${getGrupo(a)} • ${fmt(a.energia_kcal,1)} kcal • P ${fmt(a.proteina_g,1)}g • Fibra ${fmt(a.fibra_alimentar_g,1)}g • Col. ${fmt(a.colesterol_mg,0)}mg</div></div><button class="btn-outline">Abrir</button></div>`).join("")||'<div class="food-item muted">Nenhum alimento encontrado.</div>'
+}
+function selecionar(idx){
+ const a=baseAtual[idx]; alimentoSelecionado=a; el("detalhe").style.display="block"; el("vazio").style.display="none";
+ el("detNome").textContent=a.descricao_alimento; el("detGrupo").textContent=getGrupo(a); el("detKcal").textContent=fmt(a.energia_kcal,1);
+ const p=num(a.proteina_g)*4,c=num(a.carboidrato_g)*4,g=num(a.lipideos_g)*9,total=p+c+g||1;
+ el("donut").style.background=`conic-gradient(#b01263 0 ${(c/total*100)}%, #0f8f8c ${(c/total*100)}% ${((c+p)/total*100)}%, #6675df ${((c+p)/total*100)}% 100%)`;
+ el("macroTxt").innerHTML=`Carbo ${fmt(c/total*100,0)}% • Proteína ${fmt(p/total*100,0)}% • Gorduras ${fmt(g/total*100,0)}%`;
+ el("simple").innerHTML=`<div class="grid-3"><div class="metric"><h4>Colesterol</h4><div class="big">${fmt(a.colesterol_mg,1)}mg</div></div><div class="metric"><h4>Fibras</h4><div class="big">${fmt(a.fibra_alimentar_g,1)}g</div></div><div class="metric"><h4>Lipídeos</h4><div class="big">${fmt(a.lipideos_g,1)}g</div></div></div>`;
+ el("tabela").innerHTML=["proteina_g","carboidrato_g","lipideos_g","fibra_alimentar_g","colesterol_mg","sodio_mg","potassio_mg","calcio_mg","ferro_mg","magnesio_mg","zinco_mg","vitamina_c_mg"].map(k=>`<tr><th>${k}</th><td>${fmt(a[k],2)}</td></tr>`).join("");
+}
+function addAlimento(){
+ if(!alimentoSelecionado)return alert("Selecione um alimento.");
+ const g=Number(el("gramas").value)||100, ref=el("refeicao").value; adicionarItemRefeicao(ref,itemFromAlimento(alimentoSelecionado,g)); alert("Alimento adicionado ao diário.");
+}
+document.addEventListener("DOMContentLoaded",async()=>{el("refeicao").innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join(""); if(await carregarBase()){preencherGrupos();aplicarFiltros();}});
+</script><div class="footer">Fonte: TACO</div></body></html>
