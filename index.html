@@ -229,8 +229,7 @@
 
     @media (max-width: 1100px){.perfil-grid,.alimentos-grid{grid-template-columns:1fr}.tab-nav{grid-template-columns:1fr}}
 
-.simple-hidden{display:none}
-.toggle-simple{margin-top:10px}
+.simple-hidden{display:none!important}
 </style>
 
 </head>
@@ -328,7 +327,7 @@
 </div>
 </div>
 
-<div class="nutri-visual-card" id="nutriVisualCard">
+<div class= advanced-section"nutri-visual-card advanced-section" id="nutriVisualCard">
   <div class="nutri-visual-head">
     <div>
       <div class="muted" style="font-size:13px">Informações nutricionais</div>
@@ -398,15 +397,15 @@
 </div>
 
 <div class="section-title">Resumo rápido</div>
-<div class="detail-table"><table><tbody id="tblResumoRapido"></tbody></table></div>
+<div class= advanced-section"detail-table advanced-section"><table><tbody id="tblResumoRapido"></tbody></table></div>
 <div class="grid-2" style="margin-top:16px">
 <div>
 <div class="section-title">Minerais</div>
-<div class="detail-table"><table><tbody id="tblMinerais"></tbody></table></div>
+<div class= advanced-section"detail-table advanced-section"><table><tbody id="tblMinerais"></tbody></table></div>
 </div>
 <div>
 <div class="section-title">Vitaminas</div>
-<div class="detail-table"><table><tbody id="tblVitaminas"></tbody></table></div>
+<div class= advanced-section"detail-table advanced-section"><table><tbody id="tblVitaminas"></tbody></table></div>
 </div>
 </div>
 <div style="margin-top:16px">
@@ -685,11 +684,11 @@
       As metas são referências gerais para pessoas saudáveis, calculadas pela idade e sexo informados em “Perfil e Objetivos”. Para colesterol alto, crianças, uso de medicamentos, gestação, doenças renais ou outras condições, mantenha sempre a orientação do médico/nutricionista.
     </div>
     <div class="section-title">Macronutrientes e controle cardiovascular</div>
-    <div class="needs-grid" id="needsMacros"></div>
+    <div class= advanced-section"needs-grid advanced-section" id="needsMacros"></div>
     <div class="section-title">Minerais</div>
-    <div class="needs-grid" id="needsMinerais"></div>
+    <div class= advanced-section"needs-grid advanced-section" id="needsMinerais"></div>
     <div class="section-title">Vitaminas</div>
-    <div class="needs-grid" id="needsVitaminas"></div>
+    <div class= advanced-section"needs-grid advanced-section" id="needsVitaminas"></div>
   </div>
 </section></div>
 
@@ -2150,11 +2149,25 @@ else if(ordem === "energiaAsc"){
   init();
 })();
 
+let modoSimples = false;
+
 function toggleModoSimples(){
-  document.querySelectorAll('.advanced-section').forEach(el=>{
-    el.classList.toggle('simple-hidden');
+  modoSimples = !modoSimples;
+  document.querySelectorAll(".advanced-section").forEach(el=>{
+    el.classList.toggle("simple-hidden", modoSimples);
   });
+  const btn = document.getElementById("btnModoSimples");
+  if(btn){
+    btn.textContent = modoSimples ? "Modo avançado" : "Modo simples";
+  }
 }
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const btn = document.getElementById("btnModoSimples");
+  if(btn){
+    btn.addEventListener("click", toggleModoSimples);
+  }
+});
 </script>
 
 </body>
