@@ -161,7 +161,7 @@
     }
   
     .tab-nav-wrap{max-width:1680px;margin:14px auto 0;padding:0 18px}
-    .tab-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+    .tab-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
     .tab-btn{border:1px solid transparent;background:#fff;border-radius:14px;padding:13px 12px;cursor:pointer;font-size:15px;color:var(--text);font-weight:700}
     .tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
     .tab-btn span{display:block;font-size:12px;font-weight:400;margin-top:3px;opacity:.78}
@@ -187,27 +187,6 @@
     .need-card.high .need-fill{background:#dc2626}
     .needs-note{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted);font-size:13px;line-height:1.45}
     @media (max-width: 1100px){.needs-grid{grid-template-columns:repeat(2,1fr)}}
-    
-    .family-profile-strip{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:end;margin-bottom:14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#f9fafb}
-    .quick-summary-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;background:#fff;box-shadow:var(--shadow)}
-    .semaphore-row{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:center}
-    .semaphore-badge{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-weight:800;text-align:center;border:6px solid #e5e7eb;background:#f9fafb;color:#374151}
-    .semaphore-badge.good{border-color:#22c55e;background:#ecfdf5;color:#166534}
-    .semaphore-badge.warn{border-color:#f59e0b;background:#fffbeb;color:#92400e}
-    .semaphore-badge.high{border-color:#ef4444;background:#fef2f2;color:#991b1b}
-    .suggestion-list{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
-    .suggestion-item{border:1px solid var(--line);border-radius:12px;padding:10px;background:#f9fafb}
-    .simple-food-card{border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px;background:linear-gradient(180deg,#fff 0%,#fbfdfc 100%)}
-    .simple-food-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-    .simple-food-status{border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px}
-    .simple-food-status.good{background:#dcfce7;color:#166534}
-    .simple-food-status.warn{background:#fef3c7;color:#92400e}
-    .simple-food-status.high{background:#fee2e2;color:#991b1b}
-    .simple-food-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-    .simple-food-mini{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
-    .details-toggle{margin-top:12px}
-    @media (max-width: 760px){.family-profile-strip{grid-template-columns:1fr}.semaphore-row{grid-template-columns:1fr}.simple-food-grid{grid-template-columns:1fr}}
-
     @media (max-width: 760px){.needs-grid{grid-template-columns:1fr}}
 
     @media (max-width: 1100px){.perfil-grid,.alimentos-grid{grid-template-columns:1fr}.tab-nav{grid-template-columns:1fr}}
@@ -218,7 +197,7 @@
 <div class="topbar-inner">
 <div class="brand">
 <h1>NutriTACO</h1>
-<div>Controle alimentar familiar, colesterol e necessidades nutricionais</div>
+<div>Diário integrado com perfil, colesterol e necessidades nutricionais</div>
 </div>
 <div class="toolbar">
 <button class="btn-outline" id="exportarBtn">Exportar Diário</button>
@@ -235,98 +214,13 @@
 </div>
 <div class="tab-nav-wrap">
 <div class="tab-nav">
-<button class="tab-btn active" data-tab="perfil">Perfil e Objetivos<span>dados pessoais e metas</span></button>
+<button class="tab-btn active" data-tab="diario">Diário alimentar<span>perfil, metas, refeições e resumo do dia</span></button>
 <button class="tab-btn" data-tab="alimentos">Alimentos<span>busca, grupos e ficha completa</span></button>
-<button class="tab-btn" data-tab="diario">Diário alimentar<span>refeições, macros e histórico do dia</span></button>
 <button class="tab-btn" data-tab="necessidades">Necessidades Nutricionais<span>vitaminas, minerais e nutrientes</span></button>
 </div>
 </div>
 
-<div class="page"><section class="tab-panel active" id="tab-perfil"><div class="tab-grid perfil-grid"><div class="card"><h2>Perfil e objetivos</h2><div class="profile-box">
-<div class="family-profile-strip">
-  <div>
-    <div class="label">Perfil familiar</div>
-    <select id="perfilFamiliarSelect"></select>
-  </div>
-  <button class="btn-soft" id="salvarPerfilBtn" type="button">Salvar perfil</button>
-  <button class="btn-outline" id="novoPerfilBtn" type="button">Novo perfil</button>
-  <button class="btn-danger" id="excluirPerfilBtn" type="button">Excluir</button>
-</div>
-
-<div class="grid-2">
-<div>
-<div class="label">Peso (kg)</div>
-<input id="pesoKg" min="1" step="0.1" type="number" value="80"/>
-</div>
-<div>
-<div class="label">Altura (cm)</div>
-<input id="alturaCm" min="50" step="1" type="number" value="175"/>
-</div>
-<div>
-<div class="label">Idade</div>
-<input id="idade" min="1" step="1" type="number" value="30"/>
-</div>
-<div>
-<div class="label">Sexo</div>
-<select id="sexo">
-<option value="masculino">Masculino</option>
-<option value="feminino">Feminino</option>
-</select>
-</div>
-</div>
-<div style="margin-top:12px">
-<div class="label">Atividade física</div>
-<select id="atividade">
-<option value="1.2">Sedentário</option>
-<option value="1.375">Levemente ativo</option>
-<option selected="" value="1.55">Moderadamente ativo</option>
-<option value="1.725">Muito ativo</option>
-<option value="1.9">Extremamente ativo</option>
-</select>
-</div>
-<div class="section-title">Objetivo</div>
-<div class="grid-3" id="objetivos"></div>
-<div class="inline" style="margin-top:12px">
-<button class="btn" id="calcularMetasBtn">Calcular metas automáticas</button>
-<button class="btn-soft" id="usarMetasManuaisBtn">Usar valores manuais</button>
-</div>
-</div></div><div class="card"><h2>Dashboard</h2><div class="muted">Resumo do perfil, gasto estimado e meta diária.</div><div class="grid-4">
-<div class="metric green-soft">
-<h4>IMC</h4>
-<div class="big" id="dashImc">0</div>
-<div class="muted" id="dashImcStatus">—</div>
-</div>
-<div class="metric blue-soft">
-<h4>Gasto estimado</h4>
-<div class="big" id="dashGasto">0</div>
-<div class="muted">kcal/dia</div>
-</div>
-<div class="metric amber-soft">
-<h4>Meta diária</h4>
-<div class="big" id="dashMeta">0</div>
-<div class="muted">kcal/dia</div>
-</div>
-<div class="metric violet-soft">
-<h4>Objetivo atual</h4>
-<div class="big" id="dashObjetivo" style="font-size:18px">—</div>
-<div class="muted">perfil nutricional</div>
-</div>
-</div></div><div class="card"><h2>Modo colesterol familiar</h2><div class="muted">Indicadores extras para acompanhar colesterol alimentar, fibras e lipídeos no dia.</div>
-<div class="cholesterol-card" style="margin-top:14px">
-  <div class="cholesterol-head">
-    <div>
-      <strong>Metas de cuidado</strong>
-      <div class="muted" style="margin-top:4px">Use como controle alimentar diário, sem substituir a orientação médica.</div>
-    </div>
-    <span class="heart-badge low">❤ Controle ativo</span>
-  </div>
-  <div class="heart-grid">
-    <div class="heart-metric"><h4>Colesterol alimentar</h4><div class="big">≤ 200</div><div class="muted">mg/dia</div></div>
-    <div class="heart-metric"><h4>Fibra alimentar</h4><div class="big">≥ 25</div><div class="muted">g/dia</div></div>
-    <div class="heart-metric"><h4>Foco do app</h4><div class="big" style="font-size:18px">Escolhas melhores</div><div class="muted">sem radicalismo</div></div>
-  </div>
-  <div class="heart-note">O painel classifica os alimentos com base nos dados disponíveis na TACO: colesterol, lipídeos e fibras. Como a tabela usada não possui gordura saturada/trans, o app não substitui avaliação nutricional completa.</div>
-</div></div></div></section><section class="tab-panel" id="tab-alimentos"><div class="tab-grid alimentos-grid"><div class="card"><h2>Alimentos</h2><div class="muted">Busque por nome, filtre por grupo e abra a ficha nutricional completa.</div><div>
+<div class="page"><section class="tab-panel" id="tab-alimentos"><div class="tab-grid alimentos-grid"><div class="card"><h2>Alimentos</h2><div class="muted">Busque por nome, filtre por grupo e abra a ficha nutricional completa.</div><div>
 <div class="label">Buscar alimento</div>
 <input class="search-input" id="busca" placeholder="Ex.: arroz, banana, frango..." type="text">
 </input></div><div class="grid-2" style="margin-top:12px">
@@ -375,23 +269,6 @@
 <div class="big" id="detLipideos">0</div>
 <div class="muted">g</div>
 </div>
-</div>
-
-<div class="simple-food-card" id="fichaSimplesCard">
-  <div class="simple-food-top">
-    <div>
-      <h3 style="margin:0">Leitura simples do alimento</h3>
-      <div class="muted" id="simpleFoodText" style="margin-top:6px">Selecione um alimento para receber uma orientação rápida.</div>
-    </div>
-    <span class="simple-food-status good" id="simpleFoodStatus">Boa escolha</span>
-  </div>
-  <div class="simple-food-grid">
-    <div class="simple-food-mini"><div class="label">Colesterol</div><strong id="simpleColesterol">0 mg</strong></div>
-    <div class="simple-food-mini"><div class="label">Fibras</div><strong id="simpleFibra">0 g</strong></div>
-    <div class="simple-food-mini"><div class="label">Gorduras</div><strong id="simpleLipideos">0 g</strong></div>
-  </div>
-  <div class="suggestion-list" id="simpleFoodSugestoes"></div>
-  <button class="btn-outline details-toggle" id="toggleDetalhesBtn" type="button">Ocultar detalhes técnicos</button>
 </div>
 
 <div class="nutri-visual-card" id="nutriVisualCard">
@@ -463,7 +340,6 @@
   <div class="heart-note" id="foodColesterolNota">Selecione um alimento para ver a análise.</div>
 </div>
 
-<div id="detalhesTecnicosWrap">
 <div class="section-title">Resumo rápido</div>
 <div class="detail-table"><table><tbody id="tblResumoRapido"></tbody></table></div>
 <div class="grid-2" style="margin-top:16px">
@@ -476,11 +352,100 @@
 <div class="detail-table"><table><tbody id="tblVitaminas"></tbody></table></div>
 </div>
 </div>
-</div>
 <div style="margin-top:16px">
 <button class="btn" id="abrirModalAdicionarBtn">Adicionar em refeição</button>
 </div>
-</div></div></div></section><section class="tab-panel" id="tab-diario"><div class="card">
+</div></div></div></section><section class="tab-panel active" id="tab-diario">
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+    <div>
+      <h2>Perfil, objetivos e metas</h2>
+      <div class="muted">Configure o perfil e veja o objetivo junto com o diário do dia.</div>
+    </div>
+    <button class="btn-soft" id="calcularMetasBtn">Calcular metas automáticas</button>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="profile-box">
+      <div class="grid-2">
+        <div>
+          <div class="label">Peso (kg)</div>
+          <input id="pesoKg" min="1" step="0.1" type="number" value="80"/>
+        </div>
+        <div>
+          <div class="label">Altura (cm)</div>
+          <input id="alturaCm" min="50" step="1" type="number" value="175"/>
+        </div>
+        <div>
+          <div class="label">Idade</div>
+          <input id="idade" min="1" step="1" type="number" value="30"/>
+        </div>
+        <div>
+          <div class="label">Sexo</div>
+          <select id="sexo">
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="label">Atividade física</div>
+        <select id="atividade">
+          <option value="1.2">Sedentário</option>
+          <option value="1.375">Levemente ativo</option>
+          <option selected value="1.55">Moderadamente ativo</option>
+          <option value="1.725">Muito ativo</option>
+          <option value="1.9">Extremamente ativo</option>
+        </select>
+      </div>
+
+      <div class="section-title">Objetivo</div>
+      <div class="grid-3" id="objetivos"></div>
+
+      <div class="inline" style="margin-top:12px">
+        <button class="btn-soft" id="usarMetasManuaisBtn">Usar valores manuais</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="grid-4">
+        <div class="metric green-soft">
+          <h4>IMC</h4>
+          <div class="big" id="dashImc">0</div>
+          <div class="muted" id="dashImcStatus">—</div>
+        </div>
+        <div class="metric blue-soft">
+          <h4>Gasto estimado</h4>
+          <div class="big" id="dashGasto">0</div>
+          <div class="muted">kcal/dia</div>
+        </div>
+        <div class="metric amber-soft">
+          <h4>Meta diária</h4>
+          <div class="big" id="dashMeta">0</div>
+          <div class="muted">kcal/dia</div>
+        </div>
+        <div class="metric violet-soft">
+          <h4>Objetivo atual</h4>
+          <div class="big" id="dashObjetivo" style="font-size:18px">—</div>
+          <div class="muted">perfil nutricional</div>
+        </div>
+      </div>
+
+      <div class="cholesterol-card" style="margin-top:14px">
+        <div class="cholesterol-head">
+          <div>
+            <strong>Modo colesterol familiar</strong>
+            <div class="muted" style="margin-top:4px">Indicadores extras para colesterol alimentar, fibras e lipídeos no dia.</div>
+          </div>
+          <span class="heart-badge low">❤ Controle ativo</span>
+        </div>
+        <div class="heart-note">Use como controle alimentar diário, sem substituir a orientação médica. A TACO desta base não possui gordura saturada/trans.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
 <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap">
 <div>
 <h2>Diário alimentar</h2>
@@ -516,18 +481,6 @@
 <div class="summary-box"><strong id="totalCarbo">0</strong><br/><span class="muted">carboidrato (g)</span></div>
 <div class="summary-box"><strong id="totalLipideos">0</strong><br/><span class="muted">lipídeos (g)</span></div>
 </div>
-
-<div class="quick-summary-card" id="resumoInteligenteDia">
-  <div class="semaphore-row">
-    <div class="semaphore-badge good" id="semaforoDia">BOM</div>
-    <div>
-      <h3 style="margin:0" id="resumoDiaTitulo">Resumo inteligente do dia</h3>
-      <div class="muted" id="resumoDiaTexto" style="margin-top:6px">Lance alimentos para receber uma leitura simples do dia.</div>
-      <div class="suggestion-list" id="sugestoesDia"></div>
-    </div>
-  </div>
-</div>
-
 <div class="cholesterol-card">
   <div class="cholesterol-head">
     <div>
@@ -1517,298 +1470,6 @@ function aplicarFiltros(){
   }
   
   
-
-  // ===== PERFIS FAMILIARES - VERSÃO CORRIGIDA =====
-  let perfisFamilia = [];
-  let perfilAtualId = "eu";
-  let perfilSistemaPronto = false;
-
-  function criarPerfilBase(id, nome){
-    return {
-      id,
-      nome,
-      pesoKg: "80",
-      alturaCm: "175",
-      idade: "30",
-      sexo: "masculino",
-      atividade: "1.55",
-      objetivo: "manter_peso",
-      metaKcal: "2000",
-      metaProteina: "120",
-      metaCarbo: "250",
-      metaLipideos: "70",
-      diario: {}
-    };
-  }
-
-  function perfilDaTela(){
-    const atual = perfisFamilia.find(p => p.id === perfilAtualId) || criarPerfilBase(perfilAtualId, "Perfil");
-    return {
-      ...atual,
-      pesoKg: el("pesoKg").value || "80",
-      alturaCm: el("alturaCm").value || "175",
-      idade: el("idade").value || "30",
-      sexo: el("sexo").value || "masculino",
-      atividade: el("atividade").value || "1.55",
-      objetivo: objetivoAtual || "manter_peso",
-      metaKcal: el("metaKcal").value || "2000",
-      metaProteina: el("metaProteina").value || "120",
-      metaCarbo: el("metaCarbo").value || "250",
-      metaLipideos: el("metaLipideos").value || "70",
-      diario: diarioPorData || {}
-    };
-  }
-
-  function aplicarPerfil(p){
-    if(!p) return;
-    el("pesoKg").value = p.pesoKg || "80";
-    el("alturaCm").value = p.alturaCm || "175";
-    el("idade").value = p.idade || "30";
-    el("sexo").value = p.sexo || "masculino";
-    el("atividade").value = p.atividade || "1.55";
-    objetivoAtual = p.objetivo || "manter_peso";
-    el("metaKcal").value = p.metaKcal || "2000";
-    el("metaProteina").value = p.metaProteina || "120";
-    el("metaCarbo").value = p.metaCarbo || "250";
-    el("metaLipideos").value = p.metaLipideos || "70";
-    diarioPorData = p.diario || {};
-    renderObjetivos();
-    atualizarDashboardPerfil();
-  }
-
-  function persistirPerfis(){
-    localStorage.setItem("nutritaco_familia_perfis_corrigido_v1", JSON.stringify(perfisFamilia));
-    localStorage.setItem("nutritaco_familia_perfil_atual_corrigido_v1", perfilAtualId);
-  }
-
-  function salvarEstadoPerfilAtual(){
-    if(!perfilSistemaPronto || !perfisFamilia.length) return;
-    const idx = perfisFamilia.findIndex(p => p.id === perfilAtualId);
-    if(idx >= 0){
-      perfisFamilia[idx] = perfilDaTela();
-      persistirPerfis();
-    }
-  }
-
-  function renderPerfilSelect(){
-    const sel = el("perfilFamiliarSelect");
-    if(!sel) return;
-    sel.innerHTML = perfisFamilia
-      .map(p => `<option value="${p.id}">${p.nome}</option>`)
-      .join("");
-    sel.value = perfilAtualId;
-  }
-
-  function carregarPerfisFamilia(){
-    let salvos = null;
-    try{
-      salvos = JSON.parse(localStorage.getItem("nutritaco_familia_perfis_corrigido_v1") || "null");
-    }catch(e){
-      salvos = null;
-    }
-
-    if(Array.isArray(salvos) && salvos.length){
-      perfisFamilia = salvos.map(p => ({...criarPerfilBase(p.id || ("perfil_" + Date.now()), p.nome || "Perfil"), ...p, diario: p.diario || {}}));
-    }else{
-      perfisFamilia = [
-        criarPerfilBase("eu", "Eu"),
-        criarPerfilBase("filho", "Filho(a)"),
-        criarPerfilBase("marido", "Marido")
-      ];
-      // preserva o diário que já existia no app antes da criação dos perfis
-      perfisFamilia[0].diario = diarioPorData || {};
-    }
-
-    perfilAtualId = localStorage.getItem("nutritaco_familia_perfil_atual_corrigido_v1") || perfisFamilia[0].id;
-    if(!perfisFamilia.find(p => p.id === perfilAtualId)) perfilAtualId = perfisFamilia[0].id;
-
-    perfilSistemaPronto = true;
-    aplicarPerfil(perfisFamilia.find(p => p.id === perfilAtualId));
-    renderPerfilSelect();
-    persistirPerfis();
-  }
-
-  function trocarPerfilFamiliar(novoId){
-    if(!novoId || novoId === perfilAtualId) return;
-    salvarEstadoPerfilAtual();
-    perfilAtualId = novoId;
-    const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
-    aplicarPerfil(perfil);
-    renderPerfilSelect();
-    persistirPerfis();
-    renderMealTabs();
-    renderRefeicoes();
-    renderResumo();
-    if(typeof renderNecessidades === "function") renderNecessidades();
-  }
-
-  function salvarPerfilAtualManual(){
-    salvarEstadoPerfilAtual();
-    renderPerfilSelect();
-    alert("Perfil salvo com sucesso.");
-  }
-
-  function criarNovoPerfil(){
-    salvarEstadoPerfilAtual();
-    const nome = prompt("Nome do novo perfil:", "Novo perfil");
-    if(!nome) return;
-    const id = "perfil_" + Date.now();
-    const novo = criarPerfilBase(id, nome);
-    perfisFamilia.push(novo);
-    perfilAtualId = id;
-    aplicarPerfil(novo);
-    renderPerfilSelect();
-    persistirPerfis();
-    renderMealTabs();
-    renderRefeicoes();
-    renderResumo();
-    if(typeof renderNecessidades === "function") renderNecessidades();
-  }
-
-  function excluirPerfilAtual(){
-    if(perfisFamilia.length <= 1){
-      alert("É necessário manter pelo menos um perfil.");
-      return;
-    }
-    const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
-    if(!confirm(`Excluir o perfil "${perfil?.nome || "selecionado"}"?`)) return;
-
-    perfisFamilia = perfisFamilia.filter(p => p.id !== perfilAtualId);
-    perfilAtualId = perfisFamilia[0].id;
-    aplicarPerfil(perfisFamilia[0]);
-    renderPerfilSelect();
-    persistirPerfis();
-    renderMealTabs();
-    renderRefeicoes();
-    renderResumo();
-    if(typeof renderNecessidades === "function") renderNecessidades();
-  }
-
-  const salvarLocalOriginalFamilia = salvarLocal;
-  salvarLocal = function(){
-    salvarLocalOriginalFamilia();
-    salvarEstadoPerfilAtual();
-  };
-
-
-  // ===== RESUMO INTELIGENTE E SUGESTÕES =====
-  function gerarSugestoesDia(total){
-    const sugestoes = [];
-    const metaCol = 200;
-    const metaFibra = 25;
-    const metaLip = Math.max(1, Number(el("metaLipideos").value) || 70);
-
-    if(total.colesterol > metaCol){
-      sugestoes.push("Colesterol alimentar alto hoje: prefira nas próximas refeições opções vegetais, frutas, aveia, feijão, lentilha e carnes mais magras.");
-    }
-    if(total.fibra < metaFibra * 0.6){
-      sugestoes.push("Fibras baixas: tente incluir aveia, fruta com casca, verduras, feijão ou leguminosas.");
-    }
-    if(total.lipideos > metaLip){
-      sugestoes.push("Gorduras acima da meta: reduza frituras, queijos gordos, embutidos e porções muito oleosas no restante do dia.");
-    }
-    if(!sugestoes.length){
-      sugestoes.push("Dia bem encaminhado: mantenha alimentos naturais, boas fibras e moderação nas gorduras.");
-    }
-    return sugestoes;
-  }
-
-  function atualizarResumoInteligenteDia(total){
-    if(!el("semaforoDia")) return;
-    const metaCol = 200;
-    const metaFibra = 25;
-    const metaLip = Math.max(1, Number(el("metaLipideos").value) || 70);
-
-    let nivel = "good", badge = "BOM", titulo = "Dia favorável para controle";
-    let texto = "As escolhas do dia estão equilibradas para colesterol, considerando os dados disponíveis da TACO.";
-
-    if(total.colesterol > metaCol || total.lipideos > metaLip * 1.15){
-      nivel = "high"; badge = "ATENÇÃO"; titulo = "Dia pede cuidado";
-      texto = "O diário passou de pontos importantes para colesterol/gorduras. Ajuste as próximas refeições com mais fibras e menos alimentos gordurosos.";
-    }else if(total.colesterol > metaCol * 0.75 || total.fibra < metaFibra * 0.6 || total.lipideos > metaLip * 0.9){
-      nivel = "warn"; badge = "MODERAR"; titulo = "Dia em observação";
-      texto = "Ainda dá para equilibrar o dia. O melhor ajuste agora é aumentar fibras e moderar gorduras.";
-    }
-
-    el("semaforoDia").className = "semaphore-badge " + nivel;
-    el("semaforoDia").textContent = badge;
-    el("resumoDiaTitulo").textContent = titulo;
-    el("resumoDiaTexto").textContent = texto;
-    el("sugestoesDia").innerHTML = gerarSugestoesDia(total).map(s => `<div class="suggestion-item">${s}</div>`).join("");
-  }
-
-  const _atualizarResumoColesterolDiaBase = atualizarResumoColesterolDia;
-  atualizarResumoColesterolDia = function(total){
-    _atualizarResumoColesterolDiaBase(total);
-    atualizarResumoInteligenteDia(total);
-  };
-
-  function atualizarFichaSimplesAlimento(){
-    if(!alimentoSelecionado || !el("simpleFoodStatus")) return;
-    const a = alimentoSelecionado;
-    const gramas = Math.max(1, Number(el("baseCalcGramas")?.value) || 100);
-    const fator = gramas / 100;
-    const colesterol = num(a.colesterol_mg) * fator;
-    const fibra = num(a.fibra_alimentar_g) * fator;
-    const lipideos = num(a.lipideos_g) * fator;
-    const c = classificarColesterolAlimento(a, gramas);
-
-    const nivelClasse = c.nivel === "low" ? "good" : c.nivel === "medium" ? "warn" : "high";
-    const statusTxt = nivelClasse === "good" ? "Boa escolha" : nivelClasse === "warn" ? "Moderação" : "Atenção";
-
-    el("simpleFoodStatus").className = "simple-food-status " + nivelClasse;
-    el("simpleFoodStatus").textContent = statusTxt;
-    el("simpleFoodText").textContent = c.nota;
-    el("simpleColesterol").textContent = fmt(colesterol,1) + " mg";
-    el("simpleFibra").textContent = fmt(fibra,1) + " g";
-    el("simpleLipideos").textContent = fmt(lipideos,1) + " g";
-
-    const sug = [];
-    if(nivelClasse === "high"){
-      sug.push("Sugestão: use porção menor ou troque por alimento com mais fibras e menos gorduras.");
-      sug.push("Boas alternativas frequentes: frutas, aveia, feijão, lentilha, verduras, peixe grelhado ou frango sem pele.");
-    }else if(nivelClasse === "warn"){
-      sug.push("Sugestão: pode entrar na rotina, mas observe a porção e o restante do dia.");
-      sug.push("Combine com alimentos ricos em fibras para ajudar no controle do colesterol.");
-    }else{
-      sug.push("Boa escolha para uma alimentação mais cuidadosa com colesterol.");
-    }
-    el("simpleFoodSugestoes").innerHTML = sug.map(s => `<div class="suggestion-item">${s}</div>`).join("");
-  }
-
-  const _atualizarPainelColesterolAlimentoBase = atualizarPainelColesterolAlimento;
-  atualizarPainelColesterolAlimento = function(){
-    _atualizarPainelColesterolAlimentoBase();
-    atualizarFichaSimplesAlimento();
-  };
-
-  function bindExtrasFamilia(){
-    if(el("perfilFamiliarSelect")){
-      el("perfilFamiliarSelect").addEventListener("change", e => trocarPerfil(e.target.value));
-    }
-    if(el("salvarPerfilBtn")){
-      el("salvarPerfilBtn").addEventListener("click", ()=>{
-        const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
-        const novoNome = prompt("Nome do perfil:", perfil?.nome || "Perfil");
-        if(novoNome) perfil.nome = novoNome;
-        salvarPerfilAtual();
-        renderPerfilSelect();
-        alert("Perfil salvo com sucesso.");
-      });
-    }
-    if(el("novoPerfilBtn")) el("novoPerfilBtn").addEventListener("click", criarNovoPerfil);
-    if(el("excluirPerfilBtn")) el("excluirPerfilBtn").addEventListener("click", excluirPerfilAtual);
-    if(el("toggleDetalhesBtn")){
-      el("toggleDetalhesBtn").addEventListener("click", ()=>{
-        const bloco = el("detalhesTecnicosWrap");
-        if(!bloco) return;
-        bloco.classList.toggle("hidden");
-        el("toggleDetalhesBtn").textContent = bloco.classList.contains("hidden") ? "Ver todos os nutrientes" : "Ocultar detalhes técnicos";
-      });
-    }
-  }
-
-
   async function init(){
     setupTabs();
     carregarLocal();
