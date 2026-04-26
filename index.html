@@ -161,7 +161,7 @@
     }
   
     .tab-nav-wrap{max-width:1680px;margin:14px auto 0;padding:0 18px}
-    .tab-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+    .tab-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
     .tab-btn{border:1px solid transparent;background:#fff;border-radius:14px;padding:13px 12px;cursor:pointer;font-size:15px;color:var(--text);font-weight:700}
     .tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
     .tab-btn span{display:block;font-size:12px;font-weight:400;margin-top:3px;opacity:.78}
@@ -205,6 +205,19 @@
     .food-suggestion strong{font-size:14px}
     .food-suggestion span{font-size:12px;color:var(--muted)}
     .suggestion-note{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.45}
+    
+    .recipes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+    .recipe-card{border:1px solid var(--line);border-radius:18px;padding:16px;background:#fff;box-shadow:var(--shadow)}
+    .recipe-card h3{margin:0 0 6px}
+    .recipe-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .recipe-items{margin:12px 0 0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.45}
+    .recipe-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .recipe-small{font-size:13px;color:var(--muted);line-height:1.45;margin-top:8px}
+    .recipe-toolbar{display:grid;grid-template-columns:1fr 180px 180px;gap:12px;margin-top:14px}
+    .recipe-warning{border:1px solid #fcd34d;background:#fffbeb;color:#92400e;border-radius:14px;padding:12px;margin-top:14px;font-size:14px}
+    @media (max-width: 1100px){.recipes-grid{grid-template-columns:1fr 1fr}.recipe-toolbar{grid-template-columns:1fr}}
+    @media (max-width: 760px){.recipes-grid{grid-template-columns:1fr}.recipe-actions{grid-template-columns:1fr}}
+
     @media (max-width: 900px){.missing-grid,.suggestion-grid{grid-template-columns:1fr}}
 
     @media (max-width: 760px){.needs-grid{grid-template-columns:1fr}}
@@ -236,6 +249,7 @@
 <div class="tab-nav">
 <button class="tab-btn active" data-tab="diario">Diário alimentar<span>perfil, metas, refeições e resumo do dia</span></button>
 <button class="tab-btn" data-tab="alimentos">Alimentos<span>busca, grupos e ficha completa</span></button>
+<button class="tab-btn" data-tab="receitas">Receitas rápidas<span>medidas caseiras e lançamento automático</span></button>
 <button class="tab-btn" data-tab="necessidades">Necessidades Nutricionais<span>vitaminas, minerais e nutrientes</span></button>
 </div>
 </div>
@@ -592,7 +606,41 @@
 </div>
 <div class="meal-tabs" id="mealTabs"></div>
 <div id="mealContainer"></div>
-</section><section class="tab-panel" id="tab-necessidades">
+</section>
+<section class="tab-panel" id="tab-receitas">
+  <div class="card">
+    <h2>Receitas rápidas</h2>
+    <div class="muted">Escolha uma receita simples com medidas caseiras. O app converte para gramas estimadas e lança os alimentos automaticamente no diário.</div>
+
+    <div class="recipe-toolbar">
+      <div>
+        <div class="label">Buscar receita</div>
+        <input type="text" id="buscaReceita" placeholder="Ex.: aveia, arroz, omelete..." />
+      </div>
+      <div>
+        <div class="label">Refeição</div>
+        <select id="receitaRefeicao"></select>
+      </div>
+      <div>
+        <div class="label">Porções</div>
+        <select id="receitaPorcoes">
+          <option value="0.5">Meia porção</option>
+          <option value="1" selected>1 porção</option>
+          <option value="1.5">1,5 porção</option>
+          <option value="2">2 porções</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="recipe-warning">
+      As medidas caseiras são estimativas. Para dieta clínica ou controle rigoroso, a balança e o acompanhamento profissional continuam sendo mais precisos.
+    </div>
+
+    <div class="recipes-grid" id="listaReceitas"></div>
+  </div>
+</section>
+
+<section class="tab-panel" id="tab-necessidades">
   <div class="card">
     <div class="needs-header">
       <div>
@@ -766,6 +814,7 @@ async function carregarManifesto(){
 
     aplicarFiltros();
     atualizarFaltaDia();
+    renderReceitas();
   }catch(err){
     setStatus("Erro ao carregar taco_completo.json.", "error");
   }
@@ -1581,6 +1630,7 @@ function aplicarFiltros(){
         preencherGruposSimples();
         aplicarFiltros();
         atualizarFaltaDia();
+        renderReceitas();
         setStatus(`Base manual carregada com sucesso: ${baseAtual.length} alimentos.`, "ok");
       }catch(err){
         setStatus("O arquivo selecionado não é um JSON válido da base completa.", "error");
@@ -1640,6 +1690,9 @@ function aplicarFiltros(){
     if(el("baseCalcGramas")) el("baseCalcGramas").addEventListener("input", atualizarGraficoAlimento);
     el("modalRefeicao").addEventListener("change", atualizarPreviewModal);
     el("modalOverlay").addEventListener("click", (e)=>{ if(e.target === el("modalOverlay")) fecharModal(); });
+    if(el("buscaReceita")) el("buscaReceita").addEventListener("input", renderReceitas);
+    if(el("receitaPorcoes")) el("receitaPorcoes").addEventListener("change", renderReceitas);
+    if(el("receitaRefeicao")) el("receitaRefeicao").addEventListener("change", ()=>{});
   }
 
 
@@ -1663,7 +1716,9 @@ function aplicarFiltros(){
 
   window.NutriTaco = {
     removerItem,
-    editarItem: abrirModalEdicao
+    editarItem: abrirModalEdicao,
+    adicionarReceita,
+    verReceita
   };
 
 
@@ -1679,6 +1734,238 @@ function aplicarFiltros(){
   }
   
   
+
+  // ===== RECEITAS RÁPIDAS =====
+  const receitasRapidas = [
+    {
+      id:"arroz_feijao",
+      nome:"Arroz com feijão simples",
+      categoria:"Almoço/Jantar",
+      nota:"Base brasileira simples. Boa para combinar com salada e proteína magra.",
+      ingredientes:[
+        {busca:"Arroz, tipo 1, cozido", medida:"4 colheres de sopa de arroz cozido", gramas:100},
+        {busca:"Feijão, carioca, cozido", medida:"1 concha pequena de feijão", gramas:86}
+      ]
+    },
+    {
+      id:"omelete_simples",
+      nome:"Omelete simples",
+      categoria:"Café/Almoço/Jantar",
+      nota:"Boa opção de proteína. Para colesterol alto, observe a frequência de gemas conforme orientação médica.",
+      ingredientes:[
+        {busca:"Ovo, de galinha, inteiro, cozido/10minutos", medida:"2 ovos", gramas:100},
+        {busca:"Tomate, com semente, cru", medida:"2 colheres de sopa de tomate picado", gramas:40},
+        {busca:"Cebola, crua", medida:"1 colher de sopa de cebola picada", gramas:15}
+      ]
+    },
+    {
+      id:"mingau_aveia",
+      nome:"Mingau de aveia",
+      categoria:"Café/Lanche",
+      nota:"Excelente para aumentar fibras, especialmente útil no cuidado com colesterol.",
+      ingredientes:[
+        {busca:"Aveia, flocos, crua", medida:"3 colheres de sopa de aveia", gramas:30},
+        {busca:"Leite, vaca, desnatado, UHT", medida:"1 copo americano de leite", gramas:200},
+        {busca:"Banana, prata, crua", medida:"1 banana média", gramas:86}
+      ]
+    },
+    {
+      id:"iogurte_fruta",
+      nome:"Iogurte com fruta e aveia",
+      categoria:"Café/Lanche",
+      nota:"Lanche prático, com fibras e boa saciedade.",
+      ingredientes:[
+        {busca:"Iogurte, natural", medida:"1 pote de iogurte natural", gramas:170},
+        {busca:"Banana, prata, crua", medida:"1 banana média", gramas:86},
+        {busca:"Aveia, flocos, crua", medida:"1 colher de sopa de aveia", gramas:10}
+      ]
+    },
+    {
+      id:"salada_basica",
+      nome:"Salada básica",
+      categoria:"Almoço/Jantar",
+      nota:"Ajuda a elevar fibras e melhorar o volume da refeição com poucas calorias.",
+      ingredientes:[
+        {busca:"Alface, crespa, crua", medida:"3 folhas de alface", gramas:45},
+        {busca:"Tomate, com semente, cru", medida:"1 tomate pequeno", gramas:80},
+        {busca:"Cenoura, crua", medida:"2 colheres de sopa de cenoura ralada", gramas:30}
+      ]
+    },
+    {
+      id:"frango_arroz_salada",
+      nome:"Frango com arroz e salada",
+      categoria:"Almoço/Jantar",
+      nota:"Prato simples e equilibrado, com proteína magra.",
+      ingredientes:[
+        {busca:"Frango, peito, sem pele, grelhado", medida:"1 filé médio de frango", gramas:100},
+        {busca:"Arroz, tipo 1, cozido", medida:"3 colheres de sopa de arroz cozido", gramas:75},
+        {busca:"Alface, crespa, crua", medida:"3 folhas de alface", gramas:45},
+        {busca:"Tomate, com semente, cru", medida:"1 tomate pequeno", gramas:80}
+      ]
+    },
+    {
+      id:"sanduiche_natural",
+      nome:"Sanduíche natural simples",
+      categoria:"Lanche",
+      nota:"Opção prática. Prefira pão integral quando possível.",
+      ingredientes:[
+        {busca:"Pão, de forma, integral", medida:"2 fatias de pão integral", gramas:50},
+        {busca:"Frango, peito, sem pele, cozido", medida:"3 colheres de sopa de frango desfiado", gramas:60},
+        {busca:"Alface, crespa, crua", medida:"1 folha de alface", gramas:15},
+        {busca:"Tomate, com semente, cru", medida:"2 rodelas de tomate", gramas:30}
+      ]
+    },
+    {
+      id:"vitamina_banana_aveia",
+      nome:"Vitamina de banana com aveia",
+      categoria:"Café/Lanche",
+      nota:"Boa para energia e fibras. Use leite desnatado para reduzir gorduras.",
+      ingredientes:[
+        {busca:"Banana, prata, crua", medida:"1 banana média", gramas:86},
+        {busca:"Leite, vaca, desnatado, UHT", medida:"1 copo americano de leite", gramas:200},
+        {busca:"Aveia, flocos, crua", medida:"2 colheres de sopa de aveia", gramas:20}
+      ]
+    }
+  ];
+
+  function popularRefeicoesReceitas(){
+    if(!el("receitaRefeicao")) return;
+    el("receitaRefeicao").innerHTML = refeicoes.map(r => `<option value="${r.id}">${r.nome}</option>`).join("");
+    el("receitaRefeicao").value = refeicaoAtiva || "almoco";
+  }
+
+  function encontrarAlimentoReceita(termo){
+    const normal = String(termo || "").toLowerCase();
+    let a = (baseAtual || []).find(x => String(x.descricao_alimento || "").toLowerCase() === normal);
+    if(a) return a;
+    a = (baseAtual || []).find(x => String(x.descricao_alimento || "").toLowerCase().includes(normal));
+    if(a) return a;
+    const primeira = normal.split(",")[0].trim();
+    return (baseAtual || []).find(x => String(x.descricao_alimento || "").toLowerCase().includes(primeira));
+  }
+
+  function calcularReceita(receita, porcoes=1){
+    const total = {kcal:0, proteina:0, carbo:0, lipideos:0, colesterol:0, fibra:0};
+    let encontrados = 0;
+    receita.ingredientes.forEach(ing => {
+      const a = encontrarAlimentoReceita(ing.busca);
+      if(!a) return;
+      encontrados++;
+      const f = (ing.gramas * porcoes) / 100;
+      total.kcal += num(a.energia_kcal) * f;
+      total.proteina += num(a.proteina_g) * f;
+      total.carbo += num(a.carboidrato_g) * f;
+      total.lipideos += num(a.lipideos_g) * f;
+      total.colesterol += num(a.colesterol_mg) * f;
+      total.fibra += num(a.fibra_alimentar_g) * f;
+    });
+    return {...total, encontrados};
+  }
+
+  function renderReceitas(){
+    if(!el("listaReceitas")) return;
+    popularRefeicoesReceitas();
+    const termo = String(el("buscaReceita")?.value || "").toLowerCase();
+    const porcoes = Number(el("receitaPorcoes")?.value || 1);
+    const lista = receitasRapidas.filter(r => !termo || r.nome.toLowerCase().includes(termo) || r.categoria.toLowerCase().includes(termo) || r.ingredientes.some(i => i.medida.toLowerCase().includes(termo)));
+
+    el("listaReceitas").innerHTML = lista.map(r => {
+      const t = calcularReceita(r, porcoes);
+      const ingredientes = r.ingredientes.map(i => `<li>${i.medida} <span class="muted">(aprox. ${Math.round(i.gramas * porcoes)}g)</span></li>`).join("");
+      return `
+        <div class="recipe-card">
+          <h3>${r.nome}</h3>
+          <div class="muted">${r.categoria}</div>
+          <div class="recipe-meta">
+            <span class="pill">${fmt(t.kcal,0)} kcal</span>
+            <span class="pill">P ${fmt(t.proteina,1)}g</span>
+            <span class="pill">C ${fmt(t.carbo,1)}g</span>
+            <span class="pill">G ${fmt(t.lipideos,1)}g</span>
+            <span class="pill">Fibra ${fmt(t.fibra,1)}g</span>
+          </div>
+          <ul class="recipe-items">${ingredientes}</ul>
+          <div class="recipe-small">${r.nota}</div>
+          <div class="recipe-actions">
+            <button class="btn" onclick="window.NutriTaco.adicionarReceita('${r.id}')">Adicionar receita</button>
+            <button class="btn-outline" onclick="window.NutriTaco.verReceita('${r.id}')">Ver detalhes</button>
+          </div>
+        </div>
+      `;
+    }).join("") || `<div class="muted">Nenhuma receita encontrada.</div>`;
+  }
+
+  function adicionarReceita(id){
+    const receita = receitasRapidas.find(r => r.id === id);
+    if(!receita) return;
+    const refeicao = el("receitaRefeicao")?.value || refeicaoAtiva || "almoco";
+    const porcoes = Number(el("receitaPorcoes")?.value || 1);
+    let adicionados = 0;
+    let naoEncontrados = [];
+
+    receita.ingredientes.forEach(ing => {
+      const a = encontrarAlimentoReceita(ing.busca);
+      if(!a){
+        naoEncontrados.push(ing.busca);
+        return;
+      }
+      const g = ing.gramas * porcoes;
+      const f = g / 100;
+      const novo = {
+        nome: a.descricao_alimento,
+        grupo: getGrupo(a),
+        quantidade_g: g,
+        kcal: num(a.energia_kcal) * f,
+        proteina_g: num(a.proteina_g) * f,
+        carboidrato_g: num(a.carboidrato_g) * f,
+        lipideos_g: num(a.lipideos_g) * f,
+        colesterol_mg: num(a.colesterol_mg) * f,
+        fibra_alimentar_g: num(a.fibra_alimentar_g) * f,
+        sodio_mg: num(a.sodio_mg) * f,
+        calcio_mg: num(a.calcio_mg) * f,
+        ferro_mg: num(a.ferro_mg) * f,
+        magnesio_mg: num(a.magnesio_mg) * f,
+        manganes_mg: num(a.manganes_mg) * f,
+        fosforo_mg: num(a.fosforo_mg) * f,
+        potassio_mg: num(a.potassio_mg) * f,
+        cobre_mg: num(a.cobre_mg) * f,
+        zinco_mg: num(a.zinco_mg) * f,
+        retinol_mcg: num(a.retinol_mcg || a.rae_mcg || a.re_mcg) * f,
+        tiamina_mg: num(a.tiamina_mg) * f,
+        riboflavina_mg: num(a.riboflavina_mg) * f,
+        piridoxina_mg: num(a.piridoxina_mg) * f,
+        niacina_mg: num(a.niacina_mg) * f,
+        vitamina_c_mg: num(a.vitamina_c_mg) * f,
+        origem_receita: receita.nome,
+        medida_caseira: ing.medida
+      };
+      getDia()[refeicao].push(novo);
+      adicionados++;
+    });
+
+    refeicaoAtiva = refeicao;
+    salvarLocal();
+    renderMealTabs();
+    renderRefeicoes();
+    renderResumo();
+    if(typeof renderNecessidades === "function") renderNecessidades();
+
+    let msg = `Receita adicionada: ${receita.nome}\\nItens lançados: ${adicionados}`;
+    if(naoEncontrados.length){
+      msg += `\\n\\nAlguns ingredientes não foram encontrados na base: ${naoEncontrados.join(", ")}`;
+    }
+    alert(msg);
+  }
+
+  function verReceita(id){
+    const receita = receitasRapidas.find(r => r.id === id);
+    if(!receita) return;
+    const porcoes = Number(el("receitaPorcoes")?.value || 1);
+    const t = calcularReceita(receita, porcoes);
+    const lista = receita.ingredientes.map(i => `• ${i.medida} (aprox. ${Math.round(i.gramas * porcoes)}g)`).join("\\n");
+    alert(`${receita.nome}\\n\\n${lista}\\n\\nEstimativa por ${porcoes} porção(ões):\\n${fmt(t.kcal,0)} kcal | Proteína ${fmt(t.proteina,1)}g | Carbo ${fmt(t.carbo,1)}g | Gorduras ${fmt(t.lipideos,1)}g | Fibra ${fmt(t.fibra,1)}g`);
+  }
+
+
   async function init(){
     setupTabs();
     carregarLocal();
@@ -1689,6 +1976,7 @@ function aplicarFiltros(){
     renderRefeicoes();
     renderResumo();
     await carregarManifesto();
+    renderReceitas();
   }
 
   init();
