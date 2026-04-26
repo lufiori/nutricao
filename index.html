@@ -1518,126 +1518,151 @@ function aplicarFiltros(){
   
   
 
-  // ===== PERFIS FAMILIARES =====
+  // ===== PERFIS FAMILIARES - VERSÃO CORRIGIDA =====
   let perfisFamilia = [];
-  let perfilAtualId = "principal";
-  let diariosFamilia = {};
+  let perfilAtualId = "eu";
+  let perfilSistemaPronto = false;
 
-  function perfilPadrao(){
+  function criarPerfilBase(id, nome){
     return {
-      id:"principal",
-      nome:"Meu perfil",
-      pesoKg: el("pesoKg")?.value || "80",
-      alturaCm: el("alturaCm")?.value || "175",
-      idade: el("idade")?.value || "30",
-      sexo: el("sexo")?.value || "masculino",
-      atividade: el("atividade")?.value || "1.55",
-      objetivo: objetivoAtual || "manter_peso",
-      metaKcal: el("metaKcal")?.value || "2000",
-      metaProteina: el("metaProteina")?.value || "120",
-      metaCarbo: el("metaCarbo")?.value || "250",
-      metaLipideos: el("metaLipideos")?.value || "70"
+      id,
+      nome,
+      pesoKg: "80",
+      alturaCm: "175",
+      idade: "30",
+      sexo: "masculino",
+      atividade: "1.55",
+      objetivo: "manter_peso",
+      metaKcal: "2000",
+      metaProteina: "120",
+      metaCarbo: "250",
+      metaLipideos: "70",
+      diario: {}
     };
   }
 
-  function carregarPerfisFamilia(){
-    try{ perfisFamilia = JSON.parse(localStorage.getItem("nutritaco_perfis_familia_v1") || "[]"); }
-    catch(e){ perfisFamilia = []; }
-    try{ diariosFamilia = JSON.parse(localStorage.getItem("nutritaco_diarios_familia_v1") || "{}"); }
-    catch(e){ diariosFamilia = {}; }
-
-    perfilAtualId = localStorage.getItem("nutritaco_perfil_atual_v1") || "principal";
-    if(!perfisFamilia.length){
-      perfisFamilia = [perfilPadrao()];
-      diariosFamilia.principal = diarioPorData || {};
-    }
-    if(!perfisFamilia.find(p => p.id === perfilAtualId)){
-      perfilAtualId = perfisFamilia[0].id;
-    }
-    if(!diariosFamilia[perfilAtualId]) diariosFamilia[perfilAtualId] = {};
-    diarioPorData = diariosFamilia[perfilAtualId];
-    aplicarPerfilNaTela(perfisFamilia.find(p => p.id === perfilAtualId));
-    renderPerfilSelect();
-  }
-
-  function salvarPerfisFamilia(){
-    diariosFamilia[perfilAtualId] = diarioPorData;
-    localStorage.setItem("nutritaco_perfis_familia_v1", JSON.stringify(perfisFamilia));
-    localStorage.setItem("nutritaco_diarios_familia_v1", JSON.stringify(diariosFamilia));
-    localStorage.setItem("nutritaco_perfil_atual_v1", perfilAtualId);
-  }
-
-  function lerPerfilDaTela(){
-    const atual = perfisFamilia.find(p => p.id === perfilAtualId) || perfilPadrao();
+  function perfilDaTela(){
+    const atual = perfisFamilia.find(p => p.id === perfilAtualId) || criarPerfilBase(perfilAtualId, "Perfil");
     return {
       ...atual,
-      pesoKg: el("pesoKg").value,
-      alturaCm: el("alturaCm").value,
-      idade: el("idade").value,
-      sexo: el("sexo").value,
-      atividade: el("atividade").value,
-      objetivo: objetivoAtual,
-      metaKcal: el("metaKcal").value,
-      metaProteina: el("metaProteina").value,
-      metaCarbo: el("metaCarbo").value,
-      metaLipideos: el("metaLipideos").value
+      pesoKg: el("pesoKg").value || "80",
+      alturaCm: el("alturaCm").value || "175",
+      idade: el("idade").value || "30",
+      sexo: el("sexo").value || "masculino",
+      atividade: el("atividade").value || "1.55",
+      objetivo: objetivoAtual || "manter_peso",
+      metaKcal: el("metaKcal").value || "2000",
+      metaProteina: el("metaProteina").value || "120",
+      metaCarbo: el("metaCarbo").value || "250",
+      metaLipideos: el("metaLipideos").value || "70",
+      diario: diarioPorData || {}
     };
   }
 
-  function aplicarPerfilNaTela(p){
+  function aplicarPerfil(p){
     if(!p) return;
-    el("pesoKg").value = p.pesoKg || 80;
-    el("alturaCm").value = p.alturaCm || 175;
-    el("idade").value = p.idade || 30;
+    el("pesoKg").value = p.pesoKg || "80";
+    el("alturaCm").value = p.alturaCm || "175";
+    el("idade").value = p.idade || "30";
     el("sexo").value = p.sexo || "masculino";
     el("atividade").value = p.atividade || "1.55";
     objetivoAtual = p.objetivo || "manter_peso";
-    el("metaKcal").value = p.metaKcal || 2000;
-    el("metaProteina").value = p.metaProteina || 120;
-    el("metaCarbo").value = p.metaCarbo || 250;
-    el("metaLipideos").value = p.metaLipideos || 70;
+    el("metaKcal").value = p.metaKcal || "2000";
+    el("metaProteina").value = p.metaProteina || "120";
+    el("metaCarbo").value = p.metaCarbo || "250";
+    el("metaLipideos").value = p.metaLipideos || "70";
+    diarioPorData = p.diario || {};
     renderObjetivos();
     atualizarDashboardPerfil();
   }
 
-  function renderPerfilSelect(){
-    if(!el("perfilFamiliarSelect")) return;
-    el("perfilFamiliarSelect").innerHTML = perfisFamilia.map(p => `<option value="${p.id}">${p.nome}</option>`).join("");
-    el("perfilFamiliarSelect").value = perfilAtualId;
+  function persistirPerfis(){
+    localStorage.setItem("nutritaco_familia_perfis_corrigido_v1", JSON.stringify(perfisFamilia));
+    localStorage.setItem("nutritaco_familia_perfil_atual_corrigido_v1", perfilAtualId);
   }
 
-  function trocarPerfil(id){
-    const atual = perfisFamilia.findIndex(p => p.id === perfilAtualId);
-    if(atual >= 0) perfisFamilia[atual] = lerPerfilDaTela();
-    diariosFamilia[perfilAtualId] = diarioPorData;
+  function salvarEstadoPerfilAtual(){
+    if(!perfilSistemaPronto || !perfisFamilia.length) return;
+    const idx = perfisFamilia.findIndex(p => p.id === perfilAtualId);
+    if(idx >= 0){
+      perfisFamilia[idx] = perfilDaTela();
+      persistirPerfis();
+    }
+  }
 
-    perfilAtualId = id;
-    if(!diariosFamilia[perfilAtualId]) diariosFamilia[perfilAtualId] = {};
-    diarioPorData = diariosFamilia[perfilAtualId];
-    aplicarPerfilNaTela(perfisFamilia.find(p => p.id === perfilAtualId));
+  function renderPerfilSelect(){
+    const sel = el("perfilFamiliarSelect");
+    if(!sel) return;
+    sel.innerHTML = perfisFamilia
+      .map(p => `<option value="${p.id}">${p.nome}</option>`)
+      .join("");
+    sel.value = perfilAtualId;
+  }
+
+  function carregarPerfisFamilia(){
+    let salvos = null;
+    try{
+      salvos = JSON.parse(localStorage.getItem("nutritaco_familia_perfis_corrigido_v1") || "null");
+    }catch(e){
+      salvos = null;
+    }
+
+    if(Array.isArray(salvos) && salvos.length){
+      perfisFamilia = salvos.map(p => ({...criarPerfilBase(p.id || ("perfil_" + Date.now()), p.nome || "Perfil"), ...p, diario: p.diario || {}}));
+    }else{
+      perfisFamilia = [
+        criarPerfilBase("eu", "Eu"),
+        criarPerfilBase("filho", "Filho(a)"),
+        criarPerfilBase("marido", "Marido")
+      ];
+      // preserva o diário que já existia no app antes da criação dos perfis
+      perfisFamilia[0].diario = diarioPorData || {};
+    }
+
+    perfilAtualId = localStorage.getItem("nutritaco_familia_perfil_atual_corrigido_v1") || perfisFamilia[0].id;
+    if(!perfisFamilia.find(p => p.id === perfilAtualId)) perfilAtualId = perfisFamilia[0].id;
+
+    perfilSistemaPronto = true;
+    aplicarPerfil(perfisFamilia.find(p => p.id === perfilAtualId));
     renderPerfilSelect();
-    salvarPerfisFamilia();
+    persistirPerfis();
+  }
+
+  function trocarPerfilFamiliar(novoId){
+    if(!novoId || novoId === perfilAtualId) return;
+    salvarEstadoPerfilAtual();
+    perfilAtualId = novoId;
+    const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
+    aplicarPerfil(perfil);
+    renderPerfilSelect();
+    persistirPerfis();
     renderMealTabs();
     renderRefeicoes();
     renderResumo();
     if(typeof renderNecessidades === "function") renderNecessidades();
   }
 
-  function salvarPerfilAtual(){
-    const idx = perfisFamilia.findIndex(p => p.id === perfilAtualId);
-    if(idx >= 0) perfisFamilia[idx] = lerPerfilDaTela();
-    salvarPerfisFamilia();
+  function salvarPerfilAtualManual(){
+    salvarEstadoPerfilAtual();
+    renderPerfilSelect();
+    alert("Perfil salvo com sucesso.");
   }
 
   function criarNovoPerfil(){
-    const nome = prompt("Nome do novo perfil familiar:", "Novo perfil");
+    salvarEstadoPerfilAtual();
+    const nome = prompt("Nome do novo perfil:", "Novo perfil");
     if(!nome) return;
-    salvarPerfilAtual();
     const id = "perfil_" + Date.now();
-    const novo = {...perfilPadrao(), id, nome};
+    const novo = criarPerfilBase(id, nome);
     perfisFamilia.push(novo);
-    diariosFamilia[id] = {};
-    trocarPerfil(id);
+    perfilAtualId = id;
+    aplicarPerfil(novo);
+    renderPerfilSelect();
+    persistirPerfis();
+    renderMealTabs();
+    renderRefeicoes();
+    renderResumo();
+    if(typeof renderNecessidades === "function") renderNecessidades();
   }
 
   function excluirPerfilAtual(){
@@ -1646,26 +1671,25 @@ function aplicarFiltros(){
       return;
     }
     const perfil = perfisFamilia.find(p => p.id === perfilAtualId);
-    if(!confirm(`Excluir o perfil "${perfil?.nome || "selecionado"}" e o diário dele?`)) return;
-    delete diariosFamilia[perfilAtualId];
+    if(!confirm(`Excluir o perfil "${perfil?.nome || "selecionado"}"?`)) return;
+
     perfisFamilia = perfisFamilia.filter(p => p.id !== perfilAtualId);
     perfilAtualId = perfisFamilia[0].id;
-    diarioPorData = diariosFamilia[perfilAtualId] || {};
-    aplicarPerfilNaTela(perfisFamilia[0]);
+    aplicarPerfil(perfisFamilia[0]);
     renderPerfilSelect();
-    salvarPerfisFamilia();
+    persistirPerfis();
+    renderMealTabs();
     renderRefeicoes();
     renderResumo();
     if(typeof renderNecessidades === "function") renderNecessidades();
   }
 
-  const _salvarLocalBase = salvarLocal;
+  const salvarLocalOriginalFamilia = salvarLocal;
   salvarLocal = function(){
-    _salvarLocalBase();
-    if(perfisFamilia && perfisFamilia.length){
-      salvarPerfilAtual();
-    }
+    salvarLocalOriginalFamilia();
+    salvarEstadoPerfilAtual();
   };
+
 
   // ===== RESUMO INTELIGENTE E SUGESTÕES =====
   function gerarSugestoesDia(total){
