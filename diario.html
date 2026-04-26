@@ -157,7 +157,40 @@ function header(active){
  </div>
  <div class="card"><h3>Falta no seu dia</h3><div id="faltaDia"></div></div>
  <div class="card"><h3>Refeições</h3><div id="mealTabs"></div><div id="mealContainer"></div></div>
-</div><script>
+</div>
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(17,24,39,.35);z-index:100;align-items:center;justify-content:center;padding:16px">
+  <div class="card" style="width:min(520px,100%);margin:0">
+    <div class="inline" style="justify-content:space-between">
+      <div>
+        <h3 style="margin:0">Editar item</h3>
+        <div class="muted" id="editNome">Alimento</div>
+      </div>
+      <button class="btn-outline" onclick="fecharEdicao()">×</button>
+    </div>
+    <div class="grid-2" style="margin-top:14px">
+      <div>
+        <label>Refeição</label>
+        <select id="editRefeicao"></select>
+      </div>
+      <div>
+        <label>Quantidade (g)</label>
+        <input id="editQuantidade" type="number" min="1" step="1">
+      </div>
+    </div>
+    <div class="grid-4" style="margin-top:14px">
+      <div class="metric blue-soft"><h4>kcal</h4><div class="big" id="editKcal">0</div></div>
+      <div class="metric green-soft"><h4>Proteína</h4><div class="big" id="editProteina">0</div></div>
+      <div class="metric amber-soft"><h4>Carbo</h4><div class="big" id="editCarbo">0</div></div>
+      <div class="metric red-soft"><h4>Gorduras</h4><div class="big" id="editGordura">0</div></div>
+    </div>
+    <div class="inline" style="margin-top:14px">
+      <button class="btn" onclick="salvarEdicao()">Salvar alterações</button>
+      <button class="btn-outline" onclick="fecharEdicao()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
 function initPerfil(){
  const p={pesoKg:80,alturaCm:175,idade:30,sexo:"masculino",atividade:1.55,objetivo:"manter_peso",...getPerfil()};
  ["pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>{if(el(id))el(id).value=p[id]});
@@ -186,8 +219,84 @@ function salvarMetas(){const p=getPerfil();["metaKcal","metaProteina","metaCarbo
 function renderMealTabs(){el("mealTabs").innerHTML=refeicoes.map(r=>`<button class="meal-tab ${r.id===refeicaoAtiva?'active':''}" onclick="refeicaoAtiva='${r.id}';renderMealTabs();renderRefeicoes()">${r.nome}</button>`).join("")}
 function renderRefeicoes(){
  const dia=getDia(), itens=dia[refeicaoAtiva]||[], t=totaisItens(itens), ref=refeicoes.find(r=>r.id===refeicaoAtiva);
- el("mealContainer").innerHTML=`<div class="card"><h3>${ref.nome}</h3><div class="muted">${fmt(t.kcal,1)} kcal • P ${fmt(t.proteina,1)}g • C ${fmt(t.carbo,1)}g • G ${fmt(t.lipideos,1)}g</div><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Qtd</th><th>kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr></thead><tbody>${itens.length?itens.map((it,i)=>`<tr><td>${it.nome}<br><span class="muted">${it.grupo||""}</span></td><td>${fmt0(it.quantidade_g)}g</td><td>${fmt(it.kcal,1)}</td><td>${fmt(it.proteina_g,1)}</td><td>${fmt(it.carboidrato_g,1)}</td><td>${fmt(it.lipideos_g,1)}</td><td><button class="btn-danger" onclick="removerItem('${refeicaoAtiva}',${i})">Excluir</button></td></tr>`).join(""):`<tr><td colspan="7" class="muted">Nenhum item nesta refeição.</td></tr>`}</tbody></table></div></div>`
+ el("mealContainer").innerHTML=`<div class="card"><h3>${ref.nome}</h3><div class="muted">${fmt(t.kcal,1)} kcal • P ${fmt(t.proteina,1)}g • C ${fmt(t.carbo,1)}g • G ${fmt(t.lipideos,1)}g</div><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Qtd</th><th>kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr></thead><tbody>${itens.length?itens.map((it,i)=>`<tr><td>${it.nome}<br><span class="muted">${it.grupo||""}</span></td><td>${fmt0(it.quantidade_g)}g</td><td>${fmt(it.kcal,1)}</td><td>${fmt(it.proteina_g,1)}</td><td>${fmt(it.carboidrato_g,1)}</td><td>${fmt(it.lipideos_g,1)}</td><td><button class="btn-soft" onclick="abrirEdicao('${refeicaoAtiva}',${i})">Editar</button> <button class="btn-danger" onclick="removerItem('${refeicaoAtiva}',${i})">Excluir</button></td></tr>`).join(""):`<tr><td colspan="7" class="muted">Nenhum item nesta refeição.</td></tr>`}</tbody></table></div></div>`
 }
+
+let editState=null;
+
+function abrirEdicao(ref,i){
+ const dia=getDia();
+ const item=dia[ref]?.[i];
+ if(!item) return;
+ editState={ref,i,itemOriginal:{...item}};
+ el("editNome").textContent=item.nome;
+ el("editQuantidade").value=Math.round(num(item.quantidade_g));
+ el("editRefeicao").innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");
+ el("editRefeicao").value=ref;
+ atualizarPreviewEdicao();
+ el("editModal").style.display="flex";
+}
+
+function fecharEdicao(){
+ editState=null;
+ el("editModal").style.display="none";
+}
+
+function itemEditadoPelaQuantidade(){
+ if(!editState) return null;
+ const item=editState.itemOriginal;
+ const novaQtd=Number(el("editQuantidade").value)||0;
+ const qtdOriginal=num(item.quantidade_g)||1;
+ const f=novaQtd/qtdOriginal;
+ return {
+  ...item,
+  quantidade_g:novaQtd,
+  kcal:num(item.kcal)*f,
+  proteina_g:num(item.proteina_g)*f,
+  carboidrato_g:num(item.carboidrato_g)*f,
+  lipideos_g:num(item.lipideos_g)*f,
+  colesterol_mg:num(item.colesterol_mg)*f,
+  fibra_alimentar_g:num(item.fibra_alimentar_g)*f,
+  sodio_mg:num(item.sodio_mg)*f,
+  potassio_mg:num(item.potassio_mg)*f,
+  calcio_mg:num(item.calcio_mg)*f,
+  ferro_mg:num(item.ferro_mg)*f,
+  magnesio_mg:num(item.magnesio_mg)*f,
+  zinco_mg:num(item.zinco_mg)*f,
+  vitamina_c_mg:num(item.vitamina_c_mg)*f,
+  retinol_mcg:num(item.retinol_mcg)*f,
+  tiamina_mg:num(item.tiamina_mg)*f,
+  riboflavina_mg:num(item.riboflavina_mg)*f,
+  piridoxina_mg:num(item.piridoxina_mg)*f,
+  niacina_mg:num(item.niacina_mg)*f
+ };
+}
+
+function atualizarPreviewEdicao(){
+ const it=itemEditadoPelaQuantidade();
+ if(!it) return;
+ el("editKcal").textContent=fmt(it.kcal,1);
+ el("editProteina").textContent=fmt(it.proteina_g,1);
+ el("editCarbo").textContent=fmt(it.carboidrato_g,1);
+ el("editGordura").textContent=fmt(it.lipideos_g,1);
+}
+
+function salvarEdicao(){
+ if(!editState) return;
+ const novaQtd=Number(el("editQuantidade").value);
+ if(!Number.isFinite(novaQtd)||novaQtd<=0) return alert("Informe uma quantidade válida.");
+ const novaRef=el("editRefeicao").value;
+ const novoItem=itemEditadoPelaQuantidade();
+ const dia=getDia();
+ dia[editState.ref].splice(editState.i,1);
+ if(!Array.isArray(dia[novaRef])) dia[novaRef]=[];
+ dia[novaRef].push(novoItem);
+ saveDia(dia);
+ refeicaoAtiva=novaRef;
+ fecharEdicao();
+ renderDiario();
+}
+
 function removerItem(ref,i){const dia=getDia();dia[ref].splice(i,1);saveDia(dia);renderDiario()}
 function renderDiario(){
  if(el("dataDiario")&&!el("dataDiario").value)el("dataDiario").value=hoje;
@@ -205,5 +314,5 @@ function renderDiario(){
  renderMealTabs();renderRefeicoes();
 }
 function limparDia(){if(confirm("Limpar o diário deste dia?")){const diario=getDiario();delete diario[getData()];setDiario(diario);renderDiario()}}
-document.addEventListener("DOMContentLoaded",()=>{initPerfil();renderDiario();});
+document.addEventListener("DOMContentLoaded",()=>{initPerfil();renderDiario(); if(el("editQuantidade")) el("editQuantidade").addEventListener("input", atualizarPreviewEdicao);});
 </script><div class="footer">Fonte: TACO</div></body></html>
