@@ -103,6 +103,25 @@
     .objective-card{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;cursor:pointer}
     .objective-card.active{background:var(--primary-soft);border-color:#b7e2c1}
     .objective-card strong{display:block}
+    .cholesterol-card{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#fffafa 100%);box-shadow:var(--shadow);padding:16px;margin-top:18px}
+    .cholesterol-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+    .heart-badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;border:1px solid var(--line);background:#f9fafb}
+    .heart-badge.low{background:#ecfdf5;border-color:#86efac;color:#166534}
+    .heart-badge.medium{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+    .heart-badge.high{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+    .heart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    .heart-metric{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}
+    .heart-metric h4{margin:0;color:var(--muted);font-size:13px}
+    .heart-metric .big{font-size:24px;font-weight:700;margin-top:14px}
+    .heart-note{margin-top:12px;padding:12px 14px;border-radius:14px;background:#f9fafb;border:1px solid var(--line);color:#4b5563;font-size:13px;line-height:1.45}
+    .cholesterol-progress{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}
+    .cholesterol-progress-fill{height:100%;width:0%;background:var(--primary)}
+    .daily-heart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    .daily-heart-box{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}
+    .daily-heart-box strong{font-size:22px}
+    .daily-heart-box.low{background:#ecfdf5;border-color:#86efac}
+    .daily-heart-box.medium{background:#fff7ed;border-color:#fdba74}
+    .daily-heart-box.high{background:#fef2f2;border-color:#fca5a5}
 
     .nutri-visual-card{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.05);padding:18px;margin-top:16px}
     .nutri-visual-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
@@ -242,6 +261,21 @@
 <div class="big" id="dashObjetivo" style="font-size:18px">—</div>
 <div class="muted">perfil nutricional</div>
 </div>
+</div></div><div class="card"><h2>Modo colesterol familiar</h2><div class="muted">Indicadores extras para acompanhar colesterol alimentar, fibras e lipídeos no dia.</div>
+<div class="cholesterol-card" style="margin-top:14px">
+  <div class="cholesterol-head">
+    <div>
+      <strong>Metas de cuidado</strong>
+      <div class="muted" style="margin-top:4px">Use como controle alimentar diário, sem substituir a orientação médica.</div>
+    </div>
+    <span class="heart-badge low">❤ Controle ativo</span>
+  </div>
+  <div class="heart-grid">
+    <div class="heart-metric"><h4>Colesterol alimentar</h4><div class="big">≤ 200</div><div class="muted">mg/dia</div></div>
+    <div class="heart-metric"><h4>Fibra alimentar</h4><div class="big">≥ 25</div><div class="muted">g/dia</div></div>
+    <div class="heart-metric"><h4>Foco do app</h4><div class="big" style="font-size:18px">Escolhas melhores</div><div class="muted">sem radicalismo</div></div>
+  </div>
+  <div class="heart-note">O painel classifica os alimentos com base nos dados disponíveis na TACO: colesterol, lipídeos e fibras. Como a tabela usada não possui gordura saturada/trans, o app não substitui avaliação nutricional completa.</div>
 </div></div></div></section><section class="tab-panel" id="tab-alimentos"><div class="tab-grid alimentos-grid"><div class="card"><h2>Alimentos</h2><div class="muted">Busque por nome, filtre por grupo e abra a ficha nutricional completa.</div><div>
 <div class="label">Buscar alimento</div>
 <input class="search-input" id="busca" placeholder="Ex.: arroz, banana, frango..." type="text">
@@ -334,6 +368,34 @@
   <div class="nutri-table-grid" id="nutriTabelaVisual"></div>
 </div>
 
+<div class="cholesterol-card" id="painelColesterolAlimento">
+  <div class="cholesterol-head">
+    <div>
+      <div class="muted" style="font-size:13px">Painel para colesterol</div>
+      <h3 style="margin:4px 0 0">Avaliação do alimento</h3>
+    </div>
+    <span class="heart-badge" id="badgeColesterolAlimento">—</span>
+  </div>
+  <div class="heart-grid">
+    <div class="heart-metric">
+      <h4>Colesterol</h4>
+      <div class="big" id="foodColesterolMg">0</div>
+      <div class="muted">mg na porção</div>
+    </div>
+    <div class="heart-metric">
+      <h4>Fibras</h4>
+      <div class="big" id="foodFibraG">0</div>
+      <div class="muted">g na porção</div>
+    </div>
+    <div class="heart-metric">
+      <h4>Lipídeos</h4>
+      <div class="big" id="foodLipideosG">0</div>
+      <div class="muted">g na porção</div>
+    </div>
+  </div>
+  <div class="heart-note" id="foodColesterolNota">Selecione um alimento para ver a análise.</div>
+</div>
+
 <div class="section-title">Resumo rápido</div>
 <div class="detail-table"><table><tbody id="tblResumoRapido"></tbody></table></div>
 <div class="grid-2" style="margin-top:16px">
@@ -384,6 +446,36 @@
 <div class="summary-box"><strong id="totalProteina">0</strong><br/><span class="muted">proteína (g)</span></div>
 <div class="summary-box"><strong id="totalCarbo">0</strong><br/><span class="muted">carboidrato (g)</span></div>
 <div class="summary-box"><strong id="totalLipideos">0</strong><br/><span class="muted">lipídeos (g)</span></div>
+</div>
+<div class="cholesterol-card">
+  <div class="cholesterol-head">
+    <div>
+      <h3 style="margin:0">Controle do colesterol no dia</h3>
+      <div class="muted">Acompanhamento por colesterol alimentar, fibras e lipídeos.</div>
+    </div>
+    <span class="heart-badge" id="badgeDiaColesterol">—</span>
+  </div>
+  <div class="daily-heart-grid">
+    <div class="daily-heart-box" id="boxDiaColesterol">
+      <div class="label">Colesterol alimentar</div>
+      <strong id="totalColesterolDia">0</strong> <span class="muted">mg</span>
+      <div class="cholesterol-progress"><div class="cholesterol-progress-fill" id="barColesterolDia"></div></div>
+      <div class="muted" id="metaColesterolTexto" style="margin-top:6px">Meta: até 200 mg</div>
+    </div>
+    <div class="daily-heart-box" id="boxDiaFibra">
+      <div class="label">Fibra alimentar</div>
+      <strong id="totalFibraDia">0</strong> <span class="muted">g</span>
+      <div class="cholesterol-progress"><div class="cholesterol-progress-fill" id="barFibraDia"></div></div>
+      <div class="muted" style="margin-top:6px">Meta: 25 g ou mais</div>
+    </div>
+    <div class="daily-heart-box" id="boxDiaLipideos">
+      <div class="label">Lipídeos totais</div>
+      <strong id="totalLipideosColesterolDia">0</strong> <span class="muted">g</span>
+      <div class="cholesterol-progress"><div class="cholesterol-progress-fill" id="barLipideosDia"></div></div>
+      <div class="muted" style="margin-top:6px">Compare com sua meta de gorduras</div>
+    </div>
+  </div>
+  <div class="heart-note" id="notaDiaColesterol">Lance os alimentos do dia para receber o resumo.</div>
 </div>
 <div class="macro-row">
 <div class="inline" style="justify-content:space-between"><span>Proteína</span><span id="pctProteinaTxt">0%</span></div>
@@ -714,6 +806,90 @@ function aplicarFiltros(){
       ["Umidade", valorOuTraco(num(a.umidade_percentual)*fator,2,"%")]
     ];
     el("nutriTabelaVisual").innerHTML = itens.map(([label, value]) => `<div class="nutri-cell"><div class="nutri-cell-label">${label}:</div><div class="nutri-cell-value">${value}</div></div>`).join("");
+    atualizarPainelColesterolAlimento();
+  }
+
+
+  function classificarColesterolAlimento(a, gramas){
+    const fator = gramas / 100;
+    const colesterol = num(a.colesterol_mg) * fator;
+    const lipideos = num(a.lipideos_g) * fator;
+    const fibra = num(a.fibra_alimentar_g) * fator;
+
+    if(colesterol > 90 || (lipideos > 18 && fibra < 2)){
+      return {nivel:"high", texto:"Atenção", nota:"Alimento com maior atenção para colesterol/lipídeos. Prefira porções menores e equilibre com alimentos ricos em fibras."};
+    }
+    if(colesterol > 30 || lipideos > 10){
+      return {nivel:"medium", texto:"Moderação", nota:"Pode entrar na rotina com controle de porção. Observe o restante do dia e tente compensar com fibras."};
+    }
+    if(fibra >= 3){
+      return {nivel:"low", texto:"Boa escolha", nota:"Alimento favorável para uma rotina de cuidado, especialmente por oferecer fibras."};
+    }
+    return {nivel:"low", texto:"Baixo impacto", nota:"Pelos dados disponíveis na TACO, este alimento tem baixo colesterol/lipídeos na porção informada."};
+  }
+
+  function atualizarPainelColesterolAlimento(){
+    if(!alimentoSelecionado || !el("foodColesterolMg")) return;
+    const a = alimentoSelecionado;
+    const gramas = Math.max(1, Number(el("baseCalcGramas")?.value) || 100);
+    const fator = gramas / 100;
+    const colesterol = num(a.colesterol_mg) * fator;
+    const fibra = num(a.fibra_alimentar_g) * fator;
+    const lipideos = num(a.lipideos_g) * fator;
+    const c = classificarColesterolAlimento(a, gramas);
+
+    el("foodColesterolMg").textContent = fmt(colesterol,1);
+    el("foodFibraG").textContent = fmt(fibra,1);
+    el("foodLipideosG").textContent = fmt(lipideos,1);
+    el("badgeColesterolAlimento").className = "heart-badge " + c.nivel;
+    el("badgeColesterolAlimento").textContent = "❤ " + c.texto;
+    el("foodColesterolNota").textContent = c.nota + " Classificação feita com colesterol, lipídeos e fibras; a TACO desta base não traz gordura saturada/trans.";
+  }
+
+  function atualizarCaixaClasse(id, nivel){
+    const box = el(id);
+    if(!box) return;
+    box.classList.remove("low","medium","high");
+    box.classList.add(nivel);
+  }
+
+  function atualizarResumoColesterolDia(total){
+    if(!el("totalColesterolDia")) return;
+    const metaCol = 200;
+    const metaFibra = 25;
+    const metaLip = Math.max(1, Number(el("metaLipideos").value) || 70);
+    const pctCol = Math.min(100, total.colesterol / metaCol * 100);
+    const pctFibra = Math.min(100, total.fibra / metaFibra * 100);
+    const pctLip = Math.min(100, total.lipideos / metaLip * 100);
+
+    el("totalColesterolDia").textContent = fmt(total.colesterol,1);
+    el("totalFibraDia").textContent = fmt(total.fibra,1);
+    el("totalLipideosColesterolDia").textContent = fmt(total.lipideos,1);
+    el("barColesterolDia").style.width = pctCol + "%";
+    el("barFibraDia").style.width = pctFibra + "%";
+    el("barLipideosDia").style.width = pctLip + "%";
+
+    let nivel = "low";
+    let texto = "❤ Dia equilibrado";
+    let nota = "O dia está dentro do controle de colesterol alimentar. Mantenha fibras e boas escolhas.";
+
+    if(total.colesterol > metaCol || total.lipideos > metaLip * 1.15){
+      nivel = "high";
+      texto = "❤ Atenção no dia";
+      nota = "Hoje passou da meta de colesterol alimentar ou de lipídeos. Considere reduzir porções de alimentos mais gordurosos e aumentar fibras nas próximas refeições.";
+    }else if(total.colesterol > metaCol * 0.75 || total.fibra < metaFibra * 0.6){
+      nivel = "medium";
+      texto = "❤ Em observação";
+      nota = "O dia ainda está administrável, mas vale atenção: tente elevar fibras e moderar alimentos com colesterol/lipídeos.";
+    }
+
+    el("badgeDiaColesterol").className = "heart-badge " + nivel;
+    el("badgeDiaColesterol").textContent = texto;
+    el("notaDiaColesterol").textContent = nota + " Observação: acompanhamento alimentar não substitui orientação médica/nutricional.";
+
+    atualizarCaixaClasse("boxDiaColesterol", total.colesterol > metaCol ? "high" : total.colesterol > metaCol*0.75 ? "medium" : "low");
+    atualizarCaixaClasse("boxDiaFibra", total.fibra >= metaFibra ? "low" : total.fibra >= metaFibra*0.6 ? "medium" : "high");
+    atualizarCaixaClasse("boxDiaLipideos", total.lipideos > metaLip*1.15 ? "high" : total.lipideos > metaLip*0.85 ? "medium" : "low");
   }
 
   function selecionarAlimento(a){
@@ -787,8 +963,11 @@ function aplicarFiltros(){
       acc.proteina += num(item.proteina_g);
       acc.carbo += num(item.carboidrato_g);
       acc.lipideos += num(item.lipideos_g);
+      acc.colesterol += num(item.colesterol_mg);
+      acc.fibra += num(item.fibra_alimentar_g);
+      acc.sodio += num(item.sodio_mg);
       return acc;
-    }, {kcal:0, proteina:0, carbo:0, lipideos:0});
+    }, {kcal:0, proteina:0, carbo:0, lipideos:0, colesterol:0, fibra:0, sodio:0});
   }
 
   function renderRefeicoes(){
@@ -809,6 +988,8 @@ function aplicarFiltros(){
             <span class="mini-pill">${fmt(t.proteina,1)} g P</span>
             <span class="mini-pill">${fmt(t.carbo,1)} g C</span>
             <span class="mini-pill">${fmt(t.lipideos,1)} g G</span>
+            <span class="mini-pill">${fmt(t.fibra,1)} g fibras</span>
+            <span class="mini-pill">${fmt(t.colesterol,1)} mg colesterol</span>
           </div>
         </div>
         <div class="table-wrap" style="margin-top:12px">
@@ -821,11 +1002,13 @@ function aplicarFiltros(){
                 <th>P</th>
                 <th>C</th>
                 <th>G</th>
+                <th>Fibra</th>
+                <th>Col.</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              ${!itens.length ? `<tr><td colspan="7" class="muted">Nenhum item nesta refeição.</td></tr>` :
+              ${!itens.length ? `<tr><td colspan="9" class="muted">Nenhum item nesta refeição.</td></tr>` :
                 itens.map((item,i)=>`
                   <tr>
                     <td>${item.nome}</td>
@@ -834,6 +1017,8 @@ function aplicarFiltros(){
                     <td>${fmt(item.proteina_g,1)}</td>
                     <td>${fmt(item.carboidrato_g,1)}</td>
                     <td>${fmt(item.lipideos_g,1)}</td>
+                    <td>${fmt(item.fibra_alimentar_g,1)}</td>
+                    <td>${fmt(item.colesterol_mg,1)} mg</td>
                     <td>
                       <button class="btn-soft" onclick="window.NutriTaco.editarItem('${refeicaoAtiva}', ${i})">Editar</button>
                       <button class="btn-danger" onclick="window.NutriTaco.removerItem('${refeicaoAtiva}', ${i})">Excluir</button>
@@ -929,6 +1114,7 @@ function aplicarFiltros(){
     el("pctProteinaTxt").textContent = Math.round(pctProt) + "%";
     el("pctCarboTxt").textContent = Math.round(pctCarb) + "%";
     el("pctLipideosTxt").textContent = Math.round(pctLip) + "%";
+    atualizarResumoColesterolDia(total);
   }
 
   function prepararModalAdicionar(edicao){
@@ -961,7 +1147,10 @@ function aplicarFiltros(){
       energia_kcal: (num(item.kcal) / num(item.quantidade_g)) * 100,
       proteina_g: (num(item.proteina_g) / num(item.quantidade_g)) * 100,
       carboidrato_g: (num(item.carboidrato_g) / num(item.quantidade_g)) * 100,
-      lipideos_g: (num(item.lipideos_g) / num(item.quantidade_g)) * 100
+      lipideos_g: (num(item.lipideos_g) / num(item.quantidade_g)) * 100,
+      colesterol_mg: (num(item.colesterol_mg) / num(item.quantidade_g)) * 100,
+      fibra_alimentar_g: (num(item.fibra_alimentar_g) / num(item.quantidade_g)) * 100,
+      sodio_mg: (num(item.sodio_mg) / num(item.quantidade_g)) * 100
     };
     editandoItem = {refeicaoId, idx};
     el("modalRefeicao").value = refeicaoId;
@@ -1001,7 +1190,10 @@ function aplicarFiltros(){
       kcal: num(alimentoSelecionado.energia_kcal) * f,
       proteina_g: num(alimentoSelecionado.proteina_g) * f,
       carboidrato_g: num(alimentoSelecionado.carboidrato_g) * f,
-      lipideos_g: num(alimentoSelecionado.lipideos_g) * f
+      lipideos_g: num(alimentoSelecionado.lipideos_g) * f,
+      colesterol_mg: num(alimentoSelecionado.colesterol_mg) * f,
+      fibra_alimentar_g: num(alimentoSelecionado.fibra_alimentar_g) * f,
+      sodio_mg: num(alimentoSelecionado.sodio_mg) * f
     };
 
     if(editandoItem){
