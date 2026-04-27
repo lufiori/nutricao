@@ -70,7 +70,24 @@ th{background:#fafafa}.table-wrap{border:1px solid var(--line);border-radius:14p
 .chol-badge{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;display:inline-block;margin-top:8px}.chol-low{background:#dcfce7;color:#166534}.chol-mid{background:#fef3c7;color:#92400e}.chol-high{background:#fee2e2;color:#991b1b}
 .add-box{border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px;margin-top:16px}
 @media(max-width:1100px){.group-grid,.food-card-grid{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}.nutrient-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.group-grid,.food-card-grid,.search-top{grid-template-columns:1fr}.food-metrics{grid-template-columns:repeat(2,1fr)}.bar-row{grid-template-columns:1fr}.nutrient-grid{grid-template-columns:1fr}.donut{width:180px;height:180px}}
-</style></head><body>
+
+.floating-add{
+ position:fixed;bottom:15px;left:0;right:0;
+ background:#fff;border-top:1px solid #ddd;
+ padding:10px;display:flex;gap:10px;z-index:99;
+}
+.floating-add select,.floating-add input{flex:1}
+.quick-add{
+ margin-top:10px;
+ display:flex;gap:6px;
+}
+.quick-add button{
+ flex:1;
+ font-size:12px;
+ padding:6px;
+}
+</style>
+</head><body>
 <script>
 const refeicoes=[
 {id:"cafe_da_manha",nome:"Café da manhã"},{id:"almoco",nome:"Almoço"},{id:"jantar",nome:"Jantar"},{id:"lanches",nome:"Lanches"},{id:"ceia",nome:"Ceia"}
@@ -156,7 +173,51 @@ function header(active){
  <a class="${active==='necessidades'?'active':''}" href="necessidades.html">Necessidades</a>
  </nav></div></div>`
 }
-</script><script>document.write(header("alimentos"));</script>
+
+function quickAdd(idx,qtd,ref){
+ const a=baseAtual[idx];
+ adicionarItemRefeicao(ref,itemFromAlimento(a,qtd));
+ alert("Adicionado rápido!");
+}
+
+function quickAddSelected(){
+ if(!alimentoSelecionado)return;
+ const ref=document.getElementById("quickRef").value;
+ const qtd=Number(document.getElementById("quickQtd").value)||100;
+ adicionarItemRefeicao(ref,itemFromAlimento(alimentoSelecionado,qtd));
+ alert("Adicionado!");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+ const sel=document.getElementById("quickRef");
+ if(sel){
+   sel.innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");
+ }
+});
+</script>
+<script>document.write(header("alimentos"));
+function quickAdd(idx,qtd,ref){
+ const a=baseAtual[idx];
+ adicionarItemRefeicao(ref,itemFromAlimento(a,qtd));
+ alert("Adicionado rápido!");
+}
+
+function quickAddSelected(){
+ if(!alimentoSelecionado)return;
+ const ref=document.getElementById("quickRef").value;
+ const qtd=Number(document.getElementById("quickQtd").value)||100;
+ adicionarItemRefeicao(ref,itemFromAlimento(alimentoSelecionado,qtd));
+ alert("Adicionado!");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+ const sel=document.getElementById("quickRef");
+ if(sel){
+   sel.innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");
+ }
+});
+</script>
+
 <div class="page alimentos-hero">
 <section class="screen active" id="screenHome"><div class="search-top"><div><label>Pesquisar alimento</label><input id="buscaHome" placeholder="🔍 Pesquisar alimento..." onkeydown="if(event.key==='Enter')pesquisarHome()"></div><button class="btn" onclick="pesquisarHome()">Pesquisar</button></div><div class="card"><div class="inline" style="justify-content:space-between"><div><h2>Grupos alimentares</h2><div class="muted">Clique em um grupo para ver os alimentos em cards.</div></div></div><div id="statusBase" class="status"></div><div class="group-grid" id="groupGrid"></div></div></section>
 <section class="screen" id="screenLista"><button class="back-link" onclick="voltarHome()">← Voltar</button><div class="search-top"><div><label>Pesquisar dentro do grupo</label><input id="buscaLista" placeholder="🔍 Pesquisar alimento..." oninput="aplicarLista()"></div><button class="btn-outline" onclick="voltarHome()">Grupos</button></div><div class="list-toolbar"><div><h2 id="tituloGrupo">Grupo</h2><div id="contadorLista" class="muted">0 alimentos encontrados</div><small class="muted">Valores nutricionais com base em 100g do alimento.</small></div><div class="inline"><div><label>Ordenar por</label><select id="ordenarLista" onchange="aplicarLista()"><option value="nome">Nome (A-Z)</option><option value="energiaAsc">Menos energia</option><option value="energiaDesc">Mais energia</option><option value="proteinaDesc">Ricos em proteína</option><option value="colesterolAsc">Menos colesterol</option><option value="colesterolDesc">Mais colesterol</option><option value="fibraDesc">Mais fibras</option><option value="lipideosDesc">Mais lipídeos</option><option value="vitcDesc">Mais vitamina C</option><option value="calcioDesc">Mais cálcio</option><option value="ferroDesc">Mais ferro</option></select></div><button class="btn-soft" onclick="ativarMelhores()">❤️ Melhores para colesterol</button><button class="btn-outline" onclick="limparMelhores()">Limpar</button></div></div><div class="food-card-grid" id="cardsAlimentos"></div></section>
@@ -173,10 +234,44 @@ function renderGrupos(){const grupos=[...new Set(baseAtual.map(getGrupo).filter(
 function abrirGrupo(g){grupoAtual=g;filtroCol=false;el("tituloGrupo").innerHTML=`${grupoIcone(g)} ${g}`;el("buscaLista").value=el("buscaHome").value||"";mostrarTela("screenLista");aplicarLista();window.scrollTo({top:0,behavior:"smooth"})}
 function pesquisarHome(){const termo=el("buscaHome").value.trim();if(termo){grupoAtual="__todos__";el("tituloGrupo").textContent="Resultado da busca";el("buscaLista").value=termo;mostrarTela("screenLista");aplicarLista()}}
 function aplicarLista(){const termo=(el("buscaLista").value||"").toLowerCase(),ordem=el("ordenarLista").value;let arr=baseAtual.filter(a=>(grupoAtual==="__todos__"||getGrupo(a)===grupoAtual)&&(!termo||String(a.descricao_alimento||"").toLowerCase().includes(termo)));if(filtroCol)arr=arr.filter(bomCol).sort((a,b)=>scoreCol(b)-scoreCol(a));else if(ordem==="nome")arr.sort((a,b)=>String(a.descricao_alimento).localeCompare(String(b.descricao_alimento),"pt-BR"));else if(ordem==="energiaAsc")arr.sort((a,b)=>num(a.energia_kcal)-num(b.energia_kcal));else if(ordem==="energiaDesc")arr.sort((a,b)=>num(b.energia_kcal)-num(a.energia_kcal));else if(ordem==="proteinaDesc")arr.sort((a,b)=>num(b.proteina_g)-num(a.proteina_g));else if(ordem==="colesterolAsc")arr.sort((a,b)=>num(a.colesterol_mg)-num(b.colesterol_mg));else if(ordem==="colesterolDesc")arr.sort((a,b)=>num(b.colesterol_mg)-num(a.colesterol_mg));else if(ordem==="fibraDesc")arr.sort((a,b)=>num(b.fibra_alimentar_g)-num(a.fibra_alimentar_g));else if(ordem==="lipideosDesc")arr.sort((a,b)=>num(b.lipideos_g)-num(a.lipideos_g));else if(ordem==="vitcDesc")arr.sort((a,b)=>num(b.vitamina_c_mg)-num(a.vitamina_c_mg));else if(ordem==="calcioDesc")arr.sort((a,b)=>num(b.calcio_mg)-num(a.calcio_mg));else if(ordem==="ferroDesc")arr.sort((a,b)=>num(b.ferro_mg)-num(a.ferro_mg));listaAtual=arr;el("contadorLista").textContent=`${arr.length} alimentos encontrados`;renderCards(arr.slice(0,80))}
-function renderCards(arr){el("cardsAlimentos").innerHTML=arr.map(a=>{const idx=baseAtual.indexOf(a),n=colesterolNivel(a);return `<div class="food-card" onclick="abrirDetalhe(${idx})"><h3>${a.descricao_alimento}</h3><hr><div class="food-metrics"><div>Energia:<strong>${fmt(a.energia_kcal,0)} kcal</strong></div><div>Carboidratos:<strong>${fmt(a.carboidrato_g,1)} g</strong></div><div>Proteínas:<strong>${fmt(a.proteina_g,1)} g</strong></div><div>Colesterol:<strong>${fmt(a.colesterol_mg,0)} mg</strong></div></div><span class="chol-badge ${n.cls}">${n.txt}</span><div class="food-card-footer">Saiba mais →</div></div>`}).join("")||'<div class="card muted">Nenhum alimento encontrado.</div>'}
+function renderCards(arr){el("cardsAlimentos").innerHTML=arr.map(a=>{const idx=baseAtual.indexOf(a),n=colesterolNivel(a);return `<div class="food-card" onclick="abrirDetalhe(${idx})"><h3>${a.descricao_alimento}</h3><hr><div class="food-metrics"><div>Energia:<strong>${fmt(a.energia_kcal,0)} kcal</strong></div><div>Carboidratos:<strong>${fmt(a.carboidrato_g,1)} g</strong></div><div>Proteínas:<strong>${fmt(a.proteina_g,1)} g</strong></div><div>Colesterol:<strong>${fmt(a.colesterol_mg,0)} mg</strong></div></div><span class="chol-badge ${n.cls}">${n.txt}</span><div class="food-card-footer">Saiba mais →
+<div class="quick-add">
+<button onclick="event.stopPropagation();quickAdd(${idx},100,'almoco')">+ almoço</button>
+<button onclick="event.stopPropagation();quickAdd(${idx},100,'jantar')">+ jantar</button>
+</div>
+</div></div>`}).join("")||'<div class="card muted">Nenhum alimento encontrado.</div>'}
 function ativarMelhores(){filtroCol=true;aplicarLista()}function limparMelhores(){filtroCol=false;aplicarLista()}
 function abrirDetalhe(idx){const a=baseAtual[idx];alimentoSelecionado=a;mostrarTela("screenDetalhe");el("detTitulo").textContent=`Informações nutricionais de ${a.descricao_alimento}`;el("detNome").textContent=a.descricao_alimento;el("detGrupo").textContent=getGrupo(a);el("baseGramas").value=100;renderDetalhe();window.scrollTo({top:0,behavior:"smooth"})}
 function renderDetalhe(){const a=alimentoSelecionado;if(!a)return;const g=Math.max(1,Number(el("baseGramas").value)||100),f=g/100;const kcal=num(a.energia_kcal)*f,carb=num(a.carboidrato_g)*f,prot=num(a.proteina_g)*f,lip=num(a.lipideos_g)*f,col=num(a.colesterol_mg)*f;const kcalCarb=carb*4,kcalProt=prot*4,kcalLip=lip*9,macroTotal=kcalCarb+kcalProt+kcalLip||1;const pCarb=kcalCarb/macroTotal*100,pProt=kcalProt/macroTotal*100,pLip=kcalLip/macroTotal*100,pCol=Math.min(25,col/200*100);el("chartIntro").innerHTML=`Quantidade de calorias em cada ${g} grama(s) de <strong>${a.descricao_alimento}</strong>.<br><br><strong>Total: ${fmt(kcal,0)} kcal</strong>`;el("barCarbPct").textContent=fmt(pCarb,0)+"%";el("barProtPct").textContent=fmt(pProt,0)+"%";el("barLipPct").textContent=fmt(pLip,0)+"%";el("barColPct").textContent=fmt(col,0)+"mg";el("barCarbVal").textContent=fmt(carb,1)+" g";el("barProtVal").textContent=fmt(prot,1)+" g";el("barLipVal").textContent=fmt(lip,1)+" g";el("barColVal").textContent=`${fmt(col,1)} mg de colesterol`;el("donut").style.background=`conic-gradient(#b01263 0 ${pCarb}%, #0f8f8c ${pCarb}% ${pCarb+pProt}%, #6675df ${pCarb+pProt}% ${pCarb+pProt+pLip}%, #ef4444 ${pCarb+pProt+pLip}% ${Math.min(100,pCarb+pProt+pLip+pCol)}%, #e5e7eb ${Math.min(100,pCarb+pProt+pLip+pCol)}% 100%)`;el("donutKcal").textContent=fmt(kcal,0);const n=colesterolNivel({...a,colesterol_mg:col,lipideos_g:lip,fibra_alimentar_g:num(a.fibra_alimentar_g)*f});el("detBadge").className=`chol-badge ${n.cls}`;el("detBadge").textContent=n.txt;const fields=[["Energia",`${fmt(kcal,0)} kcal<br>${fmt(num(a.energia_kj)*f,0)} kJ`],["Carboidratos",`${fmt(carb,1)} g`],["Proteínas",`${fmt(prot,1)} g`],["Lipídeos",`${fmt(lip,1)} g`],["Colesterol",`${fmt(col,1)} mg`],["Fibra alimentar",`${fmt(num(a.fibra_alimentar_g)*f,1)} g`],["Ferro",`${fmt(num(a.ferro_mg)*f,2)} mg`],["Cálcio",`${fmt(num(a.calcio_mg)*f,1)} mg`],["Sódio",`${fmt(num(a.sodio_mg)*f,1)} mg`],["Magnésio",`${fmt(num(a.magnesio_mg)*f,1)} mg`],["Potássio",`${fmt(num(a.potassio_mg)*f,1)} mg`],["Manganês",`${fmt(num(a.manganes_mg)*f,2)} mg`],["Fósforo",`${fmt(num(a.fosforo_mg)*f,1)} mg`],["Cobre",`${fmt(num(a.cobre_mg)*f,2)} mg`],["Zinco",`${fmt(num(a.zinco_mg)*f,2)} mg`],["Cinzas",`${fmt(num(a.cinzas_g)*f,2)} g`],["Retinol",`${fmt(num(a.retinol_mcg)*f,1)} mcg`],["Tiamina",`${fmt(num(a.tiamina_mg)*f,2)} mg`],["Riboflavina",`${fmt(num(a.riboflavina_mg)*f,2)} mg`],["Piridoxina",`${fmt(num(a.piridoxina_mg)*f,2)} mg`],["Niacina",`${fmt(num(a.niacina_mg)*f,2)} mg`],["Umidade",`${fmt(num(a.umidade_percentual)*f,1)} %`],["Vitamina C",`${fmt(num(a.vitamina_c_mg)*f,1)} mg`]];el("nutrientGrid").innerHTML=fields.map(x=>`<div class="nutrient-item">${x[0]}<strong>${x[1]}</strong></div>`).join("")}
 function voltarHome(){mostrarTela("screenHome")}function voltarLista(){mostrarTela("screenLista")}function addAlimento(){if(!alimentoSelecionado)return;const g=Number(el("addGramas").value)||Number(el("baseGramas").value)||100,ref=el("addRefeicao").value;adicionarItemRefeicao(ref,itemFromAlimento(alimentoSelecionado,g));alert("Alimento adicionado ao diário.")}
 document.addEventListener("DOMContentLoaded",async()=>{el("addRefeicao").innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");if(await carregarBase()){renderGrupos()}});
-</script><div class="footer">Fonte: TACO - Tabela Brasileira de Composição de Alimentos</div></body></html>
+
+function quickAdd(idx,qtd,ref){
+ const a=baseAtual[idx];
+ adicionarItemRefeicao(ref,itemFromAlimento(a,qtd));
+ alert("Adicionado rápido!");
+}
+
+function quickAddSelected(){
+ if(!alimentoSelecionado)return;
+ const ref=document.getElementById("quickRef").value;
+ const qtd=Number(document.getElementById("quickQtd").value)||100;
+ adicionarItemRefeicao(ref,itemFromAlimento(alimentoSelecionado,qtd));
+ alert("Adicionado!");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+ const sel=document.getElementById("quickRef");
+ if(sel){
+   sel.innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");
+ }
+});
+</script>
+<div class="footer">Fonte: TACO - Tabela Brasileira de Composição de Alimentos</div>
+<div class="floating-add">
+<select id="quickRef"></select>
+<input id="quickQtd" type="number" value="100">
+<button onclick="quickAddSelected()">Adicionar</button>
+</div>
+</body>
+</html>
