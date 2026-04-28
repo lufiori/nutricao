@@ -348,79 +348,105 @@ function renderSmartSuggestions(){
 
 
 /* =========================================================
-   Upgrade: Refeição automática
-   Monta uma combinação simples conforme a refeição e o que falta no dia.
+   Upgrade: Refeição automática com medidas caseiras
+   Usa uma lista curada para evitar confusão da TACO inteira.
    ========================================================= */
 let currentAutoMealPlan=[];
 function normTxt(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
 function hasAny(txt, words){txt=normTxt(txt);return words.some(w=>txt.includes(normTxt(w)));}
-function mealSlots(meal){
-  const m=normTxt(meal);
-  if(m.includes('cafe')) return [
-    {name:'Proteína', grams:80, words:['ovo','iogurte','leite','queijo','ricota','coalhada']},
-    {name:'Carboidrato', grams:80, words:['aveia','pao','pão','tapioca','cuscuz','banana','mandioca','batata']},
-    {name:'Fruta ou fibra', grams:100, words:['banana','maca','maçã','mamao','mamão','laranja','morango','abacate','fruta']}
-  ];
-  if(m.includes('lanche')) return [
-    {name:'Fruta', grams:100, words:['banana','maca','maçã','mamao','mamão','laranja','morango','fruta']},
-    {name:'Proteína leve', grams:100, words:['iogurte','leite','ovo','queijo','ricota']},
-    {name:'Complemento', grams:40, words:['aveia','castanha','amendoim','granola','pao','pão']}
-  ];
-  return [
-    {name:'Proteína', grams:100, words:['frango','carne','peixe','ovo','patinho','tilapia','tilápia','sardinha','atum','suino','suíno','porco']},
-    {name:'Carboidrato', grams:120, words:['arroz','batata','mandioca','macarrao','macarrão','cuscuz','milho','inhame']},
-    {name:'Fibra e micronutrientes', grams:100, words:['feijao','feijão','lentilha','grao','grão','brocolis','brócolis','couve','alface','cenoura','abobora','abóbora','verdura','hortalica','hortaliça']}
-  ];
-}
 function autoMealMissing(){
   const t=calcTotals(), tar=NV.targets;
   const keys=['kcal','proteina','carbo','gordura','fibra','vitc','calcio','ferro','retinol','zinco'];
   const m={}; keys.forEach(k=>m[k]=Math.max(0,(tar[k]||0)-(t[k]||0)));
   return m;
 }
-function autoMealFoodScore(food, slot, missing){
-  const txt=`${food.nome} ${food.grupo}`;
-  let score=hasAny(txt,slot.words)?80:0;
-  if(!score) return 0;
-  score += Math.min(30, num(food.proteina)*1.2) * (missing.proteina>0?1.2:.4);
-  score += Math.min(20, num(food.fibra)*2) * (missing.fibra>0?1.2:.5);
-  score += Math.min(14, num(food.ferro)*4) * (missing.ferro>0?1:.3);
-  score += Math.min(14, num(food.vitc)/8) * (missing.vitc>0?1:.2);
-  score += Math.min(10, num(food.calcio)/120) * (missing.calcio>0?1:.2);
-  if(missing.kcal<250 && num(food.kcal)>350) score-=20;
-  if(num(food.gordura)>30) score-=10;
-  if(hasAny(txt,['preparado','industrializado','frito','doce','refrigerante','bebida alcoólica','alcoolica'])) score-=25;
-  return score;
+function curatedSlotsForMeal(meal){
+  const mapa=window.NV_MEDIDAS_CASEIRAS||{};
+  if(mapa[meal]) return mapa[meal];
+  if(normTxt(meal).includes('cafe')) return mapa['Café da manhã']||[];
+  if(normTxt(meal).includes('lanche')) return mapa['Lanche']||[];
+  if(normTxt(meal).includes('jantar')) return mapa['Jantar']||[];
+  return mapa['Almoço']||[];
+}
+function findFoodByCuratedSearch(slot, used=[]){
+  const foods=NV.foods||[];
+  for(const termo of (slot.busca||[])){
+    const n=normTxt(termo);
+    let found=foods.find(f=>!used.includes(String(f.id)) && normTxt(f.nome)===n);
+    if(found) return found;
+    found=foods.find(f=>!used.includes(String(f.id)) && normTxt(f.nome).includes(n));
+    if(found) return found;
+  }
+  const words=(slot.busca||[]).join(' ').split(/\s+/).filter(w=>w.length>3);
+  return foods.find(f=>!used.includes(String(f.id)) && hasAny(f.nome, words));
 }
 function buildAutoMealPlan(meal){
   const missing=autoMealMissing();
-  const chosen=[];
-  mealSlots(meal).forEach(slot=>{
-    const best=(NV.foods||[])
-      .filter(f=>f && f.nome && !chosen.some(c=>String(c.food.id)===String(f.id)))
-      .map(f=>({food:f, slot:slot.name, grams:slot.grams, score:autoMealFoodScore(f,slot,missing)}))
-      .filter(x=>x.score>0)
-      .sort((a,b)=>b.score-a.score)[0];
-    if(best) chosen.push(best);
+  const used=[];
+  const plan=[];
+  curatedSlotsForMeal(meal).forEach(slot=>{
+    const food=findFoodByCuratedSearch(slot, used);
+    if(!food) return;
+    used.push(String(food.id));
+    const qtd=Number(slot.quantidade)||1;
+    const gramasUnidade=Number(slot.gramas)||100;
+    let gramas=Math.round(qtd*gramasUnidade);
+    if(missing.kcal>0 && missing.kcal<350 && slot.slot!=='Legume/verdura' && slot.slot!=='Fruta') {
+      gramas=Math.max(Math.round(gramas*0.65), Math.round(gramasUnidade));
+    }
+    plan.push({food, slot:slot.slot, quantidade:qtd, unidade:slot.unidade||'porção', gramasUnidade, grams:gramas, emoji:slot.emoji||'🍽️'});
   });
-  return chosen;
+  return plan;
+}
+function autoMealTotals(plan=currentAutoMealPlan){
+  return plan.reduce((a,x)=>{const q=(Number(x.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','ferro','vitc','calcio'].forEach(k=>a[k]+=num(x.food[k])*q);return a;},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,ferro:0,vitc:0,calcio:0});
+}
+function renderAutoMealBody(){
+  const body=document.getElementById('autoMealBody');
+  if(!body) return;
+  if(!currentAutoMealPlan.length){
+    body.innerHTML='<div class="empty">Não encontrei alimentos curados na sua base agora. Confira se o taco.json está na mesma pasta ou adicione manualmente.</div>';
+    return;
+  }
+  const totals=autoMealTotals();
+  body.innerHTML=`
+    <div class="auto-meal-note"><b>Medidas caseiras:</b> sem balança. O app converte tudo para gramas internamente ao adicionar no diário.</div>
+    <div class="auto-meal-list household-list">
+      ${currentAutoMealPlan.map((x,i)=>`
+        <div class="auto-meal-item household-item">
+          <div class="household-main">
+            <div class="household-emoji">${x.emoji}</div>
+            <div><b>${x.slot}</b><br><span>${x.food.nome}</span><small>${x.quantidade} ${x.unidade} ≈ ${x.grams}g • ${fmt(x.food.kcal)} kcal/100g</small></div>
+          </div>
+          <div class="auto-grams household-controls">
+            <button type="button" onclick="changeHouseholdQty(${i},-1)">−</button>
+            <input type="number" min="1" value="${x.quantidade}" onchange="updateHouseholdQty(${i},this.value)">
+            <button type="button" onclick="changeHouseholdQty(${i},1)">+</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="auto-meal-totals"><span>${fmt(totals.kcal)} kcal</span><span>${fmt(totals.proteina,1)}g prot.</span><span>${fmt(totals.carbo,1)}g carbo</span><span>${fmt(totals.fibra,1)}g fibras</span></div>`;
 }
 function openAutoMeal(meal='Almoço'){
   if(!NV.foods || !NV.foods.length){alert('A base de alimentos ainda está carregando.');return;}
   currentAutoMealPlan=buildAutoMealPlan(meal);
   const modal=document.getElementById('autoMealModal');
-  const body=document.getElementById('autoMealBody');
   const title=document.getElementById('autoMealTitle');
-  if(!modal||!body) return;
-  title.textContent=`Sugestão para ${meal}`;
-  if(!currentAutoMealPlan.length){
-    body.innerHTML='<div class="empty">Não encontrei uma combinação automática boa agora. Tente adicionar manualmente ou verificar se a base TACO carregou corretamente.</div>';
-  } else {
-    const totals=currentAutoMealPlan.reduce((a,x)=>{const q=(Number(x.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','ferro','vitc'].forEach(k=>a[k]+=num(x.food[k])*q);return a;},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,ferro:0,vitc:0});
-    body.innerHTML=`<div class="auto-meal-note"><b>Ideia equilibrada:</b> proteína + carboidrato + fibras/micronutrientes. Ajuste as gramas se quiser antes de adicionar.</div><div class="auto-meal-list">${currentAutoMealPlan.map((x,i)=>`<div class="auto-meal-item"><div><b>${x.slot}</b><br><span>${x.food.nome}</span><small>${x.food.grupo||'Alimento'} • ${fmt(x.food.kcal)} kcal/100g</small></div><div class="auto-grams"><input type="number" min="1" value="${x.grams}" onchange="updateAutoMealGram(${i},this.value)"><span>g</span></div></div>`).join('')}</div><div class="auto-meal-totals"><span>${fmt(totals.kcal)} kcal</span><span>${fmt(totals.proteina,1)}g prot.</span><span>${fmt(totals.carbo,1)}g carbo</span><span>${fmt(totals.fibra,1)}g fibras</span></div>`;
-  }
+  if(!modal) return;
+  if(title) title.textContent=`Sugestão simples para ${meal}`;
+  renderAutoMealBody();
   modal.dataset.meal=meal;
   modal.classList.add('open');
+}
+function updateHouseholdQty(i,v){
+  const item=currentAutoMealPlan[i]; if(!item) return;
+  item.quantidade=Math.max(1, Number(v)||1);
+  item.grams=Math.round(item.quantidade*(Number(item.gramasUnidade)||100));
+  renderAutoMealBody();
+}
+function changeHouseholdQty(i,delta){
+  const item=currentAutoMealPlan[i]; if(!item) return;
+  updateHouseholdQty(i,(Number(item.quantidade)||1)+delta);
 }
 function updateAutoMealGram(i,v){
   if(currentAutoMealPlan[i]) currentAutoMealPlan[i].grams=Math.max(1,Number(v)||100);
