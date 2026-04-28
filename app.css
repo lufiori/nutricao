@@ -200,3 +200,62 @@
   .macro-mini{grid-template-columns:repeat(2,1fr)}
   .meal-grid{grid-template-columns:1fr}
 }
+
+
+/* ===== Ajuste final receitas: tabela sem scroll e formulário mais alinhado ===== */
+.recipe-side .table-wrap,
+#recipeDetail .table-wrap{
+  overflow-x: visible !important;
+}
+
+.recipe-side table,
+#recipeDetail table{
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+.recipe-side table th:first-child,
+.recipe-side table td:first-child,
+#recipeDetail table th:first-child,
+#recipeDetail table td:first-child{
+  width: 52% !important;
+}
+
+.recipe-side table th:last-child,
+.recipe-side table td:last-child,
+#recipeDetail table th:last-child,
+#recipeDetail table td:last-child{
+  width: 48% !important;
+  text-align: right !important;
+  font-weight: 800;
+}
+
+.recipe-layout{
+  grid-template-columns:minmax(0,1fr) 420px !important;
+  gap:20px !important;
+}
+
+.recipe-form{
+  max-width: 860px;
+}
+
+.ingredient-line{
+  grid-template-columns:minmax(220px,1.7fr) 80px 130px 100px 42px !important;
+}
+
+.form-grid textarea.search{
+  min-height: 92px;
+}
+
+#rPreparo{
+  min-height: 150px;
+}
+
+@media(max-width:720px){
+  .ingredient-line{grid-template-columns:1fr !important;}
+  .recipe-side table th:last-child,
+  .recipe-side table td:last-child,
+  #recipeDetail table th:last-child,
+  #recipeDetail table td:last-child{text-align:left !important;}
+}

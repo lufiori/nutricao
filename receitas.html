@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriVida - Receitas</title>
-<link rel="stylesheet" href="app.css?v=menu3">
+<link rel="stylesheet" href="app.css?v=menu4">
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html"><span class="logo">🌿</span>NutriVida</a><nav class="desktop-nav"><a class="navbtn" href="index.html">Hoje</a><a class="navbtn" href="alimentos.html">Alimentos</a><a class="navbtn active" href="receitas.html">Receitas</a><a class="navbtn" href="favoritos.html">Favoritos</a><a class="navbtn" href="perfil.html">Perfil</a></nav></div></header>
@@ -156,11 +156,21 @@ function exampleRecipes(){return [
 ]}
 function makeRecipe(nome,descricao,tempo,porcoes,dificuldade,preparo,ingredientes){return {id:String(uid()),nome,descricao,tempo,porcoes,dificuldade,preparo,ingredientes,nutrientes:calcRecipe(ingredientes)}}
 
+function findTacoFood(ing){
+  if(!ing) return null;
+  return tacoFoods.find(x=>String(x.id)===String(ing.foodId || ing.alimentoId)) ||
+         tacoFoods.find(x=>normalizeText(x.nome)===normalizeText(ing.nome)) ||
+         tacoFoods.find(x=>normalizeText(x.nome).includes(normalizeText(ing.nome))) ||
+         null;
+}
+
 function calcRecipe(ings){
   const t={kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,sodio:0,colesterol:0,vitc:0,retinol:0,zinco:0};
-  ings.forEach(i=>{
-    const f=tacoFoods.find(x=>String(x.id)===String(i.foodId)); if(!f)return;
-    const q=num(i.gramas)/100;
+  (ings||[]).forEach(i=>{
+    const f=findTacoFood(i);
+    if(!f) return;
+    const gramas = num(i.gramas || i.gramasTotal || i.quantidade || 0);
+    const q=gramas/100;
     Object.keys(t).forEach(k=>t[k]+=num(f[k])*q);
   });
   return t;
@@ -179,11 +189,24 @@ function renderRecipes(){
 function showRecipe(id){
   const r=recipes.find(x=>x.id===id); if(!r)return;
   r.nutrientes=calcRecipe(r.ingredientes||[]);
-  const html=`<div class="section-title" style="margin-top:0"><h2>${esc(r.nome)}</h2><button class="ghost danger-btn" onclick="deleteRecipe('${r.id}')">Excluir</button></div><p class="subtitle">${esc(r.descricao||'')}</p><div class="recipe-meta" style="margin:12px 0"><span class="recipe-pill">⏱ ${esc(r.tempo||'-')}</span><span class="recipe-pill">🍽 ${esc(r.porcoes||1)} porção(ões)</span><span class="recipe-pill">⭐ ${esc(r.dificuldade||'Fácil')}</span></div><h3>Ingredientes</h3><ul class="ingredients-list">${(r.ingredientes||[]).map(i=>{const f=tacoFoods.find(x=>String(x.id)===String(i.foodId));return `<li><span>${esc(i.nome)}<small>${esc(f?.grupo||'Sem grupo')} • ${fmt(i.gramas)} g</small></span><b>${esc(i.quantidade)} ${esc(i.medida)}</b></li>`}).join('')}</ul><h3>Modo de preparo</h3><p style="white-space:pre-line;line-height:1.55">${esc(r.preparo||'Modo de preparo não informado.')}</p><h3>Nutrição total</h3>${nutritionTable(r.nutrientes)}<div class="recipe-actions" style="margin-top:12px"><button class="primary" onclick="openMealModal('${r.id}')">Adicionar ao diário</button></div>`;
+  const html=`<div class="section-title" style="margin-top:0"><h2>${esc(r.nome)}</h2><button class="ghost danger-btn" onclick="deleteRecipe('${r.id}')">Excluir</button></div><p class="subtitle">${esc(r.descricao||'')}</p><div class="recipe-meta" style="margin:12px 0"><span class="recipe-pill">⏱ ${esc(r.tempo||'-')}</span><span class="recipe-pill">🍽 ${esc(r.porcoes||1)} porção(ões)</span><span class="recipe-pill">⭐ ${esc(r.dificuldade||'Fácil')}</span></div><h3>Ingredientes</h3><ul class="ingredients-list">${(r.ingredientes||[]).map(i=>{const f=findTacoFood(i);return `<li><span>${esc(i.nome)}<small>${esc(f?.grupo||'Sem grupo')} • ${fmt(i.gramas||i.gramasTotal)} g</small></span><b>${esc(i.quantidade)} ${esc(i.medida)}</b></li>`}).join('')}</ul><h3>Modo de preparo</h3><p style="white-space:pre-line;line-height:1.55">${esc(r.preparo||'Modo de preparo não informado.')}</p><h3>Nutrição total</h3>${nutritionTable(r.nutrientes)}<div class="recipe-actions" style="margin-top:12px"><button class="primary" onclick="openMealModal('${r.id}')">Adicionar ao diário</button></div>`;
   document.getElementById('recipeDetail').innerHTML=html;
 }
 
-function nutritionTable(n){return `<div class="table-wrap"><table><thead><tr><th>Nutriente</th><th>Total</th></tr></thead><tbody><tr><td>Energia</td><td>${fmt(n.kcal,0)} kcal</td></tr><tr><td>Proteínas</td><td>${fmt(n.proteina)} g</td></tr><tr><td>Carboidratos</td><td>${fmt(n.carbo)} g</td></tr><tr><td>Gorduras</td><td>${fmt(n.gordura)} g</td></tr><tr><td>Fibras</td><td>${fmt(n.fibra)} g</td></tr><tr><td>Cálcio</td><td>${fmt(n.calcio)} mg</td></tr><tr><td>Ferro</td><td>${fmt(n.ferro)} mg</td></tr><tr><td>Sódio</td><td>${fmt(n.sodio)} mg</td></tr><tr><td>Colesterol</td><td>${fmt(n.colesterol)} mg</td></tr></tbody></table></div>`}
+function nutritionTable(n){
+  n=n||{};
+  return `<table><thead><tr><th>Nutriente</th><th>Total</th></tr></thead><tbody>
+    <tr><td>Energia</td><td>${fmt(n.kcal,0)} kcal</td></tr>
+    <tr><td>Proteínas</td><td>${fmt(n.proteina)} g</td></tr>
+    <tr><td>Carboidratos</td><td>${fmt(n.carbo)} g</td></tr>
+    <tr><td>Gorduras</td><td>${fmt(n.gordura)} g</td></tr>
+    <tr><td>Fibras</td><td>${fmt(n.fibra)} g</td></tr>
+    <tr><td>Cálcio</td><td>${fmt(n.calcio)} mg</td></tr>
+    <tr><td>Ferro</td><td>${fmt(n.ferro)} mg</td></tr>
+    <tr><td>Sódio</td><td>${fmt(n.sodio)} mg</td></tr>
+    <tr><td>Colesterol</td><td>${fmt(n.colesterol)} mg</td></tr>
+  </tbody></table>`;
+}
 
 function addIngredientLine(){
   const ed=document.getElementById('ingredientEditor');
@@ -271,6 +294,6 @@ function confirmAddRecipeToDiary(meal){
 
 loadTaco();
 </script>
-<script src="app.js?v=menu3"></script>
+<script src="app.js?v=menu4"></script>
 </body>
 </html>
