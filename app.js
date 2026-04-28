@@ -1,6 +1,7 @@
 const NV={
   meals:['Café da manhã','Almoço','Lanche','Jantar'],
-  targets:{kcal:2000,proteina:100,carbo:250,gordura:70,fibra:25,calcio:1000,ferro:14,vitc:75},
+  defaultTargets:{kcal:2000,proteina:100,carbo:250,gordura:70,fibra:25,calcio:1000,ferro:14,vitc:75},
+  get targets(){return getPersonalTargets()},
   foods:[
     {id:'arroz',nome:'Arroz branco cozido',grupo:'Cereais',kcal:128,proteina:2.5,carbo:28.1,gordura:.2,fibra:1.6,calcio:4,ferro:.1,vitc:0},
     {id:'feijao',nome:'Feijão carioca cozido',grupo:'Leguminosas',kcal:76,proteina:4.8,carbo:13.6,gordura:.5,fibra:8.5,calcio:27,ferro:1.3,vitc:0},
@@ -15,6 +16,81 @@ const NV={
   get profile(){return JSON.parse(localStorage.getItem('nv_profile')||'{}')},
   set profile(v){localStorage.setItem('nv_profile',JSON.stringify(v))}
 };
+
+
+function getPersonalTargets(){
+  const p=NV.profile||{};
+  return Object.assign({}, NV.defaultTargets, p.targets||{});
+}
+function calcProfileTargets(profile){
+  const sexo=profile.sexo||'feminino';
+  const idade=Math.max(1, Number(profile.idade)||30);
+  const peso=Math.max(1, Number(profile.peso)||70);
+  const altura=Math.max(1, Number(profile.altura)||170);
+  const atividade=Number(profile.atividade)||1.2;
+  const objetivo=profile.objetivo||'manter';
+  const tmb=(sexo==='masculino') ? (10*peso + 6.25*altura - 5*idade + 5) : (10*peso + 6.25*altura - 5*idade - 161);
+  let kcal=tmb*atividade;
+  if(objetivo==='emagrecer') kcal*=0.85;
+  if(objetivo==='ganhar') kcal*=1.15;
+  kcal=Math.round(kcal/10)*10;
+  const proteinaPorKg = objetivo==='ganhar' ? 2.0 : (objetivo==='emagrecer' ? 1.8 : 1.6);
+  const proteina=Math.round(peso*proteinaPorKg);
+  const gordura=Math.round(peso*0.8);
+  const kcalRestante=Math.max(0, kcal - (proteina*4) - (gordura*9));
+  const carbo=Math.round(kcalRestante/4);
+  const fibra=Math.max(25, Math.round(kcal/1000*14));
+  const calcio=idade>=51 ? 1200 : 1000;
+  let ferro=8;
+  if(sexo==='feminino' && idade>=14 && idade<=50) ferro=18;
+  const vitc=sexo==='masculino' ? 90 : 75;
+  return {kcal,proteina,carbo,gordura,fibra,calcio,ferro,vitc};
+}
+function profileIsComplete(p=NV.profile){
+  return !!(p && p.sexo && Number(p.idade)>0 && Number(p.peso)>0 && Number(p.altura)>0 && p.objetivo);
+}
+function saveProfileAuto(){
+  const p={
+    sexo:document.getElementById('sexo')?.value || 'feminino',
+    idade:Number(document.getElementById('idade')?.value)||0,
+    peso:Number(document.getElementById('peso')?.value)||0,
+    altura:Number(document.getElementById('altura')?.value)||0,
+    atividade:Number(document.getElementById('atividade')?.value)||1.2,
+    objetivo:document.getElementById('objetivo')?.value || 'manter'
+  };
+  if(!p.idade || !p.peso || !p.altura){ alert('Preencha idade, peso e altura para calcular suas metas.'); return; }
+  p.targets=calcProfileTargets(p);
+  NV.profile=p;
+  renderProfileResult?.();
+  renderHome?.();
+  alert('Perfil e metas salvos com sucesso.');
+}
+function loadProfilePage(){
+  const p=Object.assign({sexo:'feminino',idade:30,peso:70,altura:170,atividade:1.2,objetivo:'manter'}, NV.profile||{});
+  ['sexo','idade','peso','altura','atividade','objetivo'].forEach(k=>{const el=document.getElementById(k); if(el) el.value=p[k];});
+  renderProfileResult();
+}
+function renderProfileResult(){
+  const box=document.getElementById('profileResult'); if(!box) return;
+  const p={
+    sexo:document.getElementById('sexo')?.value || 'feminino',
+    idade:Number(document.getElementById('idade')?.value)||0,
+    peso:Number(document.getElementById('peso')?.value)||0,
+    altura:Number(document.getElementById('altura')?.value)||0,
+    atividade:Number(document.getElementById('atividade')?.value)||1.2,
+    objetivo:document.getElementById('objetivo')?.value || 'manter'
+  };
+  const targets=(p.idade && p.peso && p.altura) ? calcProfileTargets(p) : NV.targets;
+  const cards=['kcal','proteina','carbo','gordura','fibra'].map(k=>`<div class="metric"><span>${label(k)}</span><b>${fmt(targets[k],k==='kcal'?0:1)}${unit(k)}</b><small>meta diária calculada</small></div>`).join('');
+  const micros=['calcio','ferro','vitc'].map(k=>`<tr><td>${label(k)}</td><td>${fmt(targets[k],1)}${unit(k)}</td></tr>`).join('');
+  box.innerHTML=`<div class="grid grid4">${cards}</div><div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Micronutriente</th><th>Meta</th></tr></thead><tbody>${micros}</tbody></table></div>`;
+}
+function resetProfile(){
+  if(!confirm('Apagar perfil salvo e voltar às metas padrão?')) return;
+  NV.profile={};
+  loadProfilePage?.();
+  renderHome?.();
+}
 
 async function loadFoods(){
   const files=['taco.json','alimentos.json','dados_taco.json','base_taco.json'];
@@ -130,7 +206,7 @@ function toggleFav(foodId){let favs=NV.favs;favs=favs.includes(foodId)?favs.filt
 function renderSummary(containerId='summaryCards'){const el=document.getElementById(containerId);if(!el)return;const t=calcTotals(),tar=NV.targets;el.innerHTML=['kcal','proteina','carbo','gordura','fibra'].map(k=>`<div class="metric"><span>${label(k)}</span><b>${fmt(t[k],k==='kcal'?0:1)}${unit(k)}</b><div class="progress"><div class="bar" style="width:${pct(t[k],tar[k])}%"></div></div><small>${pct(t[k],tar[k])}% da meta</small></div>`).join('')}
 function label(k){return {kcal:'Calorias',proteina:'Proteínas',carbo:'Carboidratos',gordura:'Gorduras',fibra:'Fibras',calcio:'Cálcio',ferro:'Ferro',vitc:'Vitamina C',colesterol:'Colesterol'}[k]||k}
 function unit(k){return {kcal:' kcal',proteina:' g',carbo:' g',gordura:' g',fibra:' g',calcio:' mg',ferro:' mg',vitc:' mg',colesterol:' mg'}[k]||''}
-function renderMissing(){const el=document.getElementById('missingList');if(!el)return;const t=calcTotals();const keys=['proteina','fibra','calcio','ferro','vitc'];el.innerHTML=keys.map(k=>{const falta=Math.max(0,NV.targets[k]-t[k]);return `<div class="meal"><div><b>${label(k)}</b><br><small>${falta>0?'Faltam aproximadamente':'Meta atingida'} ${fmt(falta,1)}${unit(k)}</small></div><span class="pill">${pct(t[k],NV.targets[k])}%</span></div>`}).join('')}
+function renderMissing(){const el=document.getElementById('missingList');if(!el)return;const t=calcTotals();const keys=['kcal','proteina','carbo','gordura','fibra','calcio','ferro','vitc'];const profileMsg=profileIsComplete()?'' : `<div class="meal warning"><div><b>Complete seu perfil</b><br><small>Use idade, peso, altura e objetivo para calcular metas personalizadas.</small></div><a class="pill" href="perfil.html">Editar perfil</a></div>`;el.innerHTML=profileMsg+keys.map(k=>{const meta=NV.targets[k];const falta=Math.max(0,meta-t[k]);const passou=Math.max(0,t[k]-meta);let texto=falta>0?`Faltam aproximadamente ${fmt(falta,k==='kcal'?0:1)}${unit(k)}`:(passou>0?`Meta atingida • passou ${fmt(passou,k==='kcal'?0:1)}${unit(k)}`:'Meta atingida');return `<div class="meal"><div><b>${label(k)}</b><br><small>${texto}</small></div><span class="pill">${pct(t[k],meta)}%</span></div>`}).join('')}
 function renderMeals(){const el=document.getElementById('mealList');if(!el)return;const d=diaryToday();el.innerHTML=NV.meals.map(m=>{const itens=d.filter(x=>x.meal===m);const totals=calcTotals(itens);const itemHtml=itens.map(x=>{const f=byId(x.foodId)||x.food||{};const q=(Number(x.grams)||100)/100;return `<div class="diary-item"><div class="diary-main"><b>${f.nome||'Alimento'}</b><small>${fmt(num(f.kcal)*q)} kcal • ${fmt(num(f.proteina)*q,1)}g proteína • ${fmt(num(f.carbo)*q,1)}g carbo • ${fmt(num(f.gordura)*q,1)}g gordura</small></div><div class="diary-actions"><input type="number" min="1" value="${Number(x.grams)||100}" onchange="updateDiaryGrams('${x.id}',this.value)" title="gramas"><span>g</span><button class="danger-btn" onclick="removeDiary('${x.id}')">Remover</button></div></div>`}).join('');return `<div class="meal meal-block"><div class="meal-head"><div><h3>${m}</h3><small>${itens.length} item(ns) • ${fmt(totals.kcal)} kcal • ${fmt(totals.proteina,1)}g proteína</small></div><button class="ghost" onclick="openAdd('${m}')">+ Adicionar</button></div>${itens.length?`<div class="diary-list">${itemHtml}</div>`:'<div class="empty meal-empty">Nenhum alimento lançado nesta refeição.</div>'}</div>`}).join('')}
 function openAdd(meal='Almoço', foodId=''){
   const b=document.getElementById('addModal');
