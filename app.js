@@ -15,6 +15,7 @@ const NV={
   get profile(){return JSON.parse(localStorage.getItem('nv_profile')||'{}')},
   set profile(v){localStorage.setItem('nv_profile',JSON.stringify(v))}
 };
+
 async function loadFoods(){
   const files=['taco.json','alimentos.json','dados_taco.json','base_taco.json'];
   for(const file of files){
@@ -53,28 +54,45 @@ function pick(obj, aliases){
   return undefined;
 }
 function normalizeFood(f,i){
-  const nome=pick(f,['nome','alimento','descrição','descricao','descrição do alimento','descricao do alimento','descrição dos alimentos','descricao dos alimentos','description','food','name','produto','item']);
-  const grupo=pick(f,['grupo','categoria','categoria do alimento','grupo alimentar','classificação','classificacao','preparação','preparacao','tipo']);
+  const nome=pick(f,[
+    'descricao_alimento','descricao alimento','descrição alimento',
+    'nome','alimento','descrição','descricao','descrição do alimento','descricao do alimento',
+    'descrição dos alimentos','descricao dos alimentos','description','food','name','produto','item'
+  ]);
+  const grupo=pick(f,[
+    'grupo','categoria','categoria do alimento','grupo alimentar','classificação','classificacao',
+    'preparação','preparacao','tipo'
+  ]);
   return {
     id:String(pick(f,['id','codigo','código','cod','numero','número']) ?? i),
     nome:String(nome ?? 'Alimento'),
     grupo:String(grupo ?? 'Outros'),
-    kcal:num(pick(f,['kcal','energia kcal','energia(kcal)','energia (kcal)','calorias','valor energetico','valor energético','energia'])),
-    proteina:num(pick(f,['proteina','proteína','proteina g','proteína g','proteina (g)','proteína (g)','protein'])),
-    carbo:num(pick(f,['carbo','carboidrato','carboidratos','carboidrato g','carboidratos g','carboidrato (g)','carboidratos (g)','cho'])),
-    gordura:num(pick(f,['gordura','lipidios','lipídios','lipideos','lipídeos','lipidios (g)','lipídios (g)','gorduras totais','gordura total'])),
-    fibra:num(pick(f,['fibra','fibras','fibra alimentar','fibra alimentar (g)','fibras (g)'])),
-    calcio:num(pick(f,['calcio','cálcio','calcio (mg)','cálcio (mg)','ca'])),
-    ferro:num(pick(f,['ferro','ferro (mg)','fe'])),
-    vitc:num(pick(f,['vitamina c','vitamina_c','vitc','vit c','ácido ascórbico','acido ascorbico']))
+    kcal:num(pick(f,['energia_kcal','kcal','energia kcal','energia(kcal)','energia (kcal)','calorias','valor energetico','valor energético','energia'])),
+    proteina:num(pick(f,['proteina_g','proteina','proteína','proteina g','proteína g','proteina (g)','proteína (g)','protein'])),
+    carbo:num(pick(f,['carboidrato_g','carbo_g','carbo','carboidrato','carboidratos','carboidrato g','carboidratos g','carboidrato (g)','carboidratos (g)','cho'])),
+    gordura:num(pick(f,['lipideos_g','lipidios_g','gordura_g','gordura','lipidios','lipídios','lipideos','lipídeos','lipidios (g)','lipídios (g)','gorduras totais','gordura total'])),
+    fibra:num(pick(f,['fibra_alimentar_g','fibra_g','fibra','fibras','fibra alimentar','fibra alimentar (g)','fibras (g)'])),
+    calcio:num(pick(f,['calcio_mg','calcio','cálcio','calcio (mg)','cálcio (mg)','ca'])),
+    ferro:num(pick(f,['ferro_mg','ferro','ferro (mg)','fe'])),
+    vitc:num(pick(f,['vitamina_c_mg','vitamina c','vitamina_c','vitc','vit c','ácido ascórbico','acido ascorbico']))
   }
 }
 function num(v){
   if(v===undefined || v===null) return 0;
+  if(typeof v === 'number') return Number.isFinite(v) ? v : 0;
   let s=String(v).trim();
   if(!s || s==='-' || s.toUpperCase()==='NA' || s.toLowerCase()==='tr') return 0;
-  s=s.replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');
-  return Number(s)||0
+  s=s.replace(/\s/g,'').replace(/[^0-9,.-]/g,'');
+  const hasComma=s.includes(',');
+  const hasDot=s.includes('.');
+  if(hasComma && hasDot){
+    if(s.lastIndexOf(',') > s.lastIndexOf('.')) s=s.replace(/\./g,'').replace(',','.');
+    else s=s.replace(/,/g,'');
+  }else if(hasComma){
+    s=s.replace(',','.');
+  }
+  const n=Number(s);
+  return Number.isFinite(n) ? n : 0;
 }
 function byId(id){return NV.foods.find(f=>String(f.id)===String(id))}
 function calcTotals(){return NV.diary.reduce((a,it)=>{const f=byId(it.foodId)||it.food;const q=(Number(it.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','calcio','ferro','vitc'].forEach(k=>a[k]+=(num(f?.[k])*q));return a},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,vitc:0})}
