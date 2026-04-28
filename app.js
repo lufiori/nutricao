@@ -1,6 +1,6 @@
 const NV={
   meals:['Café da manhã','Almoço','Lanche','Jantar'],
-  defaultTargets:{kcal:2000,proteina:100,carbo:250,gordura:70,fibra:25,calcio:1000,ferro:14,vitc:75},
+  defaultTargets:{kcal:2000,proteina:100,carbo:250,gordura:70,fibra:25,calcio:1000,ferro:14,vitc:75,retinol:700,zinco:8},
   get targets(){return getPersonalTargets()},
   foods:[
     {id:'arroz',nome:'Arroz branco cozido',grupo:'Cereais',kcal:128,proteina:2.5,carbo:28.1,gordura:.2,fibra:1.6,calcio:4,ferro:.1,vitc:0},
@@ -44,7 +44,9 @@ function calcProfileTargets(profile){
   let ferro=8;
   if(sexo==='feminino' && idade>=14 && idade<=50) ferro=18;
   const vitc=sexo==='masculino' ? 90 : 75;
-  return {kcal,proteina,carbo,gordura,fibra,calcio,ferro,vitc};
+  const retinol=sexo==='masculino' ? 900 : 700;
+  const zinco=sexo==='masculino' ? 11 : 8;
+  return {kcal,proteina,carbo,gordura,fibra,calcio,ferro,vitc,retinol,zinco};
 }
 function profileIsComplete(p=NV.profile){
   return !!(p && p.sexo && Number(p.idade)>0 && Number(p.peso)>0 && Number(p.altura)>0 && p.objetivo);
@@ -82,7 +84,7 @@ function renderProfileResult(){
   };
   const targets=(p.idade && p.peso && p.altura) ? calcProfileTargets(p) : NV.targets;
   const cards=['kcal','proteina','carbo','gordura','fibra'].map(k=>`<div class="metric"><span>${label(k)}</span><b>${fmt(targets[k],k==='kcal'?0:1)}${unit(k)}</b><small>meta diária calculada</small></div>`).join('');
-  const micros=['calcio','ferro','vitc'].map(k=>`<tr><td>${label(k)}</td><td>${fmt(targets[k],1)}${unit(k)}</td></tr>`).join('');
+  const micros=['calcio','ferro','vitc','retinol','zinco'].map(k=>`<tr><td>${label(k)}</td><td>${fmt(targets[k],1)}${unit(k)}</td></tr>`).join('');
   box.innerHTML=`<div class="grid grid4">${cards}</div><div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Micronutriente</th><th>Meta</th></tr></thead><tbody>${micros}</tbody></table></div>`;
 }
 function resetProfile(){
@@ -192,7 +194,7 @@ function byId(id){return NV.foods.find(f=>String(f.id)===String(id))}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function diaryToday(){return NV.diary.filter(x=>(x.when||todayKey())===todayKey())}
 function clearToday(){NV.diary=NV.diary.filter(x=>(x.when||todayKey())!==todayKey());renderHome?.()}
-function calcTotals(items=diaryToday()){return items.reduce((a,it)=>{const f=byId(it.foodId)||it.food;const q=(Number(it.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','calcio','ferro','vitc'].forEach(k=>a[k]+=(num(f?.[k])*q));return a},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,vitc:0})}
+function calcTotals(items=diaryToday()){return items.reduce((a,it)=>{const f=byId(it.foodId)||it.food;const q=(Number(it.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','calcio','ferro','vitc','retinol','zinco'].forEach(k=>a[k]+=(num(f?.[k])*q));return a},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,vitc:0,retinol:0,zinco:0})}
 function fmt(v,d=0){return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d})}
 function pct(v,t){return Math.min(100,Math.round(((v||0)/(t||1))*100))}
 function openMore(){document.getElementById('moreMenu')?.classList.toggle('open')}
@@ -204,9 +206,10 @@ function updateDiaryGrams(id,grams){const d=NV.diary.map(x=>String(x.id)===Strin
 function updateDiaryMeal(id,meal){const d=NV.diary.map(x=>String(x.id)===String(id)?{...x,meal}:x);NV.diary=d;renderHome?.();}
 function toggleFav(foodId){let favs=NV.favs;favs=favs.includes(foodId)?favs.filter(x=>x!==foodId):[...favs,foodId];NV.favs=favs;renderFoods?.();renderFavs?.();}
 function renderSummary(containerId='summaryCards'){const el=document.getElementById(containerId);if(!el)return;const t=calcTotals(),tar=NV.targets;el.innerHTML=['kcal','proteina','carbo','gordura','fibra'].map(k=>`<div class="metric"><span>${label(k)}</span><b>${fmt(t[k],k==='kcal'?0:1)}${unit(k)}</b><div class="progress"><div class="bar" style="width:${pct(t[k],tar[k])}%"></div></div><small>${pct(t[k],tar[k])}% da meta</small></div>`).join('')}
-function label(k){return {kcal:'Calorias',proteina:'Proteínas',carbo:'Carboidratos',gordura:'Gorduras',fibra:'Fibras',calcio:'Cálcio',ferro:'Ferro',vitc:'Vitamina C',colesterol:'Colesterol'}[k]||k}
-function unit(k){return {kcal:' kcal',proteina:' g',carbo:' g',gordura:' g',fibra:' g',calcio:' mg',ferro:' mg',vitc:' mg',colesterol:' mg'}[k]||''}
-function renderMissing(){const el=document.getElementById('missingList');if(!el)return;const t=calcTotals();const keys=['kcal','proteina','carbo','gordura','fibra','calcio','ferro','vitc'];const profileMsg=profileIsComplete()?'' : `<div class="meal warning"><div><b>Complete seu perfil</b><br><small>Use idade, peso, altura e objetivo para calcular metas personalizadas.</small></div><a class="pill" href="perfil.html">Editar perfil</a></div>`;el.innerHTML=profileMsg+keys.map(k=>{const meta=NV.targets[k];const falta=Math.max(0,meta-t[k]);const passou=Math.max(0,t[k]-meta);let texto=falta>0?`Faltam aproximadamente ${fmt(falta,k==='kcal'?0:1)}${unit(k)}`:(passou>0?`Meta atingida • passou ${fmt(passou,k==='kcal'?0:1)}${unit(k)}`:'Meta atingida');return `<div class="meal"><div><b>${label(k)}</b><br><small>${texto}</small></div><span class="pill">${pct(t[k],meta)}%</span></div>`}).join('')}
+function label(k){return {kcal:'Calorias',proteina:'Proteínas',carbo:'Carboidratos',gordura:'Gorduras',fibra:'Fibras',calcio:'Cálcio',ferro:'Ferro',vitc:'Vitamina C',retinol:'Vitamina A',zinco:'Zinco',colesterol:'Colesterol'}[k]||k}
+function unit(k){return {kcal:' kcal',proteina:' g',carbo:' g',gordura:' g',fibra:' g',calcio:' mg',ferro:' mg',vitc:' mg',retinol:' mcg',zinco:' mg',colesterol:' mg'}[k]||''}
+function renderMissing(){const el=document.getElementById('missingList');if(!el)return;const t=calcTotals();const keys=['kcal','proteina','carbo','gordura','fibra'];const profileMsg=profileIsComplete()?'' : `<div class="meal warning"><div><b>Complete seu perfil</b><br><small>Use idade, peso, altura e objetivo para calcular metas personalizadas.</small></div><a class="pill" href="perfil.html">Editar perfil</a></div>`;el.innerHTML=profileMsg+keys.map(k=>{const meta=NV.targets[k];const falta=Math.max(0,meta-t[k]);const passou=Math.max(0,t[k]-meta);let texto=falta>0?`Faltam aproximadamente ${fmt(falta,k==='kcal'?0:1)}${unit(k)}`:(passou>0?`Meta atingida • passou ${fmt(passou,k==='kcal'?0:1)}${unit(k)}`:'Meta atingida');return `<div class="meal"><div><b>${label(k)}</b><br><small>${texto}</small></div><span class="pill">${pct(t[k],meta)}%</span></div>`}).join('')}
+function renderMicros(){const el=document.getElementById('microCards');if(!el)return;const t=calcTotals();const keys=['vitc','calcio','ferro','retinol','zinco'];el.innerHTML=keys.map(k=>{const meta=NV.targets[k]||0;const atual=t[k]||0;const p=pct(atual,meta);let status='baixo';let msg='Abaixo da meta';if(p>=100){status='ok';msg='Meta atingida';}else if(p>=70){status='medio';msg='Perto da meta';}return `<div class="micro-card ${status}"><div><span>${label(k)}</span><b>${fmt(atual,k==='retinol'?0:1)}${unit(k)}</b><small>${msg} • meta ${fmt(meta,k==='retinol'?0:1)}${unit(k)}</small></div><div class="micro-percent">${p}%</div><div class="progress"><div class="bar" style="width:${p}%"></div></div></div>`}).join('')}
 function renderMeals(){const el=document.getElementById('mealList');if(!el)return;const d=diaryToday();el.innerHTML=NV.meals.map(m=>{const itens=d.filter(x=>x.meal===m);const totals=calcTotals(itens);const itemHtml=itens.map(x=>{const f=byId(x.foodId)||x.food||{};const q=(Number(x.grams)||100)/100;return `<div class="diary-item"><div class="diary-main"><b>${f.nome||'Alimento'}</b><small>${fmt(num(f.kcal)*q)} kcal • ${fmt(num(f.proteina)*q,1)}g proteína • ${fmt(num(f.carbo)*q,1)}g carbo • ${fmt(num(f.gordura)*q,1)}g gordura</small></div><div class="diary-actions"><input type="number" min="1" value="${Number(x.grams)||100}" onchange="updateDiaryGrams('${x.id}',this.value)" title="gramas"><span>g</span><button class="danger-btn" onclick="removeDiary('${x.id}')">Remover</button></div></div>`}).join('');return `<div class="meal meal-block"><div class="meal-head"><div><h3>${m}</h3><small>${itens.length} item(ns) • ${fmt(totals.kcal)} kcal • ${fmt(totals.proteina,1)}g proteína</small></div><button class="ghost" onclick="openAdd('${m}')">+ Adicionar</button></div>${itens.length?`<div class="diary-list">${itemHtml}</div>`:'<div class="empty meal-empty">Nenhum alimento lançado nesta refeição.</div>'}</div>`}).join('')}
 function openAdd(meal='Almoço', foodId=''){
   const b=document.getElementById('addModal');
@@ -269,8 +272,8 @@ function submitAdd(){
   addDiary(foodId,document.getElementById('modalMeal').value,document.getElementById('modalGrams').value);
   closeAdd();
 }
-function renderHome(){renderSummary();renderMissing();renderMeals();renderNeeds()}
-function renderNeeds(){const el=document.getElementById('needsTable');if(!el)return;const t=calcTotals();const rows=Object.keys(NV.targets).map(k=>`<tr><td>${label(k)}</td><td>${fmt(NV.targets[k],k==='kcal'?0:1)}${unit(k)}</td><td>${fmt(t[k],k==='kcal'?0:1)}${unit(k)}</td><td>${pct(t[k],NV.targets[k])}%</td></tr>`).join('');el.innerHTML=rows}
+function renderHome(){renderSummary();renderMissing();renderMicros();renderMeals();renderNeeds()}
+function renderNeeds(){const el=document.getElementById('needsTable');if(!el)return;const t=calcTotals();const keys=['kcal','proteina','carbo','gordura','fibra','vitc','calcio','ferro','retinol','zinco'];const rows=keys.map(k=>`<tr><td>${label(k)}</td><td>${fmt(NV.targets[k],k==='kcal'||k==='retinol'?0:1)}${unit(k)}</td><td>${fmt(t[k],k==='kcal'||k==='retinol'?0:1)}${unit(k)}</td><td>${pct(t[k],NV.targets[k])}%</td></tr>`).join('');el.innerHTML=rows}
 
 const nutrientDefs=[
   ['kcal','Energia','kcal','macro'],['proteina','Proteínas','g','macro'],['carbo','Carboidratos','g','macro'],['gordura','Gorduras','g','macro'],['fibra','Fibras','g','macro'],

@@ -50,3 +50,19 @@
 .warning{background:var(--warn);border-color:var(--warnline)}
 @media(max-width:900px){.profile-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.profile-hero,.profile-form{grid-template-columns:1fr}.profile-section-title{align-items:center}}
+
+
+/* Micronutrientes */
+.micro-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.micro-card{background:#fff;border:1px solid var(--line,#e2e8e0);border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(20,40,30,.04);position:relative;overflow:hidden}
+.micro-card span{display:block;font-size:.86rem;color:#44546a;margin-bottom:5px}
+.micro-card b{display:block;font-size:1.25rem;margin-bottom:4px;color:#0f172a}
+.micro-card small{color:#53627a;padding-right:48px;display:block;line-height:1.25}
+.micro-card .progress{height:8px;margin-top:10px;border-radius:999px;background:#edf1ee;overflow:hidden}
+.micro-card .bar{height:100%;border-radius:999px;background:#2f7d46}
+.micro-card.baixo .bar{background:#d97706}
+.micro-card.medio .bar{background:#65a30d}
+.micro-card.ok .bar{background:#2f7d46}
+.micro-percent{position:absolute;right:12px;top:12px;font-weight:800;background:#f4f7f4;border-radius:999px;padding:6px 9px;color:#183524;font-size:.88rem}
+@media(max-width:900px){.micro-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.micro-grid{grid-template-columns:1fr}.micro-card{border-radius:16px}}
