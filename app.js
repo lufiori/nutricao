@@ -369,3 +369,82 @@ function openFoodDetail(id){
 }
 function closeFoodDetail(){document.getElementById('detailModal')?.classList.remove('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.more-menu')&&!e.target.closest('[data-more]'))closeMore()});
+
+/* =========================================================
+   Upgrade: Excesso inteligente (macros + micronutrientes)
+   Mostra percentuais acima de 100%, alerta 100-120% e excesso >120%.
+   ========================================================= */
+function pctRaw(v,t){
+  const meta=Number(t)||0;
+  if(!meta) return 0;
+  return Math.round(((Number(v)||0)/meta)*100);
+}
+function pctBar(v,t){
+  return Math.min(100, Math.max(0, pctRaw(v,t)));
+}
+function excessoStatus(percent){
+  if(percent >= 120) return {classe:'excesso', texto:'⚠️ Consumo elevado'};
+  if(percent > 100) return {classe:'atenção', texto:'Atenção: acima da meta'};
+  if(percent >= 100) return {classe:'ok', texto:'Meta atingida'};
+  if(percent >= 70) return {classe:'medio', texto:'Perto da meta'};
+  return {classe:'baixo', texto:'Abaixo da meta'};
+}
+function renderSummary(containerId='summaryCards'){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const t=calcTotals(), tar=NV.targets;
+  el.innerHTML=['kcal','proteina','carbo','gordura','fibra'].map(k=>{
+    const pr=pctRaw(t[k],tar[k]);
+    const st=excessoStatus(pr);
+    const meta=tar[k]||0;
+    let detalhe=`${pr}% da meta`;
+    if(pr>100){
+      detalhe=`${st.texto} • passou ${fmt((t[k]||0)-meta,k==='kcal'?0:1)}${unit(k)}`;
+    }
+    return `<div class="metric metric-${st.classe}"><span>${label(k)}</span><b>${fmt(t[k],k==='kcal'?0:1)}${unit(k)}</b><div class="progress"><div class="bar" style="width:${pctBar(t[k],tar[k])}%"></div></div><small>${detalhe}</small></div>`;
+  }).join('');
+}
+function renderMissing(){
+  const el=document.getElementById('missingList');
+  if(!el)return;
+  const t=calcTotals();
+  const keys=['kcal','proteina','carbo','gordura','fibra'];
+  const profileMsg=profileIsComplete()?'' : `<div class="meal warning"><div><b>Complete seu perfil</b><br><small>Use idade, peso, altura e objetivo para calcular metas personalizadas.</small></div><a class="pill" href="perfil.html">Editar perfil</a></div>`;
+  const excessos=[];
+  const linhas=keys.map(k=>{
+    const meta=NV.targets[k]||0;
+    const atual=t[k]||0;
+    const pr=pctRaw(atual,meta);
+    const st=excessoStatus(pr);
+    const falta=Math.max(0,meta-atual);
+    const passou=Math.max(0,atual-meta);
+    let texto='Meta atingida';
+    if(falta>0){
+      texto=`Faltam aproximadamente ${fmt(falta,k==='kcal'?0:1)}${unit(k)}`;
+    }else if(passou>0){
+      texto=`${st.texto} • passou ${fmt(passou,k==='kcal'?0:1)}${unit(k)}`;
+      if(pr>=120) excessos.push(label(k));
+    }
+    return `<div class="meal meal-${st.classe}"><div><b>${label(k)}</b><br><small>${texto}</small></div><span class="pill pill-${st.classe}">${pr}%</span></div>`;
+  }).join('');
+  const alerta=excessos.length ? `<div class="meal excess-alert"><div><b>⚠️ Atenção aos excessos</b><br><small>${excessos.join(', ')} acima de 120% da meta. Não precisa zerar: só ajuste as próximas refeições do dia.</small></div></div>` : '';
+  el.innerHTML=profileMsg+alerta+linhas;
+}
+function renderMicros(){
+  const el=document.getElementById('microCards');
+  if(!el)return;
+  const t=calcTotals();
+  const keys=['vitc','calcio','ferro','retinol','zinco'];
+  const excessos=[];
+  el.innerHTML=keys.map(k=>{
+    const meta=NV.targets[k]||0;
+    const atual=t[k]||0;
+    const pr=pctRaw(atual,meta);
+    const st=excessoStatus(pr);
+    const passou=Math.max(0,atual-meta);
+    let msg=st.texto;
+    if(pr>100) msg=`${st.texto} • passou ${fmt(passou,k==='retinol'?0:1)}${unit(k)}`;
+    if(pr>=120) excessos.push(label(k));
+    return `<div class="micro-card ${st.classe}"><div><span>${label(k)}</span><b>${fmt(atual,k==='retinol'?0:1)}${unit(k)}</b><small>${msg} • meta ${fmt(meta,k==='retinol'?0:1)}${unit(k)}</small></div><div class="micro-percent">${pr}%</div><div class="progress"><div class="bar" style="width:${pctBar(atual,meta)}%"></div></div></div>`;
+  }).join('') + (excessos.length ? `<div class="micro-excess-note">⚠️ ${excessos.join(', ')} acima do ideal diário. Use como alerta educativo e ajuste o restante do dia.</div>` : '');
+}

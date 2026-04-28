@@ -82,3 +82,19 @@
 .suggestion-ok{grid-column:1/-1}
 @media(max-width:900px){.suggestion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.suggestion-grid{grid-template-columns:1fr}.suggestion-note{font-size:.92rem}.suggestion-top{display:grid}.suggestion-card{border-radius:18px}}
+
+/* Upgrade: Excesso inteligente */
+.metric-atenção,.meal-atenção{border-color:#facc15;background:#fffbeb}
+.metric-excesso,.meal-excesso,.excess-alert{border-color:#fecaca;background:#fff1f2}
+.metric-excesso .bar{background:#dc2626}
+.metric-atenção .bar{background:#eab308}
+.pill-atenção{background:#fef3c7;color:#854d0e}
+.pill-excesso{background:#fee2e2;color:#991b1b;font-weight:800}
+.excess-alert{margin-bottom:10px}
+.micro-card.atenção{border-color:#facc15;background:#fffbeb}
+.micro-card.atenção .bar{background:#eab308}
+.micro-card.excesso{border-color:#fecaca;background:#fff1f2}
+.micro-card.excesso .bar{background:#dc2626}
+.micro-card.excesso .micro-percent{background:#fee2e2;color:#991b1b;font-weight:900}
+.micro-card.atenção .micro-percent{background:#fef3c7;color:#854d0e;font-weight:900}
+.micro-excess-note{grid-column:1/-1;border:1px solid #fecaca;background:#fff1f2;color:#7f1d1d;border-radius:16px;padding:12px 14px;font-size:.92rem;line-height:1.35}
