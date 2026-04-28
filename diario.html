@@ -1,318 +1,96 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Diário alimentar</title><style>
-:root{
-  --bg:#f6f7f9;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
-  --primary:#2f8f46;--primary-soft:#eaf6ed;--blue-soft:#eef4ff;--amber-soft:#fff8eb;
-  --red-soft:#fff1f2;--violet-soft:#f5f3ff;--shadow:0 10px 24px rgba(15,23,42,.06);--radius:18px;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriVida - Diário Alimentar</title>
+<style>
+:root {
+  --bg: #f7f8fa; --card: #fff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb;
+  --primary: #2f855a; --primary-dark: #276749; --soft-green: #e8f5ee; --danger: #dc2626;
+  --shadow: 0 8px 22px rgba(15, 23, 42, .08); --radius: 18px;
 }
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-.topbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
-.topbar-inner{max-width:1500px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.brand h1{margin:0;color:var(--primary);font-size:23px}
-.brand div{color:var(--muted);font-size:14px;margin-top:3px}
-.nav{display:flex;gap:8px;flex-wrap:wrap}
-.nav a{padding:10px 13px;border:1px solid var(--line);border-radius:12px;color:var(--text);text-decoration:none;background:#fff;font-size:14px;font-weight:700}
-.nav a.active,.nav a:hover{background:var(--primary);border-color:var(--primary);color:#fff}
-.page{max-width:1500px;margin:18px auto;padding:0 18px 28px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-label,.label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
-input,select{width:100%;padding:12px 13px;border:1px solid #d1d5db;border-radius:12px;background:#fff;font-size:15px;color:var(--text)}
-button,.btn,.btn-outline,.btn-soft,.btn-danger{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#fff;cursor:pointer;font-size:14px}
-.btn{background:var(--primary);color:#fff;border-color:var(--primary)}
-.btn-soft{background:var(--primary-soft);color:var(--primary);border-color:#b7e2c1}
-.btn-danger{color:#b91c1c;border-color:#fecaca}
-.muted{color:var(--muted)}
-.pill{display:inline-block;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:999px;padding:4px 8px;font-size:12px;color:#374151}
-.metric{border:1px solid var(--line);border-radius:14px;padding:14px}
-.metric h4{margin:0;color:var(--muted);font-size:13px}
-.metric .big{font-size:24px;font-weight:800;margin-top:18px}
-.green-soft{background:var(--primary-soft)}.blue-soft{background:var(--blue-soft)}.amber-soft{background:var(--amber-soft)}.red-soft{background:var(--red-soft)}.violet-soft{background:var(--violet-soft)}
-.inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.status{display:none;padding:12px 14px;border-radius:12px;font-size:14px;margin-top:12px}
-.status.ok{display:block;background:#ecfdf5;border:1px solid #86efac;color:#166534}
-.status.error{display:block;background:#fff7ed;border:1px solid #fdba74;color:#9a3412}
-table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
-th,td{padding:10px;border-bottom:1px solid #edf0f2;text-align:left;vertical-align:top}
-th{background:#fafafa}.table-wrap{border:1px solid var(--line);border-radius:14px;overflow:auto;background:#fff}
-.food-list{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:auto;max-height:620px;margin-top:12px}
-.food-item{padding:12px;border-bottom:1px solid #edf0f2;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-.food-item:last-child{border-bottom:none}.food-name{font-weight:800}.food-sub{font-size:13px;color:var(--muted);margin-top:4px}
-.meal-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
-.meal-tab{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;cursor:pointer;text-align:center;font-size:14px}
-.meal-tab.active{background:var(--primary-soft);border-color:#b7e2c1;color:var(--primary);font-weight:800}
-.macro-bar{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.macro-fill{height:100%;background:var(--primary);width:0%}
-.footer{text-align:center;color:var(--muted);padding:0 16px 24px;font-size:12px}
-@media(max-width:1000px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.meal-tabs{grid-template-columns:1fr 1fr}.topbar-inner{align-items:flex-start}}
-</style></head><body>
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(15,23,42,.04)}
+.topbar{max-width:1220px;margin:0 auto;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;min-width:210px}.brand-icon{width:40px;height:40px;border-radius:14px;background:var(--soft-green);display:grid;place-items:center;font-size:23px}
+.brand h1{font-size:20px;margin:0;line-height:1.1}.brand small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}nav a{text-decoration:none;border:1px solid var(--border);background:#fff;color:var(--text);padding:9px 12px;border-radius:999px;cursor:pointer;font-weight:700;font-size:13px}
+nav a.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+main{max-width:1220px;margin:0 auto;padding:24px 18px 60px}.hero{background:linear-gradient(135deg,#fff,#edf7f1);border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px}
+.hero h2{margin:0 0 8px;font-size:28px}.hero p{margin:0;color:var(--muted);line-height:1.5}.notice{margin-top:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid var(--border);color:var(--muted);font-size:13px;line-height:1.45}
+.status-pill{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid var(--border);font-size:12px;color:var(--muted);margin-top:10px}
+.toolbar,.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}.toolbar{padding:16px;margin-bottom:18px;display:grid;grid-template-columns:1.4fr 1fr auto;gap:12px;align-items:end}
+.field{position:relative}.field label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:14px;font-size:14px;background:#fff;color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,133,90,.13)}
+button{font-family:inherit}.btn{border:0;background:var(--primary);color:#fff;padding:11px 14px;border-radius:14px;cursor:pointer;font-weight:700;font-size:14px;transition:.18s ease;white-space:nowrap}
+.btn:hover{background:var(--primary-dark);transform:translateY(-1px)}.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}.btn.secondary:hover{background:#f9fafb}.btn.danger{background:#fff;color:var(--danger);border:1px solid #fecaca}.btn.danger:hover{background:#fff1f2}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:18px;align-items:start}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.recipe-card{padding:16px;display:flex;flex-direction:column;gap:13px;min-height:246px}.recipe-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.recipe-title{margin:0;font-size:19px}
+.badge{display:inline-flex;align-items:center;padding:6px 9px;border-radius:999px;background:var(--soft-green);color:#276749;font-size:12px;font-weight:800;white-space:nowrap}.badge.cafe{background:#fff7ed;color:#9a3412}.badge.almoco{background:#eef6ff;color:#1d4ed8}.badge.jantar{background:#f5f3ff;color:#6d28d9}.badge.lanche{background:#fdf2f8;color:#be185d}
+.recipe-desc{color:var(--muted);line-height:1.45;font-size:14px;margin:0;min-height:42px}.meta-row{display:flex;gap:8px;flex-wrap:wrap}.meta-pill{background:#f9fafb;border:1px solid var(--border);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:12px;font-weight:700}
+.macro-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.macro{background:#f9fafb;border:1px solid var(--border);border-radius:14px;padding:9px;text-align:center}.macro strong{display:block;font-size:14px}.macro span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.side-panel{position:sticky;top:92px;padding:16px}.empty{color:var(--muted);background:#f9fafb;border:1px dashed #cbd5e1;border-radius:16px;padding:18px;line-height:1.5}
+.detail-title{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}.detail-title h3{margin:0}
+.ingredients{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}.ingredients li{padding:10px;border:1px solid var(--border);border-radius:14px;background:#f9fafb;display:flex;justify-content:space-between;gap:10px;font-size:14px}.ingredients small{display:block;color:var(--muted);margin-top:3px}
+.nutrition-table{width:100%;border-collapse:collapse;margin-top:12px;overflow:hidden;border-radius:14px;font-size:14px}.nutrition-table th,.nutrition-table td{border-bottom:1px solid var(--border);padding:9px;text-align:left}.nutrition-table th{background:#f9fafb;color:var(--muted);font-size:12px}
+.form-panel{margin-top:18px;padding:16px}.form-panel h3{margin:0 0 10px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}
+.ingredient-editor{display:grid;gap:10px;margin-top:8px}.ingredient-line{display:grid;grid-template-columns:minmax(180px,1.5fr) 90px 120px 90px 42px;gap:8px;align-items:end;padding:10px;border:1px solid var(--border);border-radius:16px;background:#fbfbfc;position:relative}
+.suggestions{position:absolute;left:10px;right:10px;top:72px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 35px rgba(15,23,42,.18);z-index:9999;max-height:300px;overflow-y:auto;display:none}
+.suggestions button{width:100%;padding:12px 14px;border:0;background:#fff;text-align:left;cursor:pointer;border-bottom:1px solid #f1f5f9;color:var(--text);font-size:14px;line-height:1.4}.suggestions button:hover{background:#f0fdf4}.suggestions small{display:block;color:var(--muted);margin-top:4px;font-size:12px}
+.calc-box{margin-top:14px;padding:14px;border-radius:18px;background:#f9fafb;border:1px solid var(--border)}.calc-box h4{margin:0 0 10px}.small-note{color:var(--muted);font-size:12px;line-height:1.45}
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.35);display:none;align-items:center;justify-content:center;padding:18px;z-index:10000}.modal{background:#fff;border-radius:22px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(15,23,42,.25);max-width:460px;width:100%;padding:18px}.modal h3{margin:0 0 8px}.meal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}.meal-btn{border:1px solid var(--border);background:#fff;border-radius:16px;padding:14px;cursor:pointer;text-align:left;font-weight:800}.meal-btn:hover{border-color:var(--primary);background:#f0fdf4}
+.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.day-tabs button{border:1px solid var(--border);background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;cursor:pointer}.day-tabs button.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.meal-section{padding:16px;margin-bottom:16px}.meal-section h3{margin:0 0 10px}.diary-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;background:#f9fafb;border:1px solid var(--border);border-radius:16px;margin-top:8px}.summary-box{padding:16px}
+@media(max-width:980px){.toolbar{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.side-panel{position:static}.grid-2{grid-template-columns:1fr}}
+@media(max-width:700px){.topbar{align-items:flex-start;flex-direction:column}nav{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}nav a{flex:0 0 auto}main{padding:18px 12px 50px}.hero{padding:18px}.hero h2{font-size:23px}.toolbar{grid-template-columns:1fr;padding:13px}.macro-row{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.ingredient-line{grid-template-columns:1fr}.suggestions{position:static;margin-top:8px}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1 1 100%}.meal-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="topbar"><div class="brand"><div class="brand-icon">🥗</div><div><h1>NutriVida</h1><small>Diário alimentar real</small></div></div>
+<nav>
+  <a href="index.html">Diário</a>
+  <a href="alimentos.html">Alimentos</a>
+  <a href="receitas.html" class="active">Receitas</a>
+  <a href="favoritos.html">Favoritos</a>
+  <a href="perfil.html">Perfil</a>
+</nav>
+</div></header>
+<main>
+<section class="hero"><h2>📘 Diário alimentar</h2><p>Aqui aparecem as receitas adicionadas pela página de receitas, separadas por refeição e data.</p></section>
+<section class="toolbar"><div class="field"><label>Data do diário</label><input id="dataDiario" type="date"></div><div class="field"><label>Filtrar refeição</label><select id="filtroRefeicao"><option value="">Todas</option><option value="cafe">Café da manhã</option><option value="almoco">Almoço</option><option value="jantar">Jantar</option><option value="lanche">Lanche</option></select></div><button class="btn secondary" onclick="limparDiarioDia()">Limpar dia</button></section>
+<section class="layout"><div><div class="day-tabs"><button onclick="mudarData(-1)">← Dia anterior</button><button class="active" onclick="irHoje()">Hoje</button><button onclick="mudarData(1)">Próximo dia →</button></div><div id="diarioConteudo"></div></div><aside class="card side-panel"><h3>Resumo do dia</h3><div id="resumoDia" class="summary-box"></div></aside></section>
+</main>
 <script>
-const refeicoes=[
-{id:"cafe_da_manha",nome:"Café da manhã"},{id:"almoco",nome:"Almoço"},{id:"jantar",nome:"Jantar"},{id:"lanches",nome:"Lanches"},{id:"ceia",nome:"Ceia"}
-];
-const objetivos=[
-{id:"perder_peso",nome:"Perder peso",ajuste:-450,protKg:2.0,gordKg:0.8},
-{id:"manter_peso",nome:"Manter peso",ajuste:0,protKg:1.6,gordKg:0.9},
-{id:"ganhar_massa",nome:"Ganhar massa",ajuste:300,protKg:2.2,gordKg:1.0}
-];
-let baseAtual=[]; let alimentoSelecionado=null; let refeicaoAtiva="almoco";
-const hoje=new Date().toISOString().slice(0,10);
-function el(id){return document.getElementById(id)}
-function num(v){const x=Number(v);return Number.isFinite(x)?x:0}
-function fmt(v,c=1){const x=Number(v);if(!Number.isFinite(x))return "—";return x.toLocaleString("pt-BR",{minimumFractionDigits:c,maximumFractionDigits:c})}
-function fmt0(v){const x=Number(v);return Number.isFinite(x)?Math.round(x).toLocaleString("pt-BR"):"0"}
-function getGrupo(a){return a?.grupo||a?.grupo_alimento||a?.descricao_grupo||a?.categoria||"Não informado"}
-function getDiario(){try{return JSON.parse(localStorage.getItem("nutritaco_multi_diario")||"{}")}catch(e){return {}}}
-function setDiario(d){localStorage.setItem("nutritaco_multi_diario",JSON.stringify(d))}
-function getData(){return (el("dataDiario")?.value)||hoje}
-function getDia(){
-  const d=getData(); const diario=getDiario();
-  if(!diario[d]) diario[d]={};
-  refeicoes.forEach(r=>{if(!Array.isArray(diario[d][r.id])) diario[d][r.id]=[]});
-  setDiario(diario); return diario[d];
-}
-function saveDia(dia){const d=getData();const diario=getDiario();diario[d]=dia;setDiario(diario)}
-function getPerfil(){
-  try{return JSON.parse(localStorage.getItem("nutritaco_multi_perfil")||"{}")}catch(e){return {}}
-}
-function setPerfil(p){localStorage.setItem("nutritaco_multi_perfil",JSON.stringify(p))}
-function getMetas(){
-  const p=getPerfil();
-  return {kcal:num(p.metaKcal)||2000,proteina:num(p.metaProteina)||120,carbo:num(p.metaCarbo)||250,lipideos:num(p.metaLipideos)||70}
-}
-function totaisItens(itens){
-  return itens.reduce((acc,it)=>{
-    acc.kcal+=num(it.kcal);acc.proteina+=num(it.proteina_g);acc.carbo+=num(it.carboidrato_g);acc.lipideos+=num(it.lipideos_g);
-    acc.colesterol+=num(it.colesterol_mg);acc.fibra+=num(it.fibra_alimentar_g);acc.calcio+=num(it.calcio_mg);acc.ferro+=num(it.ferro_mg);acc.vitc+=num(it.vitamina_c_mg);
-    acc.sodio+=num(it.sodio_mg);acc.potassio+=num(it.potassio_mg);acc.magnesio+=num(it.magnesio_mg);acc.zinco+=num(it.zinco_mg);
-    return acc;
-  },{kcal:0,proteina:0,carbo:0,lipideos:0,colesterol:0,fibra:0,calcio:0,ferro:0,vitc:0,sodio:0,potassio:0,magnesio:0,zinco:0})
-}
-function totaisDia(){
- const dia=getDia();let todos=[];refeicoes.forEach(r=>todos=todos.concat(dia[r.id]||[]));return totaisItens(todos)
-}
-async function carregarBase(){
-  try{
-    const res=await fetch("taco_completo.json"); if(!res.ok) throw new Error("base");
-    const data=await res.json(); baseAtual=Array.isArray(data)?data:(data.alimentos||[]);
-    return true;
-  }catch(e){
-    const s=el("statusBase"); if(s){s.className="status error";s.textContent="Não consegui carregar taco_completo.json. Deixe o JSON na mesma pasta dos HTMLs e abra pelo servidor."}
-    return false;
-  }
-}
-function itemFromAlimento(a,g){
- const f=g/100;
- return {
-  nome:a.descricao_alimento,grupo:getGrupo(a),quantidade_g:g,
-  kcal:num(a.energia_kcal)*f,proteina_g:num(a.proteina_g)*f,carboidrato_g:num(a.carboidrato_g)*f,lipideos_g:num(a.lipideos_g)*f,
-  colesterol_mg:num(a.colesterol_mg)*f,fibra_alimentar_g:num(a.fibra_alimentar_g)*f,
-  sodio_mg:num(a.sodio_mg)*f,potassio_mg:num(a.potassio_mg)*f,calcio_mg:num(a.calcio_mg)*f,ferro_mg:num(a.ferro_mg)*f,magnesio_mg:num(a.magnesio_mg)*f,zinco_mg:num(a.zinco_mg)*f,
-  vitamina_c_mg:num(a.vitamina_c_mg)*f,retinol_mcg:num(a.retinol_mcg||a.rae_mcg||a.re_mcg)*f,tiamina_mg:num(a.tiamina_mg)*f,riboflavina_mg:num(a.riboflavina_mg)*f,piridoxina_mg:num(a.piridoxina_mg)*f,niacina_mg:num(a.niacina_mg)*f
- }
-}
-function adicionarItemRefeicao(refeicao,item){
- const dia=getDia(); dia[refeicao].push(item); saveDia(dia);
-}
-function calcularPerfil(){
- const p=getPerfil(); const peso=num(p.pesoKg)||80, altura=num(p.alturaCm)||175, idade=num(p.idade)||30, sexo=p.sexo||"masculino", atividade=num(p.atividade)||1.55;
- const imc=peso/((altura/100)**2);
- const tmb=sexo==="masculino"?10*peso+6.25*altura-5*idade+5:10*peso+6.25*altura-5*idade-161;
- const gasto=tmb*atividade; const obj=objetivos.find(o=>o.id===(p.objetivo||"manter_peso"))||objetivos[1];
- const metaKcal=Math.max(1200,gasto+obj.ajuste), metaProteina=peso*obj.protKg, metaLipideos=peso*obj.gordKg, metaCarbo=Math.max(0,(metaKcal-metaProteina*4-metaLipideos*9)/4);
- return {imc,gasto,obj,metaKcal,metaProteina,metaLipideos,metaCarbo}
-}
-function header(active){
- return `<div class="topbar"><div class="topbar-inner"><div class="brand"><h1>NutriTACO</h1><div>Controle alimentar familiar, colesterol e base TACO</div></div><nav class="nav">
- <a class="${active==='index'?'active':''}" href="index.html">Início</a>
- <a class="${active==='diario'?'active':''}" href="diario.html">Diário alimentar</a>
- <a class="${active==='alimentos'?'active':''}" href="alimentos.html">Alimentos</a>
- <a class="${active==='receitas'?'active':''}" href="receitas.html">Receitas rápidas</a>
- <a class="${active==='necessidades'?'active':''}" href="necessidades.html">Necessidades</a>
- </nav></div></div>`
-}
-</script><script>document.write(header("diario"));</script>
-<div class="page">
- <div class="card">
-  <h2>Diário alimentar</h2><div class="muted">Perfil, metas, resumo do dia e refeições na mesma tela.</div>
-  <div class="grid-2" style="margin-top:14px">
-   <div>
-    <h3>Perfil e objetivos</h3>
-    <div class="grid-2"><div><label>Peso (kg)</label><input id="pesoKg" type="number"></div><div><label>Altura (cm)</label><input id="alturaCm" type="number"></div><div><label>Idade</label><input id="idade" type="number"></div><div><label>Sexo</label><select id="sexo"><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div></div>
-    <label style="margin-top:10px">Atividade</label><select id="atividade"><option value="1.2">Sedentário</option><option value="1.375">Levemente ativo</option><option value="1.55">Moderadamente ativo</option><option value="1.725">Muito ativo</option><option value="1.9">Extremamente ativo</option></select>
-    <div id="objetivos" class="inline" style="margin-top:12px"></div>
-    <div class="inline" style="margin-top:12px"><button class="btn-soft" onclick="salvarPerfil()">Salvar perfil</button><button class="btn" onclick="aplicarMetas()">Calcular metas</button></div>
-   </div>
-   <div>
-    <div class="grid-4"><div class="metric green-soft"><h4>IMC</h4><div class="big" id="dashImc">0</div></div><div class="metric blue-soft"><h4>Gasto</h4><div class="big" id="dashGasto">0</div></div><div class="metric amber-soft"><h4>Meta</h4><div class="big" id="dashMeta">0</div></div><div class="metric violet-soft"><h4>Objetivo</h4><div class="big" id="dashObjetivo" style="font-size:18px">—</div></div></div>
-    <h3>Metas manuais</h3><div class="grid-4"><div><label>kcal</label><input id="metaKcal" type="number" oninput="salvarMetas()"></div><div><label>Proteína</label><input id="metaProteina" type="number" oninput="salvarMetas()"></div><div><label>Carbo</label><input id="metaCarbo" type="number" oninput="salvarMetas()"></div><div><label>Gorduras</label><input id="metaLipideos" type="number" oninput="salvarMetas()"></div></div>
-   </div>
-  </div>
- </div>
- <div class="card"><div class="inline" style="justify-content:space-between"><div><h3>Resumo do dia</h3><div class="muted"><input type="date" id="dataDiario" onchange="renderDiario()"></div></div><button class="btn-danger" onclick="limparDia()">Limpar dia</button></div>
-  <div class="grid-4" style="margin-top:14px"><div class="metric blue-soft"><h4>Calorias</h4><div class="big" id="totalKcal">0</div></div><div class="metric green-soft"><h4>Proteína</h4><div class="big" id="totalProteina">0</div></div><div class="metric amber-soft"><h4>Carbo</h4><div class="big" id="totalCarbo">0</div></div><div class="metric red-soft"><h4>Gorduras</h4><div class="big" id="totalLipideos">0</div></div></div>
-  <div style="margin-top:12px"><div class="macro-bar"><div class="macro-fill" id="barKcal"></div></div><div class="muted" id="txtKcal"></div></div>
-  <div class="grid-3" style="margin-top:14px"><div class="metric green-soft" id="semaforo"><h4>Semáforo</h4><div class="big" id="semaforoTxt">BOM</div><div class="muted" id="semaforoMsg"></div></div><div class="metric"><h4>Colesterol alimentar</h4><div class="big"><span id="colesterolDia">0</span>mg</div></div><div class="metric"><h4>Fibra</h4><div class="big"><span id="fibraDia">0</span>g</div></div></div>
- </div>
- <div class="card"><h3>Falta no seu dia</h3><div id="faltaDia"></div></div>
- <div class="card"><h3>Refeições</h3><div id="mealTabs"></div><div id="mealContainer"></div></div>
-</div>
-<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(17,24,39,.35);z-index:100;align-items:center;justify-content:center;padding:16px">
-  <div class="card" style="width:min(520px,100%);margin:0">
-    <div class="inline" style="justify-content:space-between">
-      <div>
-        <h3 style="margin:0">Editar item</h3>
-        <div class="muted" id="editNome">Alimento</div>
-      </div>
-      <button class="btn-outline" onclick="fecharEdicao()">×</button>
-    </div>
-    <div class="grid-2" style="margin-top:14px">
-      <div>
-        <label>Refeição</label>
-        <select id="editRefeicao"></select>
-      </div>
-      <div>
-        <label>Quantidade (g)</label>
-        <input id="editQuantidade" type="number" min="1" step="1">
-      </div>
-    </div>
-    <div class="grid-4" style="margin-top:14px">
-      <div class="metric blue-soft"><h4>kcal</h4><div class="big" id="editKcal">0</div></div>
-      <div class="metric green-soft"><h4>Proteína</h4><div class="big" id="editProteina">0</div></div>
-      <div class="metric amber-soft"><h4>Carbo</h4><div class="big" id="editCarbo">0</div></div>
-      <div class="metric red-soft"><h4>Gorduras</h4><div class="big" id="editGordura">0</div></div>
-    </div>
-    <div class="inline" style="margin-top:14px">
-      <button class="btn" onclick="salvarEdicao()">Salvar alterações</button>
-      <button class="btn-outline" onclick="fecharEdicao()">Cancelar</button>
-    </div>
-  </div>
-</div>
+const RECEITAS_KEY = "nutrividareceitas_taco_real_v1";
+const DIARIO_KEY = "nutrividadiario_real_v1";
 
+function textoBusca(texto){return String(texto||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();}
+function numero(valor){if(valor===null||valor===undefined||valor==="")return 0;if(typeof valor==="number")return isNaN(valor)?0:valor;const n=Number(String(valor).replace(",",".").replace(/[^\d.-]/g,""));return isNaN(n)?0:n;}
+function arred(n){return Math.round((Number(n)||0)*10)/10;}
+function fmt(valor){const n=arred(valor);return Number.isInteger(n)?String(n):String(n).replace(".",",");}
+function gerarId(){return crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random());}
+function escapeHtml(texto){return String(texto??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function escapeAttr(texto){return escapeHtml(texto).replaceAll("`","&#096;");}
+function escapeJs(texto){return String(texto).replaceAll("\\","\\\\").replaceAll("'","\\'");}
+function dataHoje(){return new Date().toISOString().slice(0,10);}
+function dataBR(iso){const [a,m,d]=iso.split("-");return `${d}/${m}/${a}`;}
+function refeicaoLabel(refeicao){return {cafe:"Café da manhã",almoco:"Almoço",jantar:"Jantar",lanche:"Lanche"}[refeicao]||refeicao;}
+function carregarDiario(){try{return JSON.parse(localStorage.getItem(DIARIO_KEY))||[]}catch(e){return[]}}
+function salvarDiario(diario){localStorage.setItem(DIARIO_KEY,JSON.stringify(diario));}
+function tabelaNutrientes(n){return `<table class="nutrition-table"><thead><tr><th>Nutriente</th><th>Total</th></tr></thead><tbody><tr><td>Energia</td><td>${fmt(n.kcal)} kcal</td></tr><tr><td>Proteínas</td><td>${fmt(n.proteina)} g</td></tr><tr><td>Carboidratos</td><td>${fmt(n.carbo)} g</td></tr><tr><td>Gorduras</td><td>${fmt(n.gordura)} g</td></tr><tr><td>Fibras</td><td>${fmt(n.fibra)} g</td></tr><tr><td>Cálcio</td><td>${fmt(n.calcio)} mg</td></tr><tr><td>Ferro</td><td>${fmt(n.ferro)} mg</td></tr><tr><td>Sódio</td><td>${fmt(n.sodio)} mg</td></tr><tr><td>Colesterol</td><td>${fmt(n.colesterol)} mg</td></tr></tbody></table>`;}
+function somarNutrientes(lista){const total={kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,sodio:0,colesterol:0};lista.forEach(item=>{const n=item.nutrientes||{};total.kcal+=numero(n.kcal);total.proteina+=numero(n.proteina);total.carbo+=numero(n.carbo);total.gordura+=numero(n.gordura);total.fibra+=numero(n.fibra);total.calcio+=numero(n.calcio);total.ferro+=numero(n.ferro);total.sodio+=numero(n.sodio);total.colesterol+=numero(n.colesterol);});return total;}
+</script>
 <script>
-function initPerfil(){
- const p={pesoKg:80,alturaCm:175,idade:30,sexo:"masculino",atividade:1.55,objetivo:"manter_peso",...getPerfil()};
- ["pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>{if(el(id))el(id).value=p[id]});
- renderObjetivos(p.objetivo||"manter_peso"); renderPerfilResumo();
-}
-function renderObjetivos(atual){
- el("objetivos").innerHTML=objetivos.map(o=>`<button type="button" class="${o.id===atual?'btn':'btn-outline'}" onclick="setObjetivo('${o.id}')">${o.nome}</button>`).join("");
-}
-function setObjetivo(id){const p=getPerfil();p.objetivo=id;setPerfil(p);renderObjetivos(id);renderPerfilResumo()}
-function salvarPerfil(){
- const p=getPerfil(); ["pesoKg","alturaCm","idade","sexo","atividade"].forEach(id=>p[id]=el(id).value);
- setPerfil(p); renderPerfilResumo(); renderDiario();
-}
-function aplicarMetas(){
- salvarPerfil(); const c=calcularPerfil(); const p=getPerfil();
- p.metaKcal=Math.round(c.metaKcal);p.metaProteina=Math.round(c.metaProteina);p.metaCarbo=Math.round(c.metaCarbo);p.metaLipideos=Math.round(c.metaLipideos);
- setPerfil(p); renderPerfilResumo(); renderDiario();
-}
-function renderPerfilResumo(){
- const c=calcularPerfil(); const p=getPerfil();
- el("dashImc").textContent=fmt(c.imc,1); el("dashGasto").textContent=fmt0(c.gasto); el("dashMeta").textContent=fmt0(c.metaKcal); el("dashObjetivo").textContent=c.obj.nome;
- const metas=getMetas();
- ["metaKcal","metaProteina","metaCarbo","metaLipideos"].forEach(id=>{if(el(id)) el(id).value=metas[id.replace("meta","").toLowerCase()]||p[id]||""});
-}
-function salvarMetas(){const p=getPerfil();["metaKcal","metaProteina","metaCarbo","metaLipideos"].forEach(id=>p[id]=el(id).value);setPerfil(p);renderDiario()}
-function renderMealTabs(){el("mealTabs").innerHTML=refeicoes.map(r=>`<button class="meal-tab ${r.id===refeicaoAtiva?'active':''}" onclick="refeicaoAtiva='${r.id}';renderMealTabs();renderRefeicoes()">${r.nome}</button>`).join("")}
-function renderRefeicoes(){
- const dia=getDia(), itens=dia[refeicaoAtiva]||[], t=totaisItens(itens), ref=refeicoes.find(r=>r.id===refeicaoAtiva);
- el("mealContainer").innerHTML=`<div class="card"><h3>${ref.nome}</h3><div class="muted">${fmt(t.kcal,1)} kcal • P ${fmt(t.proteina,1)}g • C ${fmt(t.carbo,1)}g • G ${fmt(t.lipideos,1)}g</div><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Qtd</th><th>kcal</th><th>P</th><th>C</th><th>G</th><th></th></tr></thead><tbody>${itens.length?itens.map((it,i)=>`<tr><td>${it.nome}<br><span class="muted">${it.grupo||""}</span></td><td>${fmt0(it.quantidade_g)}g</td><td>${fmt(it.kcal,1)}</td><td>${fmt(it.proteina_g,1)}</td><td>${fmt(it.carboidrato_g,1)}</td><td>${fmt(it.lipideos_g,1)}</td><td><button class="btn-soft" onclick="abrirEdicao('${refeicaoAtiva}',${i})">Editar</button> <button class="btn-danger" onclick="removerItem('${refeicaoAtiva}',${i})">Excluir</button></td></tr>`).join(""):`<tr><td colspan="7" class="muted">Nenhum item nesta refeição.</td></tr>`}</tbody></table></div></div>`
-}
-
-let editState=null;
-
-function abrirEdicao(ref,i){
- const dia=getDia();
- const item=dia[ref]?.[i];
- if(!item) return;
- editState={ref,i,itemOriginal:{...item}};
- el("editNome").textContent=item.nome;
- el("editQuantidade").value=Math.round(num(item.quantidade_g));
- el("editRefeicao").innerHTML=refeicoes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join("");
- el("editRefeicao").value=ref;
- atualizarPreviewEdicao();
- el("editModal").style.display="flex";
-}
-
-function fecharEdicao(){
- editState=null;
- el("editModal").style.display="none";
-}
-
-function itemEditadoPelaQuantidade(){
- if(!editState) return null;
- const item=editState.itemOriginal;
- const novaQtd=Number(el("editQuantidade").value)||0;
- const qtdOriginal=num(item.quantidade_g)||1;
- const f=novaQtd/qtdOriginal;
- return {
-  ...item,
-  quantidade_g:novaQtd,
-  kcal:num(item.kcal)*f,
-  proteina_g:num(item.proteina_g)*f,
-  carboidrato_g:num(item.carboidrato_g)*f,
-  lipideos_g:num(item.lipideos_g)*f,
-  colesterol_mg:num(item.colesterol_mg)*f,
-  fibra_alimentar_g:num(item.fibra_alimentar_g)*f,
-  sodio_mg:num(item.sodio_mg)*f,
-  potassio_mg:num(item.potassio_mg)*f,
-  calcio_mg:num(item.calcio_mg)*f,
-  ferro_mg:num(item.ferro_mg)*f,
-  magnesio_mg:num(item.magnesio_mg)*f,
-  zinco_mg:num(item.zinco_mg)*f,
-  vitamina_c_mg:num(item.vitamina_c_mg)*f,
-  retinol_mcg:num(item.retinol_mcg)*f,
-  tiamina_mg:num(item.tiamina_mg)*f,
-  riboflavina_mg:num(item.riboflavina_mg)*f,
-  piridoxina_mg:num(item.piridoxina_mg)*f,
-  niacina_mg:num(item.niacina_mg)*f
- };
-}
-
-function atualizarPreviewEdicao(){
- const it=itemEditadoPelaQuantidade();
- if(!it) return;
- el("editKcal").textContent=fmt(it.kcal,1);
- el("editProteina").textContent=fmt(it.proteina_g,1);
- el("editCarbo").textContent=fmt(it.carboidrato_g,1);
- el("editGordura").textContent=fmt(it.lipideos_g,1);
-}
-
-function salvarEdicao(){
- if(!editState) return;
- const novaQtd=Number(el("editQuantidade").value);
- if(!Number.isFinite(novaQtd)||novaQtd<=0) return alert("Informe uma quantidade válida.");
- const novaRef=el("editRefeicao").value;
- const novoItem=itemEditadoPelaQuantidade();
- const dia=getDia();
- dia[editState.ref].splice(editState.i,1);
- if(!Array.isArray(dia[novaRef])) dia[novaRef]=[];
- dia[novaRef].push(novoItem);
- saveDia(dia);
- refeicaoAtiva=novaRef;
- fecharEdicao();
- renderDiario();
-}
-
-function removerItem(ref,i){const dia=getDia();dia[ref].splice(i,1);saveDia(dia);renderDiario()}
-function renderDiario(){
- if(el("dataDiario")&&!el("dataDiario").value)el("dataDiario").value=hoje;
- const t=totaisDia(), metas=getMetas(); 
- el("totalKcal").textContent=fmt(t.kcal,1);el("totalProteina").textContent=fmt(t.proteina,1);el("totalCarbo").textContent=fmt(t.carbo,1);el("totalLipideos").textContent=fmt(t.lipideos,1);
- const pct=metas.kcal?Math.min(100,t.kcal/metas.kcal*100):0; el("barKcal").style.width=pct+"%"; el("txtKcal").textContent=`${fmt(t.kcal,1)} / ${fmt0(metas.kcal)} kcal`;
- ["Proteina","Carbo","Lipideos"].forEach(n=>{});
- el("colesterolDia").textContent=fmt(t.colesterol,1);el("fibraDia").textContent=fmt(t.fibra,1);
- let status="BOM", cls="green-soft", msg="Dia bem encaminhado.";
- if(t.colesterol>200||t.lipideos>metas.lipideos*1.15){status="ATENÇÃO";cls="red-soft";msg="Hoje pede cuidado: reduza gordura/colesterol e aumente fibras nas próximas refeições."}
- else if(t.colesterol>150||t.fibra<15){status="MODERAR";cls="amber-soft";msg="Ainda dá para equilibrar: inclua mais fibras e modere alimentos gordurosos."}
- el("semaforo").className="metric "+cls; el("semaforoTxt").textContent=status; el("semaforoMsg").textContent=msg;
- const faltP=Math.max(0,metas.proteina-t.proteina), faltF=Math.max(0,25-t.fibra), faltCa=Math.max(0,1000-t.calcio), faltC=Math.max(0,90-t.vitc);
- el("faltaDia").innerHTML=`<div class="grid-4"><div class="metric ${faltP?'amber-soft':'green-soft'}"><h4>Proteína</h4><div class="big">${faltP?fmt(faltP,1)+"g":"ok"}</div></div><div class="metric ${faltF?'amber-soft':'green-soft'}"><h4>Fibra</h4><div class="big">${faltF?fmt(faltF,1)+"g":"ok"}</div></div><div class="metric ${faltCa?'amber-soft':'green-soft'}"><h4>Cálcio</h4><div class="big">${faltCa?fmt0(faltCa)+"mg":"ok"}</div></div><div class="metric ${faltC?'amber-soft':'green-soft'}"><h4>Vitamina C</h4><div class="big">${faltC?fmt0(faltC)+"mg":"ok"}</div></div></div>`;
- renderMealTabs();renderRefeicoes();
-}
-function limparDia(){if(confirm("Limpar o diário deste dia?")){const diario=getDiario();delete diario[getData()];setDiario(diario);renderDiario()}}
-document.addEventListener("DOMContentLoaded",()=>{initPerfil();renderDiario(); if(el("editQuantidade")) el("editQuantidade").addEventListener("input", atualizarPreviewEdicao);});
-</script><div class="footer">Fonte: TACO</div></body></html>
+const ordemRefeicoes=["cafe","almoco","jantar","lanche"];
+function renderDiario(){const data=document.getElementById("dataDiario").value||dataHoje();const filtro=document.getElementById("filtroRefeicao").value;const diario=carregarDiario();const itensDia=diario.filter(item=>item.data===data&&(!filtro||item.refeicao===filtro));const conteudo=document.getElementById("diarioConteudo");if(!itensDia.length){conteudo.innerHTML=`<div class="empty">Nenhum item lançado em ${dataBR(data)}.</div>`}else{conteudo.innerHTML=ordemRefeicoes.filter(ref=>!filtro||filtro===ref).map(ref=>{const itens=itensDia.filter(item=>item.refeicao===ref);return `<section class="card meal-section"><h3>${iconeRefeicao(ref)} ${refeicaoLabel(ref)}</h3>${itens.length?itens.map(item=>itemHtml(item)).join(""):'<div class="empty">Nada lançado nesta refeição.</div>'}</section>`}).join("")}renderResumo(data)}
+function itemHtml(item){return `<div class="diary-item"><div><strong>${escapeHtml(item.nome)}</strong><br><span class="small-note">${fmt(item.nutrientes.kcal)} kcal • Prot. ${fmt(item.nutrientes.proteina)}g • Carbo ${fmt(item.nutrientes.carbo)}g • Gord. ${fmt(item.nutrientes.gordura)}g</span></div><button class="btn danger" onclick="removerItem('${item.id}')">Remover</button></div>`}
+function renderResumo(data){const diario=carregarDiario();const itensDia=diario.filter(item=>item.data===data);const total=somarNutrientes(itensDia);document.getElementById("resumoDia").innerHTML=`<div class="macro-row" style="grid-template-columns:repeat(2,1fr);"><div class="macro"><strong>${fmt(total.kcal)}</strong><span>kcal</span></div><div class="macro"><strong>${fmt(total.proteina)}g</strong><span>proteína</span></div><div class="macro"><strong>${fmt(total.carbo)}g</strong><span>carbo</span></div><div class="macro"><strong>${fmt(total.gordura)}g</strong><span>gordura</span></div><div class="macro"><strong>${fmt(total.fibra)}g</strong><span>fibra</span></div><div class="macro"><strong>${fmt(total.colesterol)}mg</strong><span>colesterol</span></div></div><div style="margin-top:12px;">${tabelaNutrientes(total)}</div>`}
+function removerItem(id){if(!confirm("Remover este item do diário?"))return;salvarDiario(carregarDiario().filter(item=>item.id!==id));renderDiario()}
+function limparDiarioDia(){const data=document.getElementById("dataDiario").value||dataHoje();if(!confirm("Limpar todos os itens deste dia?"))return;salvarDiario(carregarDiario().filter(item=>item.data!==data));renderDiario()}
+function mudarData(delta){const campo=document.getElementById("dataDiario");const d=new Date((campo.value||dataHoje())+"T00:00:00");d.setDate(d.getDate()+delta);campo.value=d.toISOString().slice(0,10);renderDiario()}
+function irHoje(){document.getElementById("dataDiario").value=dataHoje();renderDiario()}
+function iconeRefeicao(ref){return{cafe:"☕",almoco:"🍛",jantar:"🍽️",lanche:"🍌"}[ref]||"🍽️"}
+document.getElementById("dataDiario").value=dataHoje();document.getElementById("dataDiario").addEventListener("change",renderDiario);document.getElementById("filtroRefeicao").addEventListener("change",renderDiario);renderDiario();
+</script>
+</body></html>
