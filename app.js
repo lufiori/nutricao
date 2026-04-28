@@ -272,8 +272,79 @@ function submitAdd(){
   addDiary(foodId,document.getElementById('modalMeal').value,document.getElementById('modalGrams').value);
   closeAdd();
 }
-function renderHome(){renderSummary();renderMissing();renderMicros();renderMeals();renderNeeds()}
+function renderHome(){renderSummary();renderMissing();renderSmartSuggestions();renderMicros();renderMeals();renderNeeds()}
 function renderNeeds(){const el=document.getElementById('needsTable');if(!el)return;const t=calcTotals();const keys=['kcal','proteina','carbo','gordura','fibra','vitc','calcio','ferro','retinol','zinco'];const rows=keys.map(k=>`<tr><td>${label(k)}</td><td>${fmt(NV.targets[k],k==='kcal'||k==='retinol'?0:1)}${unit(k)}</td><td>${fmt(t[k],k==='kcal'||k==='retinol'?0:1)}${unit(k)}</td><td>${pct(t[k],NV.targets[k])}%</td></tr>`).join('');el.innerHTML=rows}
+
+
+function missingNutrientsForSuggestions(){
+  const t=calcTotals();
+  const targets=NV.targets||{};
+  const keys=['proteina','fibra','carbo','gordura','kcal','vitc','calcio','ferro','retinol','zinco'];
+  const missing={};
+  keys.forEach(k=>{
+    const meta=num(targets[k]);
+    const atual=num(t[k]);
+    if(meta>0) missing[k]=Math.max(0, meta-atual);
+  });
+  return missing;
+}
+function foodSuggestionScore(food, missing){
+  if(!food) return 0;
+  let score=0;
+  const weights={proteina:3.0,fibra:2.4,vitc:2.2,ferro:2.2,calcio:1.8,zinco:1.7,retinol:1.4,carbo:0.45,kcal:0.25,gordura:0.15};
+  Object.keys(weights).forEach(k=>{
+    const falta=num(missing[k]);
+    const meta=num(NV.targets?.[k]);
+    if(falta<=0 || meta<=0) return;
+    const prioridade=Math.min(1.8, falta/meta + 0.25);
+    const valor=num(food[k]);
+    const divisor=k==='kcal'?250:(k==='retinol'?300:(k==='calcio'?200:(k==='vitc'?60:(k==='ferro'?4:(k==='zinco'?4:25)))));
+    score += (valor/divisor) * weights[k] * prioridade;
+  });
+  // evita sugerir itens quase sem valor nutricional para o que está faltando
+  if(num(food.kcal)>450 && num(missing.kcal)<200) score *= .65;
+  if(num(food.gordura)>25 && num(missing.gordura)<8) score *= .75;
+  return score;
+}
+function suggestionReason(food, missing){
+  const reasons=[];
+  const pairs=[
+    ['proteina','proteína',5,'g'],['fibra','fibras',2,'g'],['vitc','vitamina C',10,'mg'],['ferro','ferro',1,'mg'],['calcio','cálcio',80,'mg'],['zinco','zinco',1,'mg'],['retinol','vitamina A',80,'mcg']
+  ];
+  pairs.forEach(([k,n,min,u])=>{
+    if(num(missing[k])>0 && num(food[k])>=min) reasons.push(n);
+  });
+  if(!reasons.length && num(missing.kcal)>0) reasons.push('energia');
+  return reasons.slice(0,3).join(', ');
+}
+function renderSmartSuggestions(){
+  const el=document.getElementById('smartSuggestions');
+  if(!el) return;
+  const missing=missingNutrientsForSuggestions();
+  const relevantMissing=Object.entries(missing).filter(([k,v])=>v>0 && ['proteina','fibra','vitc','calcio','ferro','retinol','zinco','kcal'].includes(k));
+  if(!NV.foods || !NV.foods.length){
+    el.innerHTML='<div class="empty">Carregando base de alimentos...</div>';
+    return;
+  }
+  if(!relevantMissing.length){
+    el.innerHTML='<div class="card suggestion-ok"><h3>🎉 Dia muito bem encaminhado</h3><p class="subtitle">As principais metas já estão atingidas. Continue registrando suas refeições para manter o acompanhamento.</p></div>';
+    return;
+  }
+  const suggestions=NV.foods
+    .map(f=>({food:f,score:foodSuggestionScore(f,missing),reason:suggestionReason(f,missing)}))
+    .filter(x=>x.score>0 && x.food && x.food.nome)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,6);
+  const faltaTxt=relevantMissing.slice(0,3).map(([k,v])=>`${label(k)}: faltam ${fmt(v,k==='kcal'||k==='retinol'?0:1)}${unit(k)}`).join(' • ');
+  if(!suggestions.length){
+    el.innerHTML=`<div class="empty">Ainda não encontrei boas sugestões automáticas. ${faltaTxt}</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="suggestion-note"><b>Prioridade agora:</b> ${faltaTxt}</div>` + suggestions.map(({food,reason})=>{
+    const reasonText=reason ? `Boa fonte de ${reason}` : 'Pode ajudar a completar o dia';
+    return `<div class="suggestion-card"><div class="suggestion-top"><div><h3>${food.nome}</h3><small>${food.grupo||'Alimento'} • ${reasonText}</small></div><span class="pill">${fmt(food.kcal)} kcal</span></div><div class="suggestion-metas"><span>${fmt(food.proteina,1)}g prot.</span><span>${fmt(food.fibra,1)}g fibras</span><span>${fmt(food.ferro,1)}mg ferro</span><span>${fmt(food.vitc,1)}mg vit. C</span></div><div class="toolbar suggestion-actions"><button class="primary" onclick="openAdd('Almoço','${food.id}')">Adicionar</button><button class="ghost" onclick="openFoodDetail('${food.id}')">Ver ficha</button></div></div>`;
+  }).join('');
+}
 
 const nutrientDefs=[
   ['kcal','Energia','kcal','macro'],['proteina','Proteínas','g','macro'],['carbo','Carboidratos','g','macro'],['gordura','Gorduras','g','macro'],['fibra','Fibras','g','macro'],

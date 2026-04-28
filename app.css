@@ -66,3 +66,19 @@
 .micro-percent{position:absolute;right:12px;top:12px;font-weight:800;background:#f4f7f4;border-radius:999px;padding:6px 9px;color:#183524;font-size:.88rem}
 @media(max-width:900px){.micro-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.micro-grid{grid-template-columns:1fr}.micro-card{border-radius:16px}}
+
+
+/* Sugestões inteligentes */
+.suggestion-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.suggestion-note{grid-column:1/-1;border:1px solid #cfe4d2;background:#f1f8f2;border-radius:18px;padding:12px 14px;color:#254b2e;line-height:1.35}
+.suggestion-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 10px 30px rgba(20,40,30,.04)}
+.suggestion-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.suggestion-card h3{margin:0 0 4px;font-size:1rem;line-height:1.25}
+.suggestion-card small{color:var(--muted);line-height:1.35}
+.suggestion-metas{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.suggestion-metas span{background:#f6f8f4;border:1px solid var(--line);border-radius:999px;padding:6px 8px;font-size:.82rem;color:#475467}
+.suggestion-actions{margin:10px 0 0}
+.suggestion-actions .primary,.suggestion-actions .ghost{padding:9px 12px;border-radius:14px}
+.suggestion-ok{grid-column:1/-1}
+@media(max-width:900px){.suggestion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.suggestion-grid{grid-template-columns:1fr}.suggestion-note{font-size:.92rem}.suggestion-top{display:grid}.suggestion-card{border-radius:18px}}
