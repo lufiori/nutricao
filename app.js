@@ -17,10 +17,65 @@ const NV={
 };
 async function loadFoods(){
   const files=['taco.json','alimentos.json','dados_taco.json','base_taco.json'];
-  for(const file of files){try{const r=await fetch(file);if(r.ok){const data=await r.json();const arr=Array.isArray(data)?data:(data.alimentos||data.foods||[]);if(arr.length){NV.foods=arr.map(normalizeFood);break}}}catch(e){}}
+  for(const file of files){
+    try{
+      const r=await fetch(file);
+      if(r.ok){
+        const data=await r.json();
+        const arr=extractFoodArray(data);
+        if(arr.length){
+          NV.foods=arr.map(normalizeFood).filter(f=>f.nome && f.nome !== 'Alimento');
+          if(!NV.foods.length) NV.foods=arr.map(normalizeFood);
+          localStorage.setItem('nv_food_source', file);
+          break;
+        }
+      }
+    }catch(e){}
+  }
 }
-function normalizeFood(f,i){return {id:f.id||f.codigo||String(i),nome:f.nome||f.alimento||f.description||'Alimento',grupo:f.grupo||f.categoria||'Outros',kcal:num(f.kcal??f.energia_kcal??f.energia),proteina:num(f.proteina??f.proteinas),carbo:num(f.carbo??f.carboidrato??f.carboidratos),gordura:num(f.gordura??f.lipidios??f.lipideos),fibra:num(f.fibra??f.fibras),calcio:num(f.calcio),ferro:num(f.ferro),vitc:num(f.vitamina_c??f.vitc)}}
-function num(v){v=String(v??0).replace(',','.');return Number(v)||0}
+function extractFoodArray(data){
+  if(Array.isArray(data)) return data;
+  if(!data || typeof data!=='object') return [];
+  const possible=['alimentos','foods','dados','data','items','taco','base'];
+  for(const k of possible){ if(Array.isArray(data[k])) return data[k]; }
+  for(const v of Object.values(data)){ if(Array.isArray(v) && v.length && typeof v[0]==='object') return v; }
+  return [];
+}
+function normKey(k){return String(k||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function pick(obj, aliases){
+  if(!obj) return undefined;
+  const map={};
+  Object.keys(obj).forEach(k=>map[normKey(k)]=obj[k]);
+  for(const a of aliases){
+    const nk=normKey(a);
+    if(map[nk]!==undefined && map[nk]!==null && String(map[nk]).trim()!=='') return map[nk];
+  }
+  return undefined;
+}
+function normalizeFood(f,i){
+  const nome=pick(f,['nome','alimento','descrição','descricao','descrição do alimento','descricao do alimento','descrição dos alimentos','descricao dos alimentos','description','food','name','produto','item']);
+  const grupo=pick(f,['grupo','categoria','categoria do alimento','grupo alimentar','classificação','classificacao','preparação','preparacao','tipo']);
+  return {
+    id:String(pick(f,['id','codigo','código','cod','numero','número']) ?? i),
+    nome:String(nome ?? 'Alimento'),
+    grupo:String(grupo ?? 'Outros'),
+    kcal:num(pick(f,['kcal','energia kcal','energia(kcal)','energia (kcal)','calorias','valor energetico','valor energético','energia'])),
+    proteina:num(pick(f,['proteina','proteína','proteina g','proteína g','proteina (g)','proteína (g)','protein'])),
+    carbo:num(pick(f,['carbo','carboidrato','carboidratos','carboidrato g','carboidratos g','carboidrato (g)','carboidratos (g)','cho'])),
+    gordura:num(pick(f,['gordura','lipidios','lipídios','lipideos','lipídeos','lipidios (g)','lipídios (g)','gorduras totais','gordura total'])),
+    fibra:num(pick(f,['fibra','fibras','fibra alimentar','fibra alimentar (g)','fibras (g)'])),
+    calcio:num(pick(f,['calcio','cálcio','calcio (mg)','cálcio (mg)','ca'])),
+    ferro:num(pick(f,['ferro','ferro (mg)','fe'])),
+    vitc:num(pick(f,['vitamina c','vitamina_c','vitc','vit c','ácido ascórbico','acido ascorbico']))
+  }
+}
+function num(v){
+  if(v===undefined || v===null) return 0;
+  let s=String(v).trim();
+  if(!s || s==='-' || s.toUpperCase()==='NA' || s.toLowerCase()==='tr') return 0;
+  s=s.replace(/\./g,'').replace(',','.').replace(/[^0-9.-]/g,'');
+  return Number(s)||0
+}
 function byId(id){return NV.foods.find(f=>String(f.id)===String(id))}
 function calcTotals(){return NV.diary.reduce((a,it)=>{const f=byId(it.foodId)||it.food;const q=(Number(it.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','calcio','ferro','vitc'].forEach(k=>a[k]+=(num(f?.[k])*q));return a},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,vitc:0})}
 function fmt(v,d=0){return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d})}
