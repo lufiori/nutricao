@@ -1,128 +1,276 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriVida - Receitas</title>
-<style>
-:root {
-  --bg: #f7f8fa; --card: #fff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb;
-  --primary: #2f855a; --primary-dark: #276749; --soft-green: #e8f5ee; --danger: #dc2626;
-  --shadow: 0 8px 22px rgba(15, 23, 42, .08); --radius: 18px;
-}
-*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-header{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(15,23,42,.04)}
-.topbar{max-width:1220px;margin:0 auto;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.brand{display:flex;align-items:center;gap:10px;min-width:210px}.brand-icon{width:40px;height:40px;border-radius:14px;background:var(--soft-green);display:grid;place-items:center;font-size:23px}
-.brand h1{font-size:20px;margin:0;line-height:1.1}.brand small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
-nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}nav a{text-decoration:none;border:1px solid var(--border);background:#fff;color:var(--text);padding:9px 12px;border-radius:999px;cursor:pointer;font-weight:700;font-size:13px}
-nav a.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-main{max-width:1220px;margin:0 auto;padding:24px 18px 60px}.hero{background:linear-gradient(135deg,#fff,#edf7f1);border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px}
-.hero h2{margin:0 0 8px;font-size:28px}.hero p{margin:0;color:var(--muted);line-height:1.5}.notice{margin-top:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid var(--border);color:var(--muted);font-size:13px;line-height:1.45}
-.status-pill{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid var(--border);font-size:12px;color:var(--muted);margin-top:10px}
-.toolbar,.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}.toolbar{padding:16px;margin-bottom:18px;display:grid;grid-template-columns:1.4fr 1fr auto;gap:12px;align-items:end}
-.field{position:relative}.field label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
-input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:14px;font-size:14px;background:#fff;color:var(--text);outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,133,90,.13)}
-button{font-family:inherit}.btn{border:0;background:var(--primary);color:#fff;padding:11px 14px;border-radius:14px;cursor:pointer;font-weight:700;font-size:14px;transition:.18s ease;white-space:nowrap}
-.btn:hover{background:var(--primary-dark);transform:translateY(-1px)}.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}.btn.secondary:hover{background:#f9fafb}.btn.danger{background:#fff;color:var(--danger);border:1px solid #fecaca}.btn.danger:hover{background:#fff1f2}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:18px;align-items:start}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.recipe-card{padding:16px;display:flex;flex-direction:column;gap:13px;min-height:246px}.recipe-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.recipe-title{margin:0;font-size:19px}
-.badge{display:inline-flex;align-items:center;padding:6px 9px;border-radius:999px;background:var(--soft-green);color:#276749;font-size:12px;font-weight:800;white-space:nowrap}.badge.cafe{background:#fff7ed;color:#9a3412}.badge.almoco{background:#eef6ff;color:#1d4ed8}.badge.jantar{background:#f5f3ff;color:#6d28d9}.badge.lanche{background:#fdf2f8;color:#be185d}
-.recipe-desc{color:var(--muted);line-height:1.45;font-size:14px;margin:0;min-height:42px}.meta-row{display:flex;gap:8px;flex-wrap:wrap}.meta-pill{background:#f9fafb;border:1px solid var(--border);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:12px;font-weight:700}
-.macro-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.macro{background:#f9fafb;border:1px solid var(--border);border-radius:14px;padding:9px;text-align:center}.macro strong{display:block;font-size:14px}.macro span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.side-panel{position:sticky;top:92px;padding:16px}.empty{color:var(--muted);background:#f9fafb;border:1px dashed #cbd5e1;border-radius:16px;padding:18px;line-height:1.5}
-.detail-title{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}.detail-title h3{margin:0}
-.ingredients{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}.ingredients li{padding:10px;border:1px solid var(--border);border-radius:14px;background:#f9fafb;display:flex;justify-content:space-between;gap:10px;font-size:14px}.ingredients small{display:block;color:var(--muted);margin-top:3px}
-.nutrition-table{width:100%;border-collapse:collapse;margin-top:12px;overflow:hidden;border-radius:14px;font-size:14px}.nutrition-table th,.nutrition-table td{border-bottom:1px solid var(--border);padding:9px;text-align:left}.nutrition-table th{background:#f9fafb;color:var(--muted);font-size:12px}
-.form-panel{margin-top:18px;padding:16px}.form-panel h3{margin:0 0 10px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}
-.ingredient-editor{display:grid;gap:10px;margin-top:8px}.ingredient-line{display:grid;grid-template-columns:minmax(180px,1.5fr) 90px 120px 90px 42px;gap:8px;align-items:end;padding:10px;border:1px solid var(--border);border-radius:16px;background:#fbfbfc;position:relative}
-.suggestions{position:absolute;left:10px;right:10px;top:72px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 35px rgba(15,23,42,.18);z-index:9999;max-height:300px;overflow-y:auto;display:none}
-.suggestions button{width:100%;padding:12px 14px;border:0;background:#fff;text-align:left;cursor:pointer;border-bottom:1px solid #f1f5f9;color:var(--text);font-size:14px;line-height:1.4}.suggestions button:hover{background:#f0fdf4}.suggestions small{display:block;color:var(--muted);margin-top:4px;font-size:12px}
-.calc-box{margin-top:14px;padding:14px;border-radius:18px;background:#f9fafb;border:1px solid var(--border)}.calc-box h4{margin:0 0 10px}.small-note{color:var(--muted);font-size:12px;line-height:1.45}
-.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.35);display:none;align-items:center;justify-content:center;padding:18px;z-index:10000}.modal{background:#fff;border-radius:22px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(15,23,42,.25);max-width:460px;width:100%;padding:18px}.modal h3{margin:0 0 8px}.meal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}.meal-btn{border:1px solid var(--border);background:#fff;border-radius:16px;padding:14px;cursor:pointer;text-align:left;font-weight:800}.meal-btn:hover{border-color:var(--primary);background:#f0fdf4}
-.day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.day-tabs button{border:1px solid var(--border);background:#fff;border-radius:999px;padding:9px 12px;font-weight:800;cursor:pointer}.day-tabs button.active{background:var(--primary);border-color:var(--primary);color:#fff}
-.meal-section{padding:16px;margin-bottom:16px}.meal-section h3{margin:0 0 10px}.diary-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;background:#f9fafb;border:1px solid var(--border);border-radius:16px;margin-top:8px}.summary-box{padding:16px}
-@media(max-width:980px){.toolbar{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.side-panel{position:static}.grid-2{grid-template-columns:1fr}}
-@media(max-width:700px){.topbar{align-items:flex-start;flex-direction:column}nav{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}nav a{flex:0 0 auto}main{padding:18px 12px 50px}.hero{padding:18px}.hero h2{font-size:23px}.toolbar{grid-template-columns:1fr;padding:13px}.macro-row{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.ingredient-line{grid-template-columns:1fr}.suggestions{position:static;margin-top:8px}.btn{width:100%}.actions{width:100%}.actions .btn{flex:1 1 100%}.meal-grid{grid-template-columns:1fr}}
-</style>
+<link rel="stylesheet" href="app.css?v=menu3">
 </head>
 <body>
-<header><div class="topbar"><div class="brand"><div class="brand-icon">🥗</div><div><h1>NutriVida</h1><small>Receitas integradas à base TACO</small></div></div>
-<nav>
-  <a href="index.html">Diário</a>
-  <a href="alimentos.html">Alimentos</a>
-  <a href="receitas.html" class="active">Receitas</a>
-  <a href="favoritos.html">Favoritos</a>
-  <a href="perfil.html">Perfil</a>
-</nav>
-</div></header>
-<main>
-<section class="hero"><h2>🍽️ Receitas</h2><p>Agora a receita é uma receita mesmo: ingredientes, tempo de preparo e modo de preparo. A escolha de café, almoço, jantar ou lanche acontece somente quando você adiciona ao diário.</p><div class="notice">Este arquivo procura <b>taco.json</b> na mesma pasta. O diário real usa o mesmo armazenamento do arquivo <b>index.html</b>.</div><div id="statusBase" class="status-pill">Carregando base de alimentos...</div></section>
-<section class="toolbar"><div class="field"><label for="buscaReceita">Buscar receita</label><input id="buscaReceita" type="search" placeholder="Ex.: arroz, pão, frango, bolo..."></div><div class="field"><label for="ordenarReceitas">Ordenar por</label><select id="ordenarReceitas"><option value="nome">Nome</option><option value="kcal">Menor caloria</option><option value="proteina">Mais proteína</option><option value="tempo">Menor tempo</option></select></div><button class="btn secondary" onclick="limparFiltros()">Limpar</button></section>
-<section class="layout"><div><div id="listaReceitas" class="grid-2"></div>
-<section class="card form-panel"><h3>➕ Cadastrar receita usando TACO</h3><div class="form-grid">
-<div class="field"><label>Nome da receita</label><input id="novaNome" placeholder="Ex.: Arroz de forno simples"></div>
-<div class="field"><label>Tempo de preparo</label><input id="novoTempo" placeholder="Ex.: 25 min"></div>
-<div class="field"><label>Porções</label><input id="novasPorcoes" type="number" min="1" step="1" value="1"></div>
-<div class="field"><label>Dificuldade</label><select id="novaDificuldade"><option value="Fácil">Fácil</option><option value="Média">Média</option><option value="Difícil">Difícil</option></select></div>
-<div class="field full"><label>Descrição curta</label><textarea id="novaDescricao" rows="2" placeholder="Ex.: Receita prática para o dia a dia."></textarea></div>
-<div class="full"><label class="small-note"><b>Ingredientes</b> — busque o alimento na TACO e escolha a medida</label><div id="editorIngredientes" class="ingredient-editor"></div><button class="btn secondary" style="margin-top:10px;" onclick="adicionarLinhaIngrediente()">Adicionar ingrediente</button></div>
-<div class="field full"><label>Modo de preparo</label><textarea id="novoPreparo" rows="5" placeholder="Descreva o passo a passo da receita..."></textarea></div>
-<div class="full calc-box"><h4>Resultado nutricional automático</h4><div id="previewNutrientes" class="macro-row"></div><p class="small-note">Valores calculados pela quantidade em gramas de cada ingrediente selecionado.</p></div>
-<div class="full actions"><button class="btn" onclick="salvarNovaReceita()">Salvar receita</button><button class="btn secondary" onclick="resetarReceitas()">Restaurar exemplos</button></div>
-</div></section></div>
-<aside id="detalheReceita" class="card side-panel"><div class="empty">Clique em uma receita para visualizar ingredientes, modo de preparo e valores nutricionais.</div></aside></section>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html"><span class="logo">🌿</span>NutriVida</a><nav class="desktop-nav"><a class="navbtn" href="index.html">Hoje</a><a class="navbtn" href="alimentos.html">Alimentos</a><a class="navbtn active" href="receitas.html">Receitas</a><a class="navbtn" href="favoritos.html">Favoritos</a><a class="navbtn" href="perfil.html">Perfil</a></nav></div></header>
+
+<main class="app">
+  <section class="card soft">
+    <h1 class="title">Receitas</h1>
+    <p class="subtitle">Cadastre receitas completas: ingredientes da TACO, tempo de preparo e modo de preparo. Ao adicionar ao diário, você escolhe a refeição.</p>
+    <div class="pill" id="baseStatus" style="margin-top:12px">Carregando taco.json...</div>
+  </section>
+
+  <div class="toolbar">
+    <input class="search" id="qRecipe" placeholder="Buscar receita..." oninput="renderRecipes()">
+    <select class="search" id="sortRecipe" onchange="renderRecipes()">
+      <option value="nome">Ordenar por nome</option>
+      <option value="kcal">Menor caloria</option>
+      <option value="proteina">Mais proteína</option>
+      <option value="tempo">Menor tempo</option>
+    </select>
+    <button class="ghost" onclick="clearRecipeSearch()">Limpar</button>
+  </div>
+
+  <section class="recipe-layout">
+    <div>
+      <div id="recipeList" class="recipe-list"></div>
+
+      <section class="card recipe-form">
+        <div class="section-title" style="margin-top:0"><h2>➕ Cadastrar nova receita</h2></div>
+        <div class="form-grid">
+          <div><label>Nome da receita</label><input id="rNome" class="search" placeholder="Ex.: Omelete simples"></div>
+          <div><label>Tempo de preparo</label><input id="rTempo" class="search" placeholder="Ex.: 15 min"></div>
+          <div><label>Porções</label><input id="rPorcoes" class="search" type="number" min="1" value="1"></div>
+          <div><label>Dificuldade</label><select id="rDificuldade" class="search"><option>Fácil</option><option>Média</option><option>Difícil</option></select></div>
+          <div class="full"><label>Descrição curta</label><textarea id="rDescricao" class="search" rows="2" placeholder="Ex.: Receita prática para o dia a dia."></textarea></div>
+          <div class="full">
+            <label><b>Ingredientes</b> — busque na TACO</label>
+            <div id="ingredientEditor" class="ingredient-editor"></div>
+            <button class="ghost" style="margin-top:10px" onclick="addIngredientLine()">Adicionar ingrediente</button>
+          </div>
+          <div class="full"><label>Modo de preparo</label><textarea id="rPreparo" class="search" rows="5" placeholder="Descreva como fazer a receita..."></textarea></div>
+          <div class="full card" style="box-shadow:none;background:#fbfcfb">
+            <h3 style="margin-top:0">Resultado nutricional automático</h3>
+            <div id="recipePreview" class="macro-mini"></div>
+          </div>
+          <div class="full recipe-actions">
+            <button class="primary" onclick="saveRecipe()">Salvar receita</button>
+            <button class="ghost" onclick="resetRecipeExamples()">Restaurar exemplos</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside id="recipeDetail" class="card recipe-side">
+      <div class="empty">Clique em uma receita para ver ingredientes, preparo e nutrientes.</div>
+    </aside>
+  </section>
 </main>
-<div id="modalDiario" class="modal-backdrop"><div class="modal"><h3>Adicionar ao diário</h3><p id="modalReceitaNome" class="small-note"></p><div class="field"><label>Data</label><input id="modalData" type="date"></div><div class="meal-grid"><button class="meal-btn" onclick="confirmarAdicionarDiario('cafe')">☕ Café da manhã</button><button class="meal-btn" onclick="confirmarAdicionarDiario('almoco')">🍛 Almoço</button><button class="meal-btn" onclick="confirmarAdicionarDiario('jantar')">🍽️ Jantar</button><button class="meal-btn" onclick="confirmarAdicionarDiario('lanche')">🍌 Lanche</button></div><button class="btn secondary" onclick="fecharModalDiario()">Cancelar</button></div></div>
-<script>
-const RECEITAS_KEY = "nutrividareceitas_taco_real_v1";
-const DIARIO_KEY = "nutrividadiario_real_v1";
 
-function textoBusca(texto){return String(texto||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();}
-function numero(valor){if(valor===null||valor===undefined||valor==="")return 0;if(typeof valor==="number")return isNaN(valor)?0:valor;const n=Number(String(valor).replace(",",".").replace(/[^\d.-]/g,""));return isNaN(n)?0:n;}
-function arred(n){return Math.round((Number(n)||0)*10)/10;}
-function fmt(valor){const n=arred(valor);return Number.isInteger(n)?String(n):String(n).replace(".",",");}
-function gerarId(){return crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random());}
-function escapeHtml(texto){return String(texto??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
-function escapeAttr(texto){return escapeHtml(texto).replaceAll("`","&#096;");}
-function escapeJs(texto){return String(texto).replaceAll("\\","\\\\").replaceAll("'","\\'");}
-function dataHoje(){return new Date().toISOString().slice(0,10);}
-function dataBR(iso){const [a,m,d]=iso.split("-");return `${d}/${m}/${a}`;}
-function refeicaoLabel(refeicao){return {cafe:"Café da manhã",almoco:"Almoço",jantar:"Jantar",lanche:"Lanche"}[refeicao]||refeicao;}
-function carregarDiario(){try{return JSON.parse(localStorage.getItem(DIARIO_KEY))||[]}catch(e){return[]}}
-function salvarDiario(diario){localStorage.setItem(DIARIO_KEY,JSON.stringify(diario));}
-function tabelaNutrientes(n){return `<table class="nutrition-table"><thead><tr><th>Nutriente</th><th>Total</th></tr></thead><tbody><tr><td>Energia</td><td>${fmt(n.kcal)} kcal</td></tr><tr><td>Proteínas</td><td>${fmt(n.proteina)} g</td></tr><tr><td>Carboidratos</td><td>${fmt(n.carbo)} g</td></tr><tr><td>Gorduras</td><td>${fmt(n.gordura)} g</td></tr><tr><td>Fibras</td><td>${fmt(n.fibra)} g</td></tr><tr><td>Cálcio</td><td>${fmt(n.calcio)} mg</td></tr><tr><td>Ferro</td><td>${fmt(n.ferro)} mg</td></tr><tr><td>Sódio</td><td>${fmt(n.sodio)} mg</td></tr><tr><td>Colesterol</td><td>${fmt(n.colesterol)} mg</td></tr></tbody></table>`;}
-function somarNutrientes(lista){const total={kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,sodio:0,colesterol:0};lista.forEach(item=>{const n=item.nutrientes||{};total.kcal+=numero(n.kcal);total.proteina+=numero(n.proteina);total.carbo+=numero(n.carbo);total.gordura+=numero(n.gordura);total.fibra+=numero(n.fibra);total.calcio+=numero(n.calcio);total.ferro+=numero(n.ferro);total.sodio+=numero(n.sodio);total.colesterol+=numero(n.colesterol);});return total;}
-</script>
-<script>
-let alimentosTaco=[];let receitas=[];let receitaModalId=null;
-const miniTaco=[{"numero":1,"grupo":"Cereais e derivados","descricao alimento":"Pão francês","energia_kcal":300,"proteina_g":8,"carboidrato_g":58.6,"lipideos_g":3.1,"fibra_alimentar_g":2.3,"calcio_mg":16,"ferro_mg":1,"sodio_mg":648,"colesterol_mg":0},{"numero":2,"grupo":"Leite e derivados","descricao alimento":"Manteiga com sal","energia_kcal":726,"proteina_g":0.4,"carboidrato_g":0.1,"lipideos_g":82.4,"fibra_alimentar_g":0,"calcio_mg":9,"ferro_mg":0,"sodio_mg":579,"colesterol_mg":200},{"numero":3,"grupo":"Cereais e derivados","descricao alimento":"Arroz branco cozido","energia_kcal":128,"proteina_g":2.5,"carboidrato_g":28.1,"lipideos_g":0.2,"fibra_alimentar_g":1.6,"calcio_mg":4,"ferro_mg":0.1,"sodio_mg":1,"colesterol_mg":0},{"numero":4,"grupo":"Leguminosas","descricao alimento":"Feijão carioca cozido","energia_kcal":76,"proteina_g":4.8,"carboidrato_g":13.6,"lipideos_g":0.5,"fibra_alimentar_g":8.5,"calcio_mg":27,"ferro_mg":1.3,"sodio_mg":2,"colesterol_mg":0},{"numero":5,"grupo":"Carnes e derivados","descricao alimento":"Frango peito grelhado","energia_kcal":159,"proteina_g":32,"carboidrato_g":0,"lipideos_g":2.5,"fibra_alimentar_g":0,"calcio_mg":5,"ferro_mg":0.3,"sodio_mg":50,"colesterol_mg":89}];
-const medidasPadrao=[{nome:"gramas",gramas:1},{nome:"unidade pequena",gramas:30},{nome:"unidade média",gramas:50},{nome:"unidade grande",gramas:80},{nome:"fatia fina",gramas:15},{nome:"fatia média",gramas:30},{nome:"colher de chá",gramas:5},{nome:"colher de sobremesa",gramas:10},{nome:"colher de sopa",gramas:25},{nome:"concha pequena",gramas:80},{nome:"concha média",gramas:120},{nome:"xícara",gramas:200},{nome:"copo",gramas:200},{nome:"filé pequeno",gramas:80},{nome:"filé médio",gramas:120},{nome:"pote",gramas:170}];
+<div id="mealModal" class="modal-recipe">
+  <div class="modal-card">
+    <h2 style="margin-top:0">Adicionar ao diário</h2>
+    <p class="subtitle" id="mealModalName"></p>
+    <div style="margin-top:12px"><label>Data</label><input id="mealDate" class="search" type="date"></div>
+    <div class="meal-grid">
+      <button class="meal-choice" onclick="confirmAddRecipeToDiary('Café da manhã')">☕ Café da manhã</button>
+      <button class="meal-choice" onclick="confirmAddRecipeToDiary('Almoço')">🍛 Almoço</button>
+      <button class="meal-choice" onclick="confirmAddRecipeToDiary('Lanche')">🍌 Lanche</button>
+      <button class="meal-choice" onclick="confirmAddRecipeToDiary('Jantar')">🍽️ Jantar</button>
+    </div>
+    <button class="ghost" onclick="closeMealModal()">Cancelar</button>
+  </div>
+</div>
 
-function normalizarAlimento(item,idx){return{id:String(item["numero"]||item["id"]||item["codigo"]||idx),nome:item["descricao alimento"]||item["descricao_alimento"]||item["descrição alimento"]||item["Descrição alimento"]||item["descricao"]||item["Descrição"]||item["nome"]||item["Nome"]||"SEM NOME",grupo:item["grupo"]||item["Grupo"]||"Sem grupo",energia_kcal:numero(item["energia_kcal"]),proteina_g:numero(item["proteina_g"]),carboidrato_g:numero(item["carboidrato_g"]),lipidios_g:numero(item["lipideos_g"]??item["lipidios_g"]),fibra_g:numero(item["fibra_alimentar_g"]??item["fibra_g"]),calcio_mg:numero(item["calcio_mg"]),ferro_mg:numero(item["ferro_mg"]),sodio_mg:numero(item["sodio_mg"]),colesterol_mg:numero(item["colesterol_mg"])}}
-async function carregarBaseTaco(){const status=document.getElementById("statusBase");try{const resp=await fetch("./taco.json",{cache:"no-store"});if(!resp.ok)throw new Error("Arquivo taco.json não encontrado.");const json=await resp.json();const lista=Array.isArray(json)?json:(json.alimentos||json.data||json.items||[]);alimentosTaco=lista.map(normalizarAlimento).filter(a=>a.nome&&a.nome!=="SEM NOME");const exemplo=alimentosTaco[0]?" Ex.: "+alimentosTaco[0].nome:"";status.textContent="Base TACO carregada: "+alimentosTaco.length+" alimentos encontrados."+exemplo;}catch(e){alimentosTaco=miniTaco.map(normalizarAlimento);status.textContent="Usando mini-base de exemplo. Verifique se taco.json está na mesma pasta."}receitas=carregarReceitas();renderReceitas();atualizarPreviewNutrientes()}
-function carregarReceitas(){try{const salvas=localStorage.getItem(RECEITAS_KEY);if(salvas)return JSON.parse(salvas)}catch(e){}return receitasPadrao()}
-function salvarReceitas(){localStorage.setItem(RECEITAS_KEY,JSON.stringify(receitas))}
-function receitasPadrao(){return[montarReceitaExemplo("Pão francês com manteiga","Receita simples para café ou lanche.","5 min",1,"Fácil","Corte o pão, passe a manteiga e sirva.",[ingExemplo("Pão francês",1,"unidade média"),ingExemplo("Manteiga com sal",1,"colher de chá")]),montarReceitaExemplo("Arroz, feijão e frango","Prato básico do dia a dia.","30 min",1,"Fácil","Monte o prato com arroz, feijão e frango já preparados.",[ingExemplo("Arroz branco cozido",3,"colher de sopa"),ingExemplo("Feijão carioca cozido",1,"concha pequena"),ingExemplo("Frango peito grelhado",1,"filé médio")])]}
-function ingExemplo(nome,quantidade,medida){const alimento=alimentosTaco.find(a=>textoBusca(a.nome)===textoBusca(nome))||alimentosTaco[0];const medidaObj=medidasPadrao.find(m=>m.nome===medida)||medidasPadrao[0];return{alimentoId:alimento.id,nome:alimento.nome,quantidade,medida,gramasPorMedida:medidaObj.gramas,gramasTotal:quantidade*medidaObj.gramas}}
-function montarReceitaExemplo(nome,descricao,tempo,porcoes,dificuldade,preparo,ingredientes){return{id:gerarId(),nome,descricao,tempo,porcoes,dificuldade,preparo,ingredientes,nutrientes:calcularNutrientes(ingredientes)}}
-function calcularNutrientes(ingredientes){const total={kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,sodio:0,colesterol:0};ingredientes.forEach(ing=>{const alimento=alimentosTaco.find(a=>String(a.id)===String(ing.alimentoId));if(!alimento)return;const fator=numero(ing.gramasTotal)/100;total.kcal+=alimento.energia_kcal*fator;total.proteina+=alimento.proteina_g*fator;total.carbo+=alimento.carboidrato_g*fator;total.gordura+=alimento.lipidios_g*fator;total.fibra+=alimento.fibra_g*fator;total.calcio+=alimento.calcio_mg*fator;total.ferro+=alimento.ferro_mg*fator;total.sodio+=alimento.sodio_mg*fator;total.colesterol+=alimento.colesterol_mg*fator});return total}
-function renderReceitas(){const lista=document.getElementById("listaReceitas");const busca=textoBusca(document.getElementById("buscaReceita").value);const ordem=document.getElementById("ordenarReceitas").value;let filtradas=receitas.filter(r=>textoBusca([r.nome,r.descricao,r.preparo,...(r.ingredientes||[]).map(i=>i.nome)].join(" ")).includes(busca));filtradas.sort((a,b)=>{if(ordem==="kcal")return(a.nutrientes.kcal||0)-(b.nutrientes.kcal||0);if(ordem==="proteina")return(b.nutrientes.proteina||0)-(a.nutrientes.proteina||0);if(ordem==="tempo")return numero(a.tempo)-numero(b.tempo);return a.nome.localeCompare(b.nome,"pt-BR")});if(!filtradas.length){lista.innerHTML='<div class="empty">Nenhuma receita encontrada.</div>';return}lista.innerHTML=filtradas.map(r=>`<article class="card recipe-card"><div class="recipe-head"><div><h3 class="recipe-title">${escapeHtml(r.nome)}</h3><p class="recipe-desc">${escapeHtml(r.descricao||"")}</p></div><span class="badge">Receita</span></div><div class="meta-row"><span class="meta-pill">⏱ ${escapeHtml(r.tempo||"-")}</span><span class="meta-pill">🍽 ${escapeHtml(r.porcoes||1)} porção(ões)</span><span class="meta-pill">⭐ ${escapeHtml(r.dificuldade||"Fácil")}</span></div><div class="macro-row"><div class="macro"><strong>${fmt(r.nutrientes.kcal)}</strong><span>kcal</span></div><div class="macro"><strong>${fmt(r.nutrientes.proteina)}g</strong><span>proteína</span></div><div class="macro"><strong>${fmt(r.nutrientes.carbo)}g</strong><span>carbo</span></div><div class="macro"><strong>${fmt(r.nutrientes.gordura)}g</strong><span>gordura</span></div></div><div class="actions"><button class="btn" onclick="verReceita('${r.id}')">Ver receita</button><button class="btn secondary" onclick="abrirModalDiario('${r.id}')">Adicionar ao diário</button></div></article>`).join("")}
-function verReceita(id){const r=receitas.find(item=>item.id===id);const detalhe=document.getElementById("detalheReceita");if(!r)return;r.nutrientes=calcularNutrientes(r.ingredientes||[]);detalhe.innerHTML=`<div class="detail-title"><div><h3>${escapeHtml(r.nome)}</h3><span class="badge">Receita</span></div><button class="btn danger" onclick="excluirReceita('${r.id}')">Excluir</button></div><p class="small-note">${escapeHtml(r.descricao||"")}</p><div class="meta-row" style="margin-bottom:12px;"><span class="meta-pill">⏱ ${escapeHtml(r.tempo||"-")}</span><span class="meta-pill">🍽 ${escapeHtml(r.porcoes||1)} porção(ões)</span><span class="meta-pill">⭐ ${escapeHtml(r.dificuldade||"Fácil")}</span></div><h4>Ingredientes</h4><ul class="ingredients">${(r.ingredientes||[]).map(i=>{const alimento=alimentosTaco.find(a=>String(a.id)===String(i.alimentoId));return `<li><span>${escapeHtml(i.nome)}<small>${escapeHtml(alimento?alimento.grupo:"Alimento não encontrado")} • ${fmt(i.gramasTotal)} g</small></span><strong>${escapeHtml(i.quantidade)} ${escapeHtml(i.medida)}</strong></li>`}).join("")}</ul><h4>Modo de preparo</h4><p style="white-space:pre-line;line-height:1.5;">${escapeHtml(r.preparo||"Modo de preparo não informado.")}</p><h4>Nutrição total calculada</h4>${tabelaNutrientes(r.nutrientes)}<div class="actions" style="margin-top:14px;"><button class="btn" onclick="abrirModalDiario('${r.id}')">➕ Adicionar ao diário</button></div>`}
-function adicionarLinhaIngrediente(dados={}){const editor=document.getElementById("editorIngredientes");const div=document.createElement("div");div.className="ingredient-line";div.dataset.alimentoId=dados.alimentoId||"";div.innerHTML=`<div class="field"><label>Alimento TACO</label><input class="ingBusca" placeholder="Digite para buscar..." value="${escapeAttr(dados.nome||"")}" autocomplete="off"><div class="suggestions"></div></div><div class="field"><label>Qtd.</label><input class="ingQtd" type="number" min="0" step="0.1" value="${escapeAttr(dados.quantidade||1)}"></div><div class="field"><label>Medida</label><select class="ingMedida">${medidasPadrao.map(m=>`<option value="${m.nome}" ${dados.medida===m.nome?"selected":""}>${m.nome}</option>`).join("")}</select></div><div class="field"><label>Gramas</label><input class="ingGramas" type="number" min="0" step="0.1" value="${escapeAttr(dados.gramasTotal||"")}" placeholder="auto"></div><button class="btn danger" onclick="this.parentElement.remove(); atualizarPreviewNutrientes()">X</button>`;const busca=div.querySelector(".ingBusca");const suggestions=div.querySelector(".suggestions");const qtd=div.querySelector(".ingQtd");const medida=div.querySelector(".ingMedida");const gramas=div.querySelector(".ingGramas");busca.addEventListener("input",()=>mostrarSugestoes(div,busca.value));busca.addEventListener("focus",()=>mostrarSugestoes(div,busca.value));qtd.addEventListener("input",()=>atualizarGramasLinha(div));medida.addEventListener("change",()=>atualizarGramasLinha(div));gramas.addEventListener("input",atualizarPreviewNutrientes);document.addEventListener("click",(ev)=>{if(!div.contains(ev.target))suggestions.style.display="none"});editor.appendChild(div);if(!dados.gramasTotal)atualizarGramasLinha(div)}
-function mostrarSugestoes(linha,termo){const box=linha.querySelector(".suggestions");const termoNormal=textoBusca(termo);if(termoNormal.length<2){box.style.display="none";return}const resultados=alimentosTaco.filter(a=>textoBusca(a.nome).includes(termoNormal)).slice(0,25);if(!resultados.length){box.innerHTML=`<button type="button">Nenhum alimento encontrado</button>`;box.style.display="block";return}box.innerHTML=resultados.map(a=>`<button type="button" onclick="selecionarAlimento(this, '${escapeJs(a.id)}')"><b>${escapeHtml(a.nome)}</b><small>${escapeHtml(a.grupo)} • ${fmt(a.energia_kcal)} kcal/100g • Prot. ${fmt(a.proteina_g)}g</small></button>`).join("");box.style.display="block"}
-function selecionarAlimento(botao,alimentoId){const linha=botao.closest(".ingredient-line");const alimento=alimentosTaco.find(a=>String(a.id)===String(alimentoId));if(!alimento)return;linha.dataset.alimentoId=alimento.id;linha.querySelector(".ingBusca").value=alimento.nome;linha.querySelector(".suggestions").style.display="none";atualizarGramasLinha(linha)}
-function atualizarGramasLinha(linha){const qtd=numero(linha.querySelector(".ingQtd").value);const medidaNome=linha.querySelector(".ingMedida").value;const medida=medidasPadrao.find(m=>m.nome===medidaNome)||medidasPadrao[0];linha.querySelector(".ingGramas").value=arred(qtd*medida.gramas);atualizarPreviewNutrientes()}
-function coletarIngredientesFormulario(){return[...document.querySelectorAll(".ingredient-line")].map(linha=>{const alimentoId=linha.dataset.alimentoId;const alimento=alimentosTaco.find(a=>String(a.id)===String(alimentoId));const quantidade=numero(linha.querySelector(".ingQtd").value);const medida=linha.querySelector(".ingMedida").value;const gramasTotal=numero(linha.querySelector(".ingGramas").value);if(!alimento||!quantidade||!gramasTotal)return null;return{alimentoId:alimento.id,nome:alimento.nome,quantidade,medida,gramasPorMedida:gramasTotal/quantidade,gramasTotal}}).filter(Boolean)}
-function atualizarPreviewNutrientes(){const ingredientes=coletarIngredientesFormulario();const n=calcularNutrientes(ingredientes);document.getElementById("previewNutrientes").innerHTML=`<div class="macro"><strong>${fmt(n.kcal)}</strong><span>kcal</span></div><div class="macro"><strong>${fmt(n.proteina)}g</strong><span>proteína</span></div><div class="macro"><strong>${fmt(n.carbo)}g</strong><span>carbo</span></div><div class="macro"><strong>${fmt(n.gordura)}g</strong><span>gordura</span></div><div class="macro"><strong>${fmt(n.fibra)}g</strong><span>fibra</span></div><div class="macro"><strong>${fmt(n.sodio)}mg</strong><span>sódio</span></div><div class="macro"><strong>${fmt(n.calcio)}mg</strong><span>cálcio</span></div><div class="macro"><strong>${fmt(n.colesterol)}mg</strong><span>colesterol</span></div>`}
-function salvarNovaReceita(){const nome=document.getElementById("novaNome").value.trim();if(!nome){alert("Informe o nome da receita.");return}const ingredientes=coletarIngredientesFormulario();if(!ingredientes.length){alert("Selecione pelo menos um alimento da TACO nos ingredientes.");return}const nova={id:gerarId(),nome,tempo:document.getElementById("novoTempo").value.trim(),porcoes:numero(document.getElementById("novasPorcoes").value)||1,dificuldade:document.getElementById("novaDificuldade").value,descricao:document.getElementById("novaDescricao").value.trim(),preparo:document.getElementById("novoPreparo").value.trim(),ingredientes,nutrientes:calcularNutrientes(ingredientes)};receitas.unshift(nova);salvarReceitas();limparFormulario();renderReceitas();verReceita(nova.id);alert("Receita salva!")}
-function limparFormulario(){document.getElementById("novaNome").value="";document.getElementById("novoTempo").value="";document.getElementById("novasPorcoes").value="1";document.getElementById("novaDificuldade").value="Fácil";document.getElementById("novaDescricao").value="";document.getElementById("novoPreparo").value="";document.getElementById("editorIngredientes").innerHTML="";adicionarLinhaIngrediente();adicionarLinhaIngrediente();atualizarPreviewNutrientes()}
-function limparFiltros(){document.getElementById("buscaReceita").value="";document.getElementById("ordenarReceitas").value="nome";renderReceitas()}
-function excluirReceita(id){if(!confirm("Excluir esta receita?"))return;receitas=receitas.filter(r=>r.id!==id);salvarReceitas();renderReceitas();document.getElementById("detalheReceita").innerHTML=`<div class="empty">Receita excluída.</div>`}
-function resetarReceitas(){if(!confirm("Restaurar receitas de exemplo? Isso apaga receitas cadastradas nesta tela."))return;receitas=receitasPadrao();salvarReceitas();renderReceitas();document.getElementById("detalheReceita").innerHTML=`<div class="empty">Clique em uma receita para visualizar os detalhes.</div>`}
-function abrirModalDiario(id){const r=receitas.find(item=>item.id===id);if(!r)return;receitaModalId=id;document.getElementById("modalReceitaNome").textContent=r.nome;document.getElementById("modalData").value=dataHoje();document.getElementById("modalDiario").style.display="flex"}
-function fecharModalDiario(){receitaModalId=null;document.getElementById("modalDiario").style.display="none"}
-function confirmarAdicionarDiario(refeicao){const r=receitas.find(item=>item.id===receitaModalId);if(!r)return;r.nutrientes=calcularNutrientes(r.ingredientes||[]);const diario=carregarDiario();diario.unshift({id:gerarId(),tipo:"receita",receitaId:r.id,nome:r.nome,refeicao,data:document.getElementById("modalData").value||dataHoje(),ingredientes:r.ingredientes,nutrientes:r.nutrientes,criadoEm:new Date().toISOString()});salvarDiario(diario);fecharModalDiario();if(confirm("Receita adicionada ao diário! Deseja abrir o diário agora?"))window.location.href="index.html"}
-document.getElementById("buscaReceita").addEventListener("input",renderReceitas);document.getElementById("ordenarReceitas").addEventListener("change",renderReceitas);carregarBaseTaco().then(()=>{adicionarLinhaIngrediente();adicionarLinhaIngrediente()});
+<script>
+const RECIPES_KEY='nv_recipes';
+let tacoFoods=[];
+let recipes=[];
+let selectedRecipeId=null;
+
+const measures=[
+  {nome:'gramas',g:1},{nome:'unidade pequena',g:30},{nome:'unidade média',g:50},{nome:'unidade grande',g:80},
+  {nome:'fatia fina',g:15},{nome:'fatia média',g:30},{nome:'colher de chá',g:5},{nome:'colher de sobremesa',g:10},
+  {nome:'colher de sopa',g:25},{nome:'concha pequena',g:80},{nome:'concha média',g:120},{nome:'xícara',g:200},
+  {nome:'copo',g:200},{nome:'filé pequeno',g:80},{nome:'filé médio',g:120},{nome:'pote',g:170}
+];
+
+const miniTaco=[
+  {"numero":1,"grupo":"Cereais","descricao alimento":"Pão francês","energia_kcal":300,"proteina_g":8,"carboidrato_g":58.6,"lipideos_g":3.1,"fibra_alimentar_g":2.3,"calcio_mg":16,"ferro_mg":1,"sodio_mg":648,"colesterol_mg":0},
+  {"numero":2,"grupo":"Leite e derivados","descricao alimento":"Manteiga com sal","energia_kcal":726,"proteina_g":0.4,"carboidrato_g":0.1,"lipideos_g":82.4,"fibra_alimentar_g":0,"calcio_mg":9,"ferro_mg":0,"sodio_mg":579,"colesterol_mg":200},
+  {"numero":3,"grupo":"Cereais","descricao alimento":"Arroz branco cozido","energia_kcal":128,"proteina_g":2.5,"carboidrato_g":28.1,"lipideos_g":0.2,"fibra_alimentar_g":1.6,"calcio_mg":4,"ferro_mg":0.1,"sodio_mg":1,"colesterol_mg":0},
+  {"numero":4,"grupo":"Leguminosas","descricao alimento":"Feijão carioca cozido","energia_kcal":76,"proteina_g":4.8,"carboidrato_g":13.6,"lipideos_g":0.5,"fibra_alimentar_g":8.5,"calcio_mg":27,"ferro_mg":1.3,"sodio_mg":2,"colesterol_mg":0},
+  {"numero":5,"grupo":"Carnes","descricao alimento":"Frango peito grelhado","energia_kcal":159,"proteina_g":32,"carboidrato_g":0,"lipideos_g":2.5,"fibra_alimentar_g":0,"calcio_mg":5,"ferro_mg":0.3,"sodio_mg":50,"colesterol_mg":89}
+];
+
+function normalizeText(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function num(v){if(v===null||v===undefined||v==='')return 0;if(typeof v==='number')return isNaN(v)?0:v;const n=Number(String(v).replace(',','.').replace(/[^\d.-]/g,''));return isNaN(n)?0:n}
+function fmt(v,d=1){return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d})}
+function todayKey(){return new Date().toISOString().slice(0,10)}
+function uid(){return Date.now()+Math.floor(Math.random()*99999)}
+function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+function jsesc(v){return String(v).replaceAll("\\","\\\\").replaceAll("'","\\'")}
+
+function normalizeFood(item,idx){
+  return {
+    id:String(item.numero||item.id||item.codigo||idx),
+    nome:item["descricao alimento"]||item.descricao_alimento||item["descrição alimento"]||item.descricao||item.nome||item.Nome||'SEM NOME',
+    grupo:item.grupo||item.Grupo||'Sem grupo',
+    kcal:num(item.energia_kcal),
+    proteina:num(item.proteina_g),
+    carbo:num(item.carboidrato_g),
+    gordura:num(item.lipideos_g ?? item.lipidios_g),
+    fibra:num(item.fibra_alimentar_g ?? item.fibra_g),
+    calcio:num(item.calcio_mg),
+    ferro:num(item.ferro_mg),
+    sodio:num(item.sodio_mg),
+    colesterol:num(item.colesterol_mg),
+    vitc:num(item.vitamina_c_mg),
+    retinol:num(item.retinol_mcg),
+    zinco:num(item.zinco_mg)
+  }
+}
+
+async function loadTaco(){
+  const status=document.getElementById('baseStatus');
+  try{
+    const r=await fetch('./taco.json',{cache:'no-store'});
+    if(!r.ok) throw new Error('sem taco');
+    const j=await r.json();
+    const arr=Array.isArray(j)?j:(j.alimentos||j.data||j.items||[]);
+    tacoFoods=arr.map(normalizeFood).filter(f=>f.nome&&f.nome!=='SEM NOME');
+    status.textContent=`Base TACO carregada: ${tacoFoods.length} alimentos. Ex.: ${tacoFoods[0]?.nome||''}`;
+  }catch(e){
+    tacoFoods=miniTaco.map(normalizeFood);
+    status.textContent='Usando mini-base de exemplo. Verifique se taco.json está na mesma pasta.';
+  }
+  recipes=loadRecipes();
+  renderRecipes();
+  addIngredientLine();
+  addIngredientLine();
+  updatePreview();
+}
+
+function loadRecipes(){try{const s=localStorage.getItem(RECIPES_KEY); if(s) return JSON.parse(s)}catch(e){} return exampleRecipes()}
+function saveRecipes(){localStorage.setItem(RECIPES_KEY,JSON.stringify(recipes))}
+function exampleIngredient(name,q,measure){const f=tacoFoods.find(x=>normalizeText(x.nome)===normalizeText(name))||tacoFoods[0];const m=measures.find(x=>x.nome===measure)||measures[0];return {foodId:f.id,nome:f.nome,quantidade:q,medida:measure,gramas:q*m.g}}
+function exampleRecipes(){return [
+  makeRecipe('Pão francês com manteiga','Receita simples para café ou lanche.','5 min',1,'Fácil','Corte o pão, passe a manteiga e sirva.',[exampleIngredient('Pão francês',1,'unidade média'),exampleIngredient('Manteiga com sal',1,'colher de chá')]),
+  makeRecipe('Arroz, feijão e frango','Prato básico do dia a dia.','30 min',1,'Fácil','Monte o prato com arroz, feijão e frango já preparados.',[exampleIngredient('Arroz branco cozido',3,'colher de sopa'),exampleIngredient('Feijão carioca cozido',1,'concha pequena'),exampleIngredient('Frango peito grelhado',1,'filé médio')])
+]}
+function makeRecipe(nome,descricao,tempo,porcoes,dificuldade,preparo,ingredientes){return {id:String(uid()),nome,descricao,tempo,porcoes,dificuldade,preparo,ingredientes,nutrientes:calcRecipe(ingredientes)}}
+
+function calcRecipe(ings){
+  const t={kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,calcio:0,ferro:0,sodio:0,colesterol:0,vitc:0,retinol:0,zinco:0};
+  ings.forEach(i=>{
+    const f=tacoFoods.find(x=>String(x.id)===String(i.foodId)); if(!f)return;
+    const q=num(i.gramas)/100;
+    Object.keys(t).forEach(k=>t[k]+=num(f[k])*q);
+  });
+  return t;
+}
+
+function renderRecipes(){
+  const q=normalizeText(document.getElementById('qRecipe').value);
+  const sort=document.getElementById('sortRecipe').value;
+  let list=recipes.filter(r=>normalizeText([r.nome,r.descricao,r.preparo,...(r.ingredientes||[]).map(i=>i.nome)].join(' ')).includes(q));
+  list.sort((a,b)=> sort==='kcal' ? num(a.nutrientes.kcal)-num(b.nutrientes.kcal) : sort==='proteina' ? num(b.nutrientes.proteina)-num(a.nutrientes.proteina) : sort==='tempo' ? num(a.tempo)-num(b.tempo) : a.nome.localeCompare(b.nome,'pt-BR'));
+  const el=document.getElementById('recipeList');
+  if(!list.length){el.innerHTML='<div class="empty">Nenhuma receita encontrada.</div>';return}
+  el.innerHTML=list.map(r=>`<article class="card recipe-card"><div><h3>${esc(r.nome)}</h3><p class="subtitle">${esc(r.descricao||'')}</p></div><div class="recipe-meta"><span class="recipe-pill">⏱ ${esc(r.tempo||'-')}</span><span class="recipe-pill">🍽 ${esc(r.porcoes||1)} porção(ões)</span><span class="recipe-pill">⭐ ${esc(r.dificuldade||'Fácil')}</span></div><div class="macro-mini"><div class="metric"><span>kcal</span><b>${fmt(r.nutrientes.kcal,0)}</b></div><div class="metric"><span>Prot.</span><b>${fmt(r.nutrientes.proteina)}g</b></div><div class="metric"><span>Carbo</span><b>${fmt(r.nutrientes.carbo)}g</b></div><div class="metric"><span>Gord.</span><b>${fmt(r.nutrientes.gordura)}g</b></div></div><div class="recipe-actions"><button class="primary" onclick="showRecipe('${r.id}')">Ver receita</button><button class="ghost" onclick="openMealModal('${r.id}')">Adicionar ao diário</button></div></article>`).join('');
+}
+
+function showRecipe(id){
+  const r=recipes.find(x=>x.id===id); if(!r)return;
+  r.nutrientes=calcRecipe(r.ingredientes||[]);
+  const html=`<div class="section-title" style="margin-top:0"><h2>${esc(r.nome)}</h2><button class="ghost danger-btn" onclick="deleteRecipe('${r.id}')">Excluir</button></div><p class="subtitle">${esc(r.descricao||'')}</p><div class="recipe-meta" style="margin:12px 0"><span class="recipe-pill">⏱ ${esc(r.tempo||'-')}</span><span class="recipe-pill">🍽 ${esc(r.porcoes||1)} porção(ões)</span><span class="recipe-pill">⭐ ${esc(r.dificuldade||'Fácil')}</span></div><h3>Ingredientes</h3><ul class="ingredients-list">${(r.ingredientes||[]).map(i=>{const f=tacoFoods.find(x=>String(x.id)===String(i.foodId));return `<li><span>${esc(i.nome)}<small>${esc(f?.grupo||'Sem grupo')} • ${fmt(i.gramas)} g</small></span><b>${esc(i.quantidade)} ${esc(i.medida)}</b></li>`}).join('')}</ul><h3>Modo de preparo</h3><p style="white-space:pre-line;line-height:1.55">${esc(r.preparo||'Modo de preparo não informado.')}</p><h3>Nutrição total</h3>${nutritionTable(r.nutrientes)}<div class="recipe-actions" style="margin-top:12px"><button class="primary" onclick="openMealModal('${r.id}')">Adicionar ao diário</button></div>`;
+  document.getElementById('recipeDetail').innerHTML=html;
+}
+
+function nutritionTable(n){return `<div class="table-wrap"><table><thead><tr><th>Nutriente</th><th>Total</th></tr></thead><tbody><tr><td>Energia</td><td>${fmt(n.kcal,0)} kcal</td></tr><tr><td>Proteínas</td><td>${fmt(n.proteina)} g</td></tr><tr><td>Carboidratos</td><td>${fmt(n.carbo)} g</td></tr><tr><td>Gorduras</td><td>${fmt(n.gordura)} g</td></tr><tr><td>Fibras</td><td>${fmt(n.fibra)} g</td></tr><tr><td>Cálcio</td><td>${fmt(n.calcio)} mg</td></tr><tr><td>Ferro</td><td>${fmt(n.ferro)} mg</td></tr><tr><td>Sódio</td><td>${fmt(n.sodio)} mg</td></tr><tr><td>Colesterol</td><td>${fmt(n.colesterol)} mg</td></tr></tbody></table></div>`}
+
+function addIngredientLine(){
+  const ed=document.getElementById('ingredientEditor');
+  const div=document.createElement('div');
+  div.className='ingredient-line';
+  div.dataset.foodId='';
+  div.innerHTML=`<div><label>Alimento TACO</label><input class="search ingSearch" placeholder="Digite para buscar..." autocomplete="off"><div class="suggestions"></div></div><div><label>Qtd.</label><input class="search ingQtd" type="number" min="0" step="0.1" value="1"></div><div><label>Medida</label><select class="search ingMedida">${measures.map(m=>`<option value="${m.nome}">${m.nome}</option>`).join('')}</select></div><div><label>Gramas</label><input class="search ingGramas" type="number" min="0" step="0.1"></div><button class="ghost danger-btn" onclick="this.parentElement.remove();updatePreview()">X</button>`;
+  const search=div.querySelector('.ingSearch'), sug=div.querySelector('.suggestions');
+  search.addEventListener('input',()=>showFoodSuggestions(div,search.value));
+  search.addEventListener('focus',()=>showFoodSuggestions(div,search.value));
+  div.querySelector('.ingQtd').addEventListener('input',()=>updateLineGrams(div));
+  div.querySelector('.ingMedida').addEventListener('change',()=>updateLineGrams(div));
+  div.querySelector('.ingGramas').addEventListener('input',updatePreview);
+  document.addEventListener('click',ev=>{if(!div.contains(ev.target))sug.style.display='none'});
+  ed.appendChild(div);
+  updateLineGrams(div);
+}
+
+function showFoodSuggestions(line,term){
+  const box=line.querySelector('.suggestions');
+  const t=normalizeText(term);
+  if(t.length<2){box.style.display='none';return}
+  const res=tacoFoods.filter(f=>normalizeText(f.nome).includes(t)).slice(0,25);
+  if(!res.length){box.innerHTML='<button type="button">Nenhum alimento encontrado</button>';box.style.display='block';return}
+  box.innerHTML=res.map(f=>`<button type="button" onclick="selectFood(this,'${jsesc(f.id)}')"><b>${esc(f.nome)}</b><small>${esc(f.grupo)} • ${fmt(f.kcal,0)} kcal/100g • Prot. ${fmt(f.proteina)}g</small></button>`).join('');
+  box.style.display='block';
+}
+function selectFood(btn,id){
+  const line=btn.closest('.ingredient-line'); const f=tacoFoods.find(x=>String(x.id)===String(id)); if(!f)return;
+  line.dataset.foodId=f.id; line.querySelector('.ingSearch').value=f.nome; line.querySelector('.suggestions').style.display='none'; updateLineGrams(line);
+}
+function updateLineGrams(line){
+  const q=num(line.querySelector('.ingQtd').value);
+  const measure=measures.find(m=>m.nome===line.querySelector('.ingMedida').value)||measures[0];
+  line.querySelector('.ingGramas').value=fmt(q*measure.g,1).replace(',','.');
+  updatePreview();
+}
+function collectIngredients(){
+  return [...document.querySelectorAll('.ingredient-line')].map(line=>{
+    const f=tacoFoods.find(x=>String(x.id)===String(line.dataset.foodId));
+    const q=num(line.querySelector('.ingQtd').value);
+    const medida=line.querySelector('.ingMedida').value;
+    const gramas=num(line.querySelector('.ingGramas').value);
+    if(!f||!q||!gramas)return null;
+    return {foodId:f.id,nome:f.nome,quantidade:q,medida,gramas};
+  }).filter(Boolean);
+}
+function updatePreview(){
+  const n=calcRecipe(collectIngredients());
+  document.getElementById('recipePreview').innerHTML=`<div class="metric"><span>kcal</span><b>${fmt(n.kcal,0)}</b></div><div class="metric"><span>Proteína</span><b>${fmt(n.proteina)}g</b></div><div class="metric"><span>Carbo</span><b>${fmt(n.carbo)}g</b></div><div class="metric"><span>Gordura</span><b>${fmt(n.gordura)}g</b></div><div class="metric"><span>Fibra</span><b>${fmt(n.fibra)}g</b></div><div class="metric"><span>Sódio</span><b>${fmt(n.sodio)}mg</b></div><div class="metric"><span>Cálcio</span><b>${fmt(n.calcio)}mg</b></div><div class="metric"><span>Colesterol</span><b>${fmt(n.colesterol)}mg</b></div>`;
+}
+function saveRecipe(){
+  const nome=document.getElementById('rNome').value.trim();
+  if(!nome){alert('Informe o nome da receita.');return}
+  const ingredientes=collectIngredients();
+  if(!ingredientes.length){alert('Selecione pelo menos um alimento da TACO.');return}
+  const r=makeRecipe(nome,document.getElementById('rDescricao').value.trim(),document.getElementById('rTempo').value.trim(),num(document.getElementById('rPorcoes').value)||1,document.getElementById('rDificuldade').value,document.getElementById('rPreparo').value.trim(),ingredientes);
+  recipes.unshift(r); saveRecipes(); clearForm(); renderRecipes(); showRecipe(r.id); alert('Receita salva!');
+}
+function clearForm(){['rNome','rTempo','rDescricao','rPreparo'].forEach(id=>document.getElementById(id).value='');document.getElementById('rPorcoes').value=1;document.getElementById('rDificuldade').value='Fácil';document.getElementById('ingredientEditor').innerHTML='';addIngredientLine();addIngredientLine();updatePreview()}
+function clearRecipeSearch(){document.getElementById('qRecipe').value='';document.getElementById('sortRecipe').value='nome';renderRecipes()}
+function deleteRecipe(id){if(!confirm('Excluir esta receita?'))return;recipes=recipes.filter(r=>r.id!==id);saveRecipes();renderRecipes();document.getElementById('recipeDetail').innerHTML='<div class="empty">Receita excluída.</div>'}
+function resetRecipeExamples(){if(!confirm('Restaurar exemplos? Isso apaga receitas cadastradas nesta página.'))return;recipes=exampleRecipes();saveRecipes();renderRecipes();document.getElementById('recipeDetail').innerHTML='<div class="empty">Clique em uma receita para visualizar os detalhes.</div>'}
+
+function openMealModal(id){selectedRecipeId=id;const r=recipes.find(x=>x.id===id);if(!r)return;document.getElementById('mealModalName').textContent=r.nome;document.getElementById('mealDate').value=todayKey();document.getElementById('mealModal').classList.add('open')}
+function closeMealModal(){selectedRecipeId=null;document.getElementById('mealModal').classList.remove('open')}
+function confirmAddRecipeToDiary(meal){
+  const r=recipes.find(x=>x.id===selectedRecipeId); if(!r)return;
+  r.nutrientes=calcRecipe(r.ingredientes||[]);
+  const diary=JSON.parse(localStorage.getItem('nv_diary')||'[]');
+  diary.push({
+    id:uid(),
+    tipo:'receita',
+    recipeId:r.id,
+    foodId:'recipe_'+r.id,
+    food:{id:'recipe_'+r.id,nome:r.nome,...r.nutrientes},
+    meal,
+    grams:100,
+    when:document.getElementById('mealDate').value||todayKey()
+  });
+  localStorage.setItem('nv_diary',JSON.stringify(diary));
+  closeMealModal();
+  if(confirm('Receita adicionada ao diário! Deseja abrir o Hoje agora?')) location.href='index.html';
+}
+
+loadTaco();
 </script>
-</body></html>
+<script src="app.js?v=menu3"></script>
+</body>
+</html>
