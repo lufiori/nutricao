@@ -877,18 +877,88 @@
       };
 
       return {
-        id: String(pick("id", "codigo", "Código", "numero", "Número") || ("alimento_" + idx)),
-        nome: String(pick("nome", "Nome", "descricao", "Descrição", "alimento", "Alimento") || "Alimento sem nome"),
-        grupo: String(pick("grupo", "Grupo", "categoria", "Categoria") || "Sem grupo"),
-        energia_kcal: numero(pick("energia_kcal", "kcal", "Energia_kcal", "Energia (kcal)", "energia")),
-        proteina_g: numero(pick("proteina_g", "proteina", "Proteína (g)", "Proteina(g)", "proteínas")),
-        carboidrato_g: numero(pick("carboidrato_g", "carboidrato", "Carboidrato (g)", "Carboidratos (g)", "carbo")),
-        lipidios_g: numero(pick("lipidios_g", "lipidios", "Lipídios (g)", "Gorduras (g)", "gordura")),
-        fibra_g: numero(pick("fibra_g", "fibra", "Fibra alimentar (g)", "Fibra (g)")),
-        calcio_mg: numero(pick("calcio_mg", "calcio", "Cálcio (mg)", "Calcio (mg)")),
-        ferro_mg: numero(pick("ferro_mg", "ferro", "Ferro (mg)")),
-        sodio_mg: numero(pick("sodio_mg", "sodio", "Sódio (mg)", "Sodio (mg)")),
-        colesterol_mg: numero(pick("colesterol_mg", "colesterol", "Colesterol (mg)"))
+        id: String(pick("id", "ID", "codigo", "Código", "Codigo", "numero", "Número", "Numero", "n") || ("alimento_" + idx)),
+
+        // Compatível com vários formatos de JSON da TACO:
+        // nome, Nome, alimento, Alimento, descricao, Descricao, descrição, Descrição, description, name etc.
+        nome: String(pick(
+          "nome", "Nome",
+          "alimento", "Alimento",
+          "descricao", "Descricao", "descrição", "Descrição",
+          "description", "Description",
+          "name", "Name",
+          "food", "Food",
+          "item", "Item",
+          "produto", "Produto"
+        ) || "Alimento sem nome"),
+
+        grupo: String(pick(
+          "grupo", "Grupo",
+          "categoria", "Categoria",
+          "category", "Category",
+          "group", "Group",
+          "tipo", "Tipo"
+        ) || "Sem grupo"),
+
+        energia_kcal: numero(pick(
+          "energia_kcal", "kcal", "Kcal",
+          "Energia_kcal", "Energia (kcal)", "Energia kcal",
+          "energia", "Energia",
+          "calorias", "Calorias",
+          "energy_kcal", "Energy_kcal"
+        )),
+
+        proteina_g: numero(pick(
+          "proteina_g", "proteina", "proteínas", "proteinas",
+          "Proteína (g)", "Proteina (g)", "Proteina(g)",
+          "Proteína", "Proteina",
+          "protein_g", "Protein_g", "protein"
+        )),
+
+        carboidrato_g: numero(pick(
+          "carboidrato_g", "carboidrato", "carboidratos",
+          "Carboidrato (g)", "Carboidratos (g)", "Carboidrato", "Carboidratos",
+          "carbo", "Carbo",
+          "carbohydrate_g", "Carbohydrate_g", "carbohydrate"
+        )),
+
+        lipidios_g: numero(pick(
+          "lipidios_g", "lipidios", "lipídios",
+          "Lipídios (g)", "Lipidios (g)", "Lipideos (g)",
+          "Lipídios", "Lipidios",
+          "Gorduras (g)", "Gordura (g)", "gordura", "gorduras",
+          "fat_g", "Fat_g", "fat"
+        )),
+
+        fibra_g: numero(pick(
+          "fibra_g", "fibra",
+          "Fibra alimentar (g)", "Fibra (g)", "Fibra alimentar", "Fibra",
+          "fiber_g", "Fiber_g", "fiber"
+        )),
+
+        calcio_mg: numero(pick(
+          "calcio_mg", "calcio", "cálcio",
+          "Cálcio (mg)", "Calcio (mg)", "Cálcio", "Calcio",
+          "calcium_mg", "Calcium_mg", "calcium"
+        )),
+
+        ferro_mg: numero(pick(
+          "ferro_mg", "ferro",
+          "Ferro (mg)", "Ferro",
+          "iron_mg", "Iron_mg", "iron"
+        )),
+
+        sodio_mg: numero(pick(
+          "sodio_mg", "sodio", "sódio",
+          "Sódio (mg)", "Sodio (mg)", "Sódio", "Sodio",
+          "sodium_mg", "Sodium_mg", "sodium"
+        )),
+
+        colesterol_mg: numero(pick(
+          "colesterol_mg", "colesterol",
+          "Colesterol (mg)", "Colesterol",
+          "cholesterol_mg", "Cholesterol_mg", "cholesterol"
+        ))
       };
     }
 
@@ -901,7 +971,8 @@
         const json = await resp.json();
         const lista = Array.isArray(json) ? json : (json.alimentos || json.data || json.items || []);
         alimentosTaco = lista.map(normalizarAlimento);
-        status.textContent = "Base TACO carregada: " + alimentosTaco.length + " alimentos encontrados.";
+        const exemplo = alimentosTaco[0] ? " Ex.: " + alimentosTaco[0].nome : "";
+        status.textContent = "Base TACO carregada: " + alimentosTaco.length + " alimentos encontrados." + exemplo;
       } catch (e) {
         alimentosTaco = miniTaco.map(normalizarAlimento);
         status.textContent = "Usando mini-base de exemplo. Para a base completa, coloque taco.json na mesma pasta.";
