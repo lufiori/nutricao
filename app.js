@@ -132,47 +132,59 @@ function openAdd(meal='Almoço', foodId=''){
   if(!b)return;
   b.classList.add('open');
   const mealEl=document.getElementById('modalMeal'); if(mealEl) mealEl.value=meal;
-  fillFoodSelect(foodId);
+  const grams=document.getElementById('modalGrams'); if(grams && !grams.value) grams.value=100;
   const q=document.getElementById('modalFoodSearch');
   if(q){
     const f=byId(foodId);
     q.value=f?f.nome:'';
     setTimeout(()=>q.focus(),80);
   }
+  if(foodId) selectFoodForModal(foodId, false);
+  else clearSelectedFood();
+  fillFoodSelect(foodId);
 }
 function closeAdd(){document.getElementById('addModal')?.classList.remove('open')}
+function clearSelectedFood(){
+  const hidden=document.getElementById('modalFood'); if(hidden) hidden.value='';
+  const box=document.getElementById('modalSelectedBox'); if(box){box.style.display='none';box.innerHTML='';}
+  const btn=document.getElementById('modalAddBtn'); if(btn){btn.disabled=true;btn.textContent='Escolha um alimento';}
+}
+function normalizeSearchText(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function fillFoodSelect(selectedId=''){
-  const s=document.getElementById('modalFood');
-  if(!s)return;
   const q=document.getElementById('modalFoodSearch');
-  const text=(q?.value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const text=normalizeSearchText(q?.value||'');
   let arr=NV.foods;
   if(text){
-    arr=NV.foods.filter(f=>`${f.nome} ${f.grupo}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(text));
+    arr=NV.foods.filter(f=>normalizeSearchText(`${f.nome} ${f.grupo}`).includes(text));
   }
-  arr=arr.slice(0,80);
-  s.innerHTML=arr.map(f=>`<option value="${f.id}">${f.nome} — ${f.grupo}</option>`).join('');
-  if(selectedId && arr.some(f=>String(f.id)===String(selectedId))) s.value=selectedId;
-  renderModalFoodResults(arr);
+  arr=arr.slice(0,20);
+  renderModalFoodResults(arr, selectedId);
 }
-function renderModalFoodResults(arr){
+function renderModalFoodResults(arr, selectedId=''){
   const box=document.getElementById('modalFoodResults');
   if(!box)return;
-  const selected=document.getElementById('modalFood')?.value;
-  box.innerHTML=(arr||[]).slice(0,12).map(f=>`<button type="button" class="food-pick ${String(f.id)===String(selected)?'active':''}" onclick="selectFoodForModal('${f.id}')"><b>${f.nome}</b><small>${f.grupo} • ${fmt(f.kcal)} kcal • ${fmt(f.proteina,1)}g prot.</small></button>`).join('') || '<div class="empty small">Nenhum alimento encontrado.</div>';
+  const selected=selectedId || document.getElementById('modalFood')?.value;
+  box.innerHTML=(arr||[]).slice(0,10).map(f=>`<button type="button" class="food-pick ${String(f.id)===String(selected)?'active':''}" onclick="selectFoodForModal('${f.id}')"><b>${f.nome}</b><small>${f.grupo} • ${fmt(f.kcal)} kcal • ${fmt(f.proteina,1)}g prot.</small></button>`).join('') || '<div class="empty small">Nenhum alimento encontrado.</div>';
 }
-function selectFoodForModal(id){
+function selectFoodForModal(id, updateSearch=true){
   const f=byId(id); if(!f)return;
-  const s=document.getElementById('modalFood'); if(s){
-    if(![...s.options].some(o=>String(o.value)===String(id))) s.insertAdjacentHTML('afterbegin',`<option value="${f.id}">${f.nome} — ${f.grupo}</option>`);
-    s.value=id;
+  const hidden=document.getElementById('modalFood'); if(hidden) hidden.value=f.id;
+  const q=document.getElementById('modalFoodSearch'); if(q && updateSearch) q.value=f.nome;
+  const box=document.getElementById('modalSelectedBox');
+  if(box){
+    box.style.display='block';
+    box.innerHTML=`<div><span class="pill">Selecionado</span><h3>${f.nome}</h3><small>${f.grupo} • ${fmt(f.kcal)} kcal • ${fmt(f.proteina,1)}g proteína por 100g</small></div>`;
   }
-  const q=document.getElementById('modalFoodSearch'); if(q) q.value=f.nome;
-  renderModalFoodResults([f]);
+  const btn=document.getElementById('modalAddBtn'); if(btn){btn.disabled=false;btn.textContent='Adicionar ao diário';}
+  renderModalFoodResults([f], f.id);
+}
+function setModalGrams(v){
+  const g=document.getElementById('modalGrams');
+  if(g) g.value=v;
 }
 function submitAdd(){
   const foodId=document.getElementById('modalFood')?.value;
-  if(!foodId){alert('Escolha um alimento primeiro.');return;}
+  if(!foodId){alert('Toque em um alimento da lista primeiro.');return;}
   addDiary(foodId,document.getElementById('modalMeal').value,document.getElementById('modalGrams').value);
   closeAdd();
 }
