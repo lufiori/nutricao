@@ -63,19 +63,37 @@ function normalizeFood(f,i){
     'grupo','categoria','categoria do alimento','grupo alimentar','classificação','classificacao',
     'preparação','preparacao','tipo'
   ]);
-  return {
+  const food={
     id:String(pick(f,['id','codigo','código','cod','numero','número']) ?? i),
     nome:String(nome ?? 'Alimento'),
     grupo:String(grupo ?? 'Outros'),
+    umidade:num(pick(f,['umidade_percentual','umidade','umidade (%)','umidade_%'])),
     kcal:num(pick(f,['energia_kcal','kcal','energia kcal','energia(kcal)','energia (kcal)','calorias','valor energetico','valor energético','energia'])),
+    kj:num(pick(f,['energia_kj','kj','energia kj','energia (kj)'])),
     proteina:num(pick(f,['proteina_g','proteina','proteína','proteina g','proteína g','proteina (g)','proteína (g)','protein'])),
     carbo:num(pick(f,['carboidrato_g','carbo_g','carbo','carboidrato','carboidratos','carboidrato g','carboidratos g','carboidrato (g)','carboidratos (g)','cho'])),
     gordura:num(pick(f,['lipideos_g','lipidios_g','gordura_g','gordura','lipidios','lipídios','lipideos','lipídeos','lipidios (g)','lipídios (g)','gorduras totais','gordura total'])),
+    colesterol:num(pick(f,['colesterol_mg','colesterol','colesterol (mg)'])),
     fibra:num(pick(f,['fibra_alimentar_g','fibra_g','fibra','fibras','fibra alimentar','fibra alimentar (g)','fibras (g)'])),
+    cinzas:num(pick(f,['cinzas_g','cinzas','cinzas (g)'])),
     calcio:num(pick(f,['calcio_mg','calcio','cálcio','calcio (mg)','cálcio (mg)','ca'])),
+    magnesio:num(pick(f,['magnesio_mg','magnésio','magnesio','magnésio (mg)','magnesio (mg)','mg'])),
+    manganes:num(pick(f,['manganes_mg','manganês','manganes','manganês (mg)','manganes (mg)'])),
+    fosforo:num(pick(f,['fosforo_mg','fósforo','fosforo','fósforo (mg)','fosforo (mg)','p'])),
     ferro:num(pick(f,['ferro_mg','ferro','ferro (mg)','fe'])),
-    vitc:num(pick(f,['vitamina_c_mg','vitamina c','vitamina_c','vitc','vit c','ácido ascórbico','acido ascorbico']))
-  }
+    sodio:num(pick(f,['sodio_mg','sódio','sodio','sódio (mg)','sodio (mg)','na'])),
+    potassio:num(pick(f,['potassio_mg','potássio','potassio','potássio (mg)','potassio (mg)','k'])),
+    cobre:num(pick(f,['cobre_mg','cobre','cobre (mg)','cu'])),
+    zinco:num(pick(f,['zinco_mg','zinco','zinco (mg)','zn'])),
+    retinol:num(pick(f,['retinol_mcg','retinol','retinol (mcg)'])),
+    tiamina:num(pick(f,['tiamina_mg','tiamina','vitamina b1','b1'])),
+    riboflavina:num(pick(f,['riboflavina_mg','riboflavina','vitamina b2','b2'])),
+    piridoxina:num(pick(f,['piridoxina_mg','piridoxina','vitamina b6','b6'])),
+    niacina:num(pick(f,['niacina_mg','niacina','vitamina b3','b3'])),
+    vitc:num(pick(f,['vitamina_c_mg','vitamina c','vitamina_c','vitc','vit c','ácido ascórbico','acido ascorbico'])),
+    original:f
+  };
+  return food;
 }
 function num(v){
   if(v===undefined || v===null) return 0;
@@ -109,10 +127,78 @@ function label(k){return {kcal:'Calorias',proteina:'Proteínas',carbo:'Carboidra
 function unit(k){return {kcal:' kcal',proteina:' g',carbo:' g',gordura:' g',fibra:' g',calcio:' mg',ferro:' mg',vitc:' mg'}[k]||''}
 function renderMissing(){const el=document.getElementById('missingList');if(!el)return;const t=calcTotals();const keys=['proteina','fibra','calcio','ferro','vitc'];el.innerHTML=keys.map(k=>{const falta=Math.max(0,NV.targets[k]-t[k]);return `<div class="meal"><div><b>${label(k)}</b><br><small>${falta>0?'Faltam aproximadamente':'Meta atingida'} ${fmt(falta,1)}${unit(k)}</small></div><span class="pill">${pct(t[k],NV.targets[k])}%</span></div>`}).join('')}
 function renderMeals(){const el=document.getElementById('mealList');if(!el)return;const d=NV.diary;el.innerHTML=NV.meals.map(m=>{const itens=d.filter(x=>x.meal===m);const kcal=itens.reduce((s,x)=>s+num((byId(x.foodId)||x.food)?.kcal)*(x.grams/100),0);return `<div class="meal"><div><h3>${m}</h3><small>${itens.length?itens.map(x=>`${(byId(x.foodId)||x.food)?.nome} (${x.grams}g)`).join(' • '):'Nenhum alimento lançado'}</small></div><div style="text-align:right"><b>${fmt(kcal)} kcal</b><br><button class="ghost" onclick="openAdd('${m}')">Adicionar</button></div></div>`}).join('')}
-function openAdd(meal='Almoço'){const b=document.getElementById('addModal');if(!b)return;b.classList.add('open');document.getElementById('modalMeal').value=meal;fillFoodSelect()}
+function openAdd(meal='Almoço', foodId=''){
+  const b=document.getElementById('addModal');
+  if(!b)return;
+  b.classList.add('open');
+  const mealEl=document.getElementById('modalMeal'); if(mealEl) mealEl.value=meal;
+  fillFoodSelect(foodId);
+  const q=document.getElementById('modalFoodSearch');
+  if(q){
+    const f=byId(foodId);
+    q.value=f?f.nome:'';
+    setTimeout(()=>q.focus(),80);
+  }
+}
 function closeAdd(){document.getElementById('addModal')?.classList.remove('open')}
-function fillFoodSelect(){const s=document.getElementById('modalFood');if(!s)return;s.innerHTML=NV.foods.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('')}
-function submitAdd(){addDiary(document.getElementById('modalFood').value,document.getElementById('modalMeal').value,document.getElementById('modalGrams').value);closeAdd()}
+function fillFoodSelect(selectedId=''){
+  const s=document.getElementById('modalFood');
+  if(!s)return;
+  const q=document.getElementById('modalFoodSearch');
+  const text=(q?.value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  let arr=NV.foods;
+  if(text){
+    arr=NV.foods.filter(f=>`${f.nome} ${f.grupo}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(text));
+  }
+  arr=arr.slice(0,80);
+  s.innerHTML=arr.map(f=>`<option value="${f.id}">${f.nome} — ${f.grupo}</option>`).join('');
+  if(selectedId && arr.some(f=>String(f.id)===String(selectedId))) s.value=selectedId;
+  renderModalFoodResults(arr);
+}
+function renderModalFoodResults(arr){
+  const box=document.getElementById('modalFoodResults');
+  if(!box)return;
+  const selected=document.getElementById('modalFood')?.value;
+  box.innerHTML=(arr||[]).slice(0,12).map(f=>`<button type="button" class="food-pick ${String(f.id)===String(selected)?'active':''}" onclick="selectFoodForModal('${f.id}')"><b>${f.nome}</b><small>${f.grupo} • ${fmt(f.kcal)} kcal • ${fmt(f.proteina,1)}g prot.</small></button>`).join('') || '<div class="empty small">Nenhum alimento encontrado.</div>';
+}
+function selectFoodForModal(id){
+  const f=byId(id); if(!f)return;
+  const s=document.getElementById('modalFood'); if(s){
+    if(![...s.options].some(o=>String(o.value)===String(id))) s.insertAdjacentHTML('afterbegin',`<option value="${f.id}">${f.nome} — ${f.grupo}</option>`);
+    s.value=id;
+  }
+  const q=document.getElementById('modalFoodSearch'); if(q) q.value=f.nome;
+  renderModalFoodResults([f]);
+}
+function submitAdd(){
+  const foodId=document.getElementById('modalFood')?.value;
+  if(!foodId){alert('Escolha um alimento primeiro.');return;}
+  addDiary(foodId,document.getElementById('modalMeal').value,document.getElementById('modalGrams').value);
+  closeAdd();
+}
 function renderHome(){renderSummary();renderMissing();renderMeals();renderNeeds()}
 function renderNeeds(){const el=document.getElementById('needsTable');if(!el)return;const t=calcTotals();const rows=Object.keys(NV.targets).map(k=>`<tr><td>${label(k)}</td><td>${fmt(NV.targets[k],k==='kcal'?0:1)}${unit(k)}</td><td>${fmt(t[k],k==='kcal'?0:1)}${unit(k)}</td><td>${pct(t[k],NV.targets[k])}%</td></tr>`).join('');el.innerHTML=rows}
+
+const nutrientDefs=[
+  ['kcal','Energia','kcal','macro'],['proteina','Proteínas','g','macro'],['carbo','Carboidratos','g','macro'],['gordura','Gorduras','g','macro'],['fibra','Fibras','g','macro'],
+  ['colesterol','Colesterol','mg','micro'],['calcio','Cálcio','mg','micro'],['magnesio','Magnésio','mg','micro'],['manganes','Manganês','mg','micro'],['fosforo','Fósforo','mg','micro'],['ferro','Ferro','mg','micro'],['sodio','Sódio','mg','micro'],['potassio','Potássio','mg','micro'],['cobre','Cobre','mg','micro'],['zinco','Zinco','mg','micro'],['retinol','Retinol','mcg','micro'],['tiamina','Tiamina','mg','vit'],['riboflavina','Riboflavina','mg','vit'],['piridoxina','Piridoxina','mg','vit'],['niacina','Niacina','mg','vit'],['vitc','Vitamina C','mg','vit']
+];
+function ensureDetailModal(){
+  if(document.getElementById('detailModal'))return;
+  document.body.insertAdjacentHTML('beforeend',`<div class="modal-back" id="detailModal"><div class="modal detail-modal"><div class="modal-head"><div><h2 id="detailTitle">Ficha do alimento</h2><p class="subtitle" id="detailSub"></p></div><button class="close" onclick="closeFoodDetail()">Fechar</button></div><div id="detailBody"></div></div></div>`);
+}
+function openFoodDetail(id){
+  const f=byId(id); if(!f)return;
+  ensureDetailModal();
+  document.getElementById('detailTitle').textContent=f.nome;
+  document.getElementById('detailSub').textContent=`${f.grupo} • valores aproximados por 100g`;
+  const macros=[['proteina','Proteínas'],['carbo','Carboidratos'],['gordura','Gorduras'],['fibra','Fibras']];
+  const maxMacro=Math.max(1,...macros.map(([k])=>num(f[k])));
+  const macroHtml=macros.map(([k,n],i)=>`<div class="chart-row c${i+1}"><span>${n}</span><div class="chart-track"><div style="width:${Math.min(100,(num(f[k])/maxMacro)*100)}%"></div></div><b>${fmt(f[k],1)}g</b></div>`).join('');
+  const cards=['kcal','proteina','carbo','gordura','fibra','colesterol'].map(k=>`<div class="nutri-mini"><span>${label(k)}</span><b>${fmt(f[k],k==='kcal'?0:1)}${unit(k)}</b></div>`).join('');
+  const rows=nutrientDefs.filter(([k])=>num(f[k])>0 || ['kcal','proteina','carbo','gordura','fibra'].includes(k)).map(([k,n,u])=>`<tr><td>${n}</td><td>${fmt(f[k],k==='kcal'?0:2)} ${u}</td></tr>`).join('');
+  document.getElementById('detailBody').innerHTML=`<div class="nutri-grid">${cards}</div><div class="pretty-chart"><h3>Gráfico nutricional</h3>${macroHtml}</div><div class="toolbar"><button class="primary" onclick="closeFoodDetail();openAdd('Almoço','${f.id}')">Adicionar ao diário</button><button class="ghost" onclick="toggleFav('${f.id}')">${NV.favs.includes(String(f.id))?'★ Remover favorito':'☆ Favoritar'}</button></div><div class="table-wrap"><table><thead><tr><th>Nutriente</th><th>Quantidade por 100g</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeFoodDetail(){document.getElementById('detailModal')?.classList.remove('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.more-menu')&&!e.target.closest('[data-more]'))closeMore()});
