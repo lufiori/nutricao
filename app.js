@@ -368,17 +368,53 @@ function curatedSlotsForMeal(meal){
   if(normTxt(meal).includes('jantar')) return mapa['Jantar']||[];
   return mapa['Almoço']||[];
 }
+function grupoEhPreparado(food){
+  return normTxt(food?.grupo).includes('alimentos preparados') || normTxt(food?.grupo).includes('preparados');
+}
+function usedFoodBadName(food){
+  const n=normTxt(food?.nome);
+  return ['baião','baiao','bolonhesa','lasanha','pizza','sanduíche','sanduiche','pastel','acarajé','acaraje','torta','bolo','sopa pronta','molho'].some(x=>n.includes(normTxt(x)));
+}
+function matchesSlotRules(food, slot){
+  if(!food || usedFoodBadName(food)) return false;
+  const nome=normTxt(food.nome);
+  const grupo=normTxt(food.grupo);
+  if(grupoEhPreparado(food)) return false;
+  if((slot.bloqueados||[]).some(t=>nome.includes(normTxt(t)))) return false;
+  const permitidos=(slot.permitidos||[]).map(normTxt);
+  const grupos=(slot.grupos||[]).map(normTxt);
+  const okNome=!permitidos.length || permitidos.some(t=>nome.includes(t));
+  const okGrupo=!grupos.length || grupos.some(g=>grupo.includes(g));
+  return okNome && okGrupo;
+}
+function scoreCuratedCandidate(food, slot, termo=''){
+  const nome=normTxt(food.nome);
+  const grupo=normTxt(food.grupo);
+  let score=0;
+  const t=normTxt(termo);
+  if(t && nome===t) score+=100;
+  if(t && nome.includes(t)) score+=60;
+  (slot.permitidos||[]).forEach(p=>{ if(nome.includes(normTxt(p))) score+=25; });
+  (slot.grupos||[]).forEach(g=>{ if(grupo.includes(normTxt(g))) score+=15; });
+  ['cozido','cozida','grelhado','grelhada','natural','cru','crua'].forEach(p=>{ if(nome.includes(p)) score+=8; });
+  if((slot.slot||'').toLowerCase().includes('fruta') && !grupo.includes('frutas')) score-=100;
+  if(num(food.kcal)>450) score-=30;
+  return score;
+}
 function findFoodByCuratedSearch(slot, used=[]){
-  const foods=NV.foods||[];
+  const foods=(NV.foods||[]).filter(f=>!used.includes(String(f.id)) && matchesSlotRules(f, slot));
+  if(!foods.length) return null;
+  let best=null;
+  let bestScore=-Infinity;
   for(const termo of (slot.busca||[])){
-    const n=normTxt(termo);
-    let found=foods.find(f=>!used.includes(String(f.id)) && normTxt(f.nome)===n);
-    if(found) return found;
-    found=foods.find(f=>!used.includes(String(f.id)) && normTxt(f.nome).includes(n));
-    if(found) return found;
+    for(const f of foods){
+      const sc=scoreCuratedCandidate(f, slot, termo);
+      if(sc>bestScore){ bestScore=sc; best=f; }
+    }
+    if(bestScore>=100) return best;
   }
-  const words=(slot.busca||[]).join(' ').split(/\s+/).filter(w=>w.length>3);
-  return foods.find(f=>!used.includes(String(f.id)) && hasAny(f.nome, words));
+  if(best) return best;
+  return foods.sort((a,b)=>scoreCuratedCandidate(b,slot)-scoreCuratedCandidate(a,slot))[0] || null;
 }
 function buildAutoMealPlan(meal){
   const missing=autoMealMissing();
