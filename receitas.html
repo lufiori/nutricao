@@ -1,5 +1,1442 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NutriVida - Receitas</title><link rel="stylesheet" href="app.css"></head><body><header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html"><span class="logo">🌿</span>NutriVida</a><nav class="desktop-nav"><a class="navbtn" href="index.html">Hoje</a><a class="navbtn" href="alimentos.html">Alimentos</a><a class="navbtn active" href="receitas.html">Receitas</a><button class="navbtn" data-more onclick="openMore()">Mais</button></nav></div></header><main class="app"><section class="card soft"><h1 class="title">Receitas</h1><p class="subtitle">Espaço reservado para suas próximas ideias: receitas clicáveis, ingredientes e envio automático para o diário.</p></section><div class="grid grid2" id="recipeList"></div><p class="footer-note">Depois podemos ligar cada receita aos alimentos reais da base TACO para calcular os nutrientes automaticamente.</p></main><div class="more-menu" id="moreMenu"><a href="index.html">🏠 Hoje</a><a href="alimentos.html">🍎 Alimentos</a><a href="favoritos.html">⭐ Favoritos</a><a href="perfil.html">⚙️ Perfil</a></div><nav class="bottom-nav"><div class="bottom-nav-inner"><button onclick="location.href='index.html'">🏠<br>Hoje</button><button class="active">📖<br>Receitas</button><button data-more onclick="openMore()">☰<br>Mais</button></div></nav><script src="app.js"></script><script>
-const recipes=[{nome:'Prato básico brasileiro',tags:['almoço','equilibrado'],desc:'Arroz, feijão, frango e salada. Base simples para ajuste por gramas.',items:[['arroz',100],['feijao',100],['frango',120]]},{nome:'Lanche rápido',tags:['lanche','prático'],desc:'Banana com ovo cozido para uma refeição rápida.',items:[['banana',100],['ovo',50]]}];
-function renderRecipes(){document.getElementById('recipeList').innerHTML=recipes.map((r,i)=>`<div class="recipe"><h3>${r.nome}</h3><p class="subtitle">${r.desc}</p><p>${r.tags.map(t=>`<span class="badge">${t}</span>`).join(' ')}</p><button class="primary" onclick="addRecipe(${i})">Adicionar ingredientes ao diário</button></div>`).join('')}
-function addRecipe(i){recipes[i].items.forEach(([id,g])=>addDiary(id,'Almoço',g));alert('Receita adicionada ao diário.');}
-loadFoods().then(renderRecipes)</script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriVida - Receitas com TACO</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2f855a;
+      --primary-dark: #276749;
+      --soft-green: #e8f5ee;
+      --soft-blue: #eef6ff;
+      --soft-orange: #fff7ed;
+      --danger: #dc2626;
+      --shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .topbar {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 210px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: var(--soft-green);
+      display: grid;
+      place-items: center;
+      font-size: 23px;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    nav button {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    nav button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px 18px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #ffffff, #edf7f1);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .notice {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .toolbar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field { position: relative; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47, 133, 90, 0.13);
+    }
+
+    button { font-family: inherit; }
+
+    .btn {
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn.secondary:hover { background: #f9fafb; }
+
+    .btn.danger {
+      background: #fff;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .btn.danger:hover { background: #fff1f2; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 410px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .recipes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .recipe-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      min-height: 226px;
+    }
+
+    .recipe-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .recipe-title {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: var(--soft-green);
+      color: #276749;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.cafe { background: #fff7ed; color: #9a3412; }
+    .badge.almoco { background: #eef6ff; color: #1d4ed8; }
+    .badge.jantar { background: #f5f3ff; color: #6d28d9; }
+    .badge.lanche { background: #fdf2f8; color: #be185d; }
+
+    .recipe-desc {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+      margin: 0;
+      min-height: 42px;
+    }
+
+    .macro-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .macro {
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 9px;
+      text-align: center;
+    }
+
+    .macro strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .macro span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .side-panel {
+      position: sticky;
+      top: 92px;
+      padding: 16px;
+    }
+
+    .side-panel h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .empty {
+      color: var(--muted);
+      background: #f9fafb;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 18px;
+      line-height: 1.5;
+    }
+
+    .detail-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .detail-title h3 { margin: 0; }
+
+    .ingredients {
+      list-style: none;
+      margin: 12px 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .ingredients li {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #f9fafb;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .ingredients small {
+      display: block;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .nutrition-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    .nutrition-table th, .nutrition-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px;
+      text-align: left;
+    }
+
+    .nutrition-table th {
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .diary-box {
+      margin-top: 18px;
+      padding: 16px;
+    }
+
+    .diary-box h3 { margin: 0 0 10px; }
+
+    .diary-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .diary-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    .form-panel {
+      margin-top: 18px;
+      padding: 16px;
+    }
+
+    .form-panel h3 { margin: 0 0 12px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .ingredient-editor {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .ingredient-line {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.5fr) 90px 120px 90px 42px;
+      gap: 8px;
+      align-items: end;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fbfbfc;
+      position: relative;
+    }
+
+    .suggestions {
+      position: absolute;
+      left: 10px;
+      right: 260px;
+      top: 72px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.14);
+      z-index: 20;
+      overflow: hidden;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .suggestions button {
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .suggestions button:hover { background: #f8fafc; }
+
+    .suggestions small {
+      display: block;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .calc-box {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+    }
+
+    .calc-box h4 {
+      margin: 0 0 10px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .side-panel { position: static; }
+      .recipes-grid { grid-template-columns: 1fr; }
+      .suggestions { right: 10px; }
+    }
+
+    @media (max-width: 700px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      nav {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 2px;
+      }
+
+      nav button { flex: 0 0 auto; }
+
+      main { padding: 18px 12px 50px; }
+
+      .hero { padding: 18px; }
+      .hero h2 { font-size: 23px; }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+        padding: 13px;
+      }
+
+      .macro-row { grid-template-columns: repeat(2, 1fr); }
+
+      .form-grid { grid-template-columns: 1fr; }
+
+      .ingredient-line {
+        grid-template-columns: 1fr;
+      }
+
+      .suggestions {
+        position: static;
+        margin-top: 8px;
+      }
+
+      .btn { width: 100%; }
+
+      .actions { width: 100%; }
+      .actions .btn { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">🥗</div>
+        <div>
+          <h1>NutriVida</h1>
+          <small>Receitas integradas à base TACO</small>
+        </div>
+      </div>
+
+      <nav>
+        <button>Perfil / Diário</button>
+        <button>Alimentos</button>
+        <button class="active">Receitas</button>
+        <button>Favoritos</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>🍽️ Receitas com cálculo automático</h2>
+      <p>
+        Agora os ingredientes são buscados na base TACO. Ao selecionar um alimento, informar quantidade e medida,
+        o NutriVida calcula automaticamente calorias, proteínas, carboidratos, gorduras, fibras, cálcio, ferro, sódio e colesterol.
+      </p>
+      <div class="notice">
+        <b>Importante:</b> para usar sua base completa, coloque um arquivo chamado <b>taco.json</b> na mesma pasta deste HTML.
+        Se o arquivo não existir, esta tela usa uma mini-base de exemplo apenas para teste.
+      </div>
+      <div id="statusBase" class="status-pill">Carregando base de alimentos...</div>
+    </section>
+
+    <section class="toolbar">
+      <div class="field">
+        <label for="buscaReceita">Buscar receita</label>
+        <input id="buscaReceita" type="search" placeholder="Ex.: pão, frango, arroz, café..." />
+      </div>
+
+      <div class="field">
+        <label for="filtroTipo">Tipo de refeição</label>
+        <select id="filtroTipo">
+          <option value="">Todas</option>
+          <option value="cafe">Café da manhã</option>
+          <option value="almoco">Almoço</option>
+          <option value="jantar">Jantar</option>
+          <option value="lanche">Lanche</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="ordenarReceitas">Ordenar por</label>
+        <select id="ordenarReceitas">
+          <option value="nome">Nome</option>
+          <option value="kcal">Menor caloria</option>
+          <option value="proteina">Mais proteína</option>
+          <option value="carbo">Mais carboidrato</option>
+        </select>
+      </div>
+
+      <button class="btn secondary" onclick="limparFiltros()">Limpar</button>
+    </section>
+
+    <section class="layout">
+      <div>
+        <div id="listaReceitas" class="recipes-grid"></div>
+
+        <section class="card diary-box">
+          <h3>📘 Diário alimentar - teste</h3>
+          <p class="small-note">
+            Prévia local. Ao integrar com o NutriVida principal, este botão poderá lançar a receita no diário oficial com os ingredientes vinculados à TACO.
+          </p>
+          <div id="diarioLista" class="diary-list">
+            <div class="empty">Nenhuma receita adicionada ainda.</div>
+          </div>
+        </section>
+
+        <section class="card form-panel">
+          <h3>➕ Cadastrar receita usando TACO</h3>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Nome da receita</label>
+              <input id="novaNome" placeholder="Ex.: Pão com queijo branco" />
+            </div>
+
+            <div class="field">
+              <label>Tipo</label>
+              <select id="novaTipo">
+                <option value="cafe">Café da manhã</option>
+                <option value="almoco">Almoço</option>
+                <option value="jantar">Jantar</option>
+                <option value="lanche">Lanche</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label>Descrição</label>
+              <textarea id="novaDescricao" rows="2" placeholder="Ex.: Receita simples para café da manhã ou lanche."></textarea>
+            </div>
+
+            <div class="full">
+              <label class="small-note"><b>Ingredientes</b> — busque o alimento na TACO e escolha a medida</label>
+              <div id="editorIngredientes" class="ingredient-editor"></div>
+              <button class="btn secondary" style="margin-top:10px;" onclick="adicionarLinhaIngrediente()">Adicionar ingrediente</button>
+            </div>
+
+            <div class="full calc-box">
+              <h4>Resultado nutricional automático</h4>
+              <div id="previewNutrientes" class="macro-row"></div>
+              <p class="small-note">
+                Estes valores são calculados pela quantidade em gramas de cada ingrediente selecionado.
+              </p>
+            </div>
+
+            <div class="full actions">
+              <button class="btn" onclick="salvarNovaReceita()">Salvar receita</button>
+              <button class="btn secondary" onclick="resetarReceitas()">Restaurar exemplos</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside id="detalheReceita" class="card side-panel">
+        <div class="empty">
+          Clique em uma receita para visualizar ingredientes, medidas caseiras e informações nutricionais calculadas.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "nutrividareceitas_taco_v1";
+    const DIARY_KEY = "nutrividadiario_receitas_taco_teste_v1";
+
+    let alimentosTaco = [];
+    let receitas = [];
+    let diario = carregarDiario();
+    let receitaSelecionadaId = null;
+
+    const miniTaco = [
+      {
+        id: "taco_pao_frances",
+        nome: "Pão francês",
+        grupo: "Cereais e derivados",
+        energia_kcal: 300,
+        proteina_g: 8.0,
+        carboidrato_g: 58.6,
+        lipidios_g: 3.1,
+        fibra_g: 2.3,
+        calcio_mg: 16,
+        ferro_mg: 1.0,
+        sodio_mg: 648,
+        colesterol_mg: 0
+      },
+      {
+        id: "taco_manteiga",
+        nome: "Manteiga com sal",
+        grupo: "Leite e derivados",
+        energia_kcal: 726,
+        proteina_g: 0.4,
+        carboidrato_g: 0.1,
+        lipidios_g: 82.4,
+        fibra_g: 0,
+        calcio_mg: 9,
+        ferro_mg: 0,
+        sodio_mg: 579,
+        colesterol_mg: 200
+      },
+      {
+        id: "taco_queijo_branco",
+        nome: "Queijo minas frescal",
+        grupo: "Leite e derivados",
+        energia_kcal: 264,
+        proteina_g: 17.4,
+        carboidrato_g: 3.2,
+        lipidios_g: 20.2,
+        fibra_g: 0,
+        calcio_mg: 579,
+        ferro_mg: 0.2,
+        sodio_mg: 31,
+        colesterol_mg: 62
+      },
+      {
+        id: "taco_arroz_cozido",
+        nome: "Arroz branco cozido",
+        grupo: "Cereais e derivados",
+        energia_kcal: 128,
+        proteina_g: 2.5,
+        carboidrato_g: 28.1,
+        lipidios_g: 0.2,
+        fibra_g: 1.6,
+        calcio_mg: 4,
+        ferro_mg: 0.1,
+        sodio_mg: 1,
+        colesterol_mg: 0
+      },
+      {
+        id: "taco_feijao_cozido",
+        nome: "Feijão carioca cozido",
+        grupo: "Leguminosas",
+        energia_kcal: 76,
+        proteina_g: 4.8,
+        carboidrato_g: 13.6,
+        lipidios_g: 0.5,
+        fibra_g: 8.5,
+        calcio_mg: 27,
+        ferro_mg: 1.3,
+        sodio_mg: 2,
+        colesterol_mg: 0
+      },
+      {
+        id: "taco_frango_grelhado",
+        nome: "Frango peito grelhado",
+        grupo: "Carnes e derivados",
+        energia_kcal: 159,
+        proteina_g: 32.0,
+        carboidrato_g: 0,
+        lipidios_g: 2.5,
+        fibra_g: 0,
+        calcio_mg: 5,
+        ferro_mg: 0.3,
+        sodio_mg: 50,
+        colesterol_mg: 89
+      },
+      {
+        id: "taco_ovo",
+        nome: "Ovo de galinha inteiro",
+        grupo: "Ovos e derivados",
+        energia_kcal: 143,
+        proteina_g: 13.0,
+        carboidrato_g: 1.6,
+        lipidios_g: 8.9,
+        fibra_g: 0,
+        calcio_mg: 42,
+        ferro_mg: 1.6,
+        sodio_mg: 168,
+        colesterol_mg: 356
+      },
+      {
+        id: "taco_banana",
+        nome: "Banana prata",
+        grupo: "Frutas e derivados",
+        energia_kcal: 98,
+        proteina_g: 1.3,
+        carboidrato_g: 26.0,
+        lipidios_g: 0.1,
+        fibra_g: 2.0,
+        calcio_mg: 8,
+        ferro_mg: 0.4,
+        sodio_mg: 0,
+        colesterol_mg: 0
+      },
+      {
+        id: "taco_aveia",
+        nome: "Aveia em flocos",
+        grupo: "Cereais e derivados",
+        energia_kcal: 394,
+        proteina_g: 13.9,
+        carboidrato_g: 66.6,
+        lipidios_g: 8.5,
+        fibra_g: 9.1,
+        calcio_mg: 48,
+        ferro_mg: 4.4,
+        sodio_mg: 5,
+        colesterol_mg: 0
+      },
+      {
+        id: "taco_iogurte",
+        nome: "Iogurte natural integral",
+        grupo: "Leite e derivados",
+        energia_kcal: 51,
+        proteina_g: 4.1,
+        carboidrato_g: 1.9,
+        lipidios_g: 3.0,
+        fibra_g: 0,
+        calcio_mg: 143,
+        ferro_mg: 0.1,
+        sodio_mg: 52,
+        colesterol_mg: 14
+      }
+    ];
+
+    const medidasPadrao = [
+      { nome: "gramas", gramas: 1 },
+      { nome: "unidade pequena", gramas: 30 },
+      { nome: "unidade média", gramas: 50 },
+      { nome: "unidade grande", gramas: 80 },
+      { nome: "fatia fina", gramas: 15 },
+      { nome: "fatia média", gramas: 30 },
+      { nome: "colher de chá", gramas: 5 },
+      { nome: "colher de sobremesa", gramas: 10 },
+      { nome: "colher de sopa", gramas: 25 },
+      { nome: "concha pequena", gramas: 80 },
+      { nome: "concha média", gramas: 120 },
+      { nome: "xícara", gramas: 200 },
+      { nome: "copo", gramas: 200 },
+      { nome: "filé pequeno", gramas: 80 },
+      { nome: "filé médio", gramas: 120 },
+      { nome: "pote", gramas: 170 }
+    ];
+
+    function normalizarAlimento(item, idx) {
+      const pick = (...keys) => {
+        for (const key of keys) {
+          if (item[key] !== undefined && item[key] !== null && item[key] !== "") return item[key];
+        }
+        return 0;
+      };
+
+      return {
+        id: String(pick("id", "codigo", "Código", "numero", "Número") || ("alimento_" + idx)),
+        nome: String(pick("nome", "Nome", "descricao", "Descrição", "alimento", "Alimento") || "Alimento sem nome"),
+        grupo: String(pick("grupo", "Grupo", "categoria", "Categoria") || "Sem grupo"),
+        energia_kcal: numero(pick("energia_kcal", "kcal", "Energia_kcal", "Energia (kcal)", "energia")),
+        proteina_g: numero(pick("proteina_g", "proteina", "Proteína (g)", "Proteina(g)", "proteínas")),
+        carboidrato_g: numero(pick("carboidrato_g", "carboidrato", "Carboidrato (g)", "Carboidratos (g)", "carbo")),
+        lipidios_g: numero(pick("lipidios_g", "lipidios", "Lipídios (g)", "Gorduras (g)", "gordura")),
+        fibra_g: numero(pick("fibra_g", "fibra", "Fibra alimentar (g)", "Fibra (g)")),
+        calcio_mg: numero(pick("calcio_mg", "calcio", "Cálcio (mg)", "Calcio (mg)")),
+        ferro_mg: numero(pick("ferro_mg", "ferro", "Ferro (mg)")),
+        sodio_mg: numero(pick("sodio_mg", "sodio", "Sódio (mg)", "Sodio (mg)")),
+        colesterol_mg: numero(pick("colesterol_mg", "colesterol", "Colesterol (mg)"))
+      };
+    }
+
+    async function carregarBaseTaco() {
+      const status = document.getElementById("statusBase");
+
+      try {
+        const resp = await fetch("taco.json", { cache: "no-store" });
+        if (!resp.ok) throw new Error("Arquivo taco.json não encontrado.");
+        const json = await resp.json();
+        const lista = Array.isArray(json) ? json : (json.alimentos || json.data || json.items || []);
+        alimentosTaco = lista.map(normalizarAlimento);
+        status.textContent = "Base TACO carregada: " + alimentosTaco.length + " alimentos encontrados.";
+      } catch (e) {
+        alimentosTaco = miniTaco.map(normalizarAlimento);
+        status.textContent = "Usando mini-base de exemplo. Para a base completa, coloque taco.json na mesma pasta.";
+      }
+
+      receitas = carregarReceitas();
+      renderReceitas();
+      renderDiario();
+      atualizarPreviewNutrientes();
+    }
+
+    function receitasPadrao() {
+      return [
+        montarReceitaExemplo("Pão francês com manteiga", "cafe", "Opção simples para café da manhã.", [
+          ingExemplo("Pão francês", 1, "unidade média"),
+          ingExemplo("Manteiga com sal", 1, "colher de chá")
+        ]),
+        montarReceitaExemplo("Arroz, feijão e frango", "almoco", "Prato básico brasileiro, calculado por ingredientes.", [
+          ingExemplo("Arroz branco cozido", 3, "colher de sopa"),
+          ingExemplo("Feijão carioca cozido", 1, "concha pequena"),
+          ingExemplo("Frango peito grelhado", 1, "filé médio")
+        ]),
+        montarReceitaExemplo("Iogurte com banana e aveia", "lanche", "Lanche com fruta, fibra e boa saciedade.", [
+          ingExemplo("Iogurte natural integral", 1, "pote"),
+          ingExemplo("Banana prata", 1, "unidade média"),
+          ingExemplo("Aveia em flocos", 1, "colher de sopa")
+        ])
+      ];
+    }
+
+    function ingExemplo(nome, quantidade, medida) {
+      const alimento = alimentosTaco.find(a => a.nome.toLowerCase() === nome.toLowerCase()) || alimentosTaco[0];
+      const medidaObj = medidasPadrao.find(m => m.nome === medida) || medidasPadrao[0];
+      return {
+        alimentoId: alimento.id,
+        nome: alimento.nome,
+        quantidade,
+        medida,
+        gramasPorMedida: medidaObj.gramas,
+        gramasTotal: quantidade * medidaObj.gramas
+      };
+    }
+
+    function montarReceitaExemplo(nome, tipo, descricao, ingredientes) {
+      return {
+        id: gerarId(),
+        nome,
+        tipo,
+        descricao,
+        ingredientes,
+        nutrientes: calcularNutrientes(ingredientes)
+      };
+    }
+
+    function carregarReceitas() {
+      try {
+        const salvas = localStorage.getItem(STORAGE_KEY);
+        if (salvas) return JSON.parse(salvas);
+      } catch (e) {}
+      return receitasPadrao();
+    }
+
+    function salvarReceitas() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(receitas));
+    }
+
+    function carregarDiario() {
+      try {
+        return JSON.parse(localStorage.getItem(DIARY_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function salvarDiario() {
+      localStorage.setItem(DIARY_KEY, JSON.stringify(diario));
+    }
+
+    function tipoLabel(tipo) {
+      return {
+        cafe: "Café da manhã",
+        almoco: "Almoço",
+        jantar: "Jantar",
+        lanche: "Lanche"
+      }[tipo] || "Receita";
+    }
+
+    function calcularNutrientes(ingredientes) {
+      const total = {
+        kcal: 0,
+        proteina: 0,
+        carbo: 0,
+        gordura: 0,
+        fibra: 0,
+        calcio: 0,
+        ferro: 0,
+        sodio: 0,
+        colesterol: 0
+      };
+
+      ingredientes.forEach(ing => {
+        const alimento = alimentosTaco.find(a => a.id === ing.alimentoId);
+        if (!alimento) return;
+
+        const fator = numero(ing.gramasTotal) / 100;
+
+        total.kcal += alimento.energia_kcal * fator;
+        total.proteina += alimento.proteina_g * fator;
+        total.carbo += alimento.carboidrato_g * fator;
+        total.gordura += alimento.lipidios_g * fator;
+        total.fibra += alimento.fibra_g * fator;
+        total.calcio += alimento.calcio_mg * fator;
+        total.ferro += alimento.ferro_mg * fator;
+        total.sodio += alimento.sodio_mg * fator;
+        total.colesterol += alimento.colesterol_mg * fator;
+      });
+
+      return total;
+    }
+
+    function renderReceitas() {
+      const lista = document.getElementById("listaReceitas");
+      const busca = document.getElementById("buscaReceita").value.trim().toLowerCase();
+      const tipo = document.getElementById("filtroTipo").value;
+      const ordem = document.getElementById("ordenarReceitas").value;
+
+      let filtradas = receitas.filter(r => {
+        const texto = [
+          r.nome,
+          r.descricao,
+          ...(r.ingredientes || []).map(i => i.nome)
+        ].join(" ").toLowerCase();
+
+        return texto.includes(busca) && (!tipo || r.tipo === tipo);
+      });
+
+      filtradas.sort((a, b) => {
+        if (ordem === "kcal") return (a.nutrientes.kcal || 0) - (b.nutrientes.kcal || 0);
+        if (ordem === "proteina") return (b.nutrientes.proteina || 0) - (a.nutrientes.proteina || 0);
+        if (ordem === "carbo") return (b.nutrientes.carbo || 0) - (a.nutrientes.carbo || 0);
+        return a.nome.localeCompare(b.nome, "pt-BR");
+      });
+
+      if (!filtradas.length) {
+        lista.innerHTML = '<div class="empty">Nenhuma receita encontrada com os filtros atuais.</div>';
+        return;
+      }
+
+      lista.innerHTML = filtradas.map(r => `
+        <article class="card recipe-card">
+          <div class="recipe-head">
+            <div>
+              <h3 class="recipe-title">${escapeHtml(r.nome)}</h3>
+              <p class="recipe-desc">${escapeHtml(r.descricao || "")}</p>
+            </div>
+            <span class="badge ${r.tipo}">${tipoLabel(r.tipo)}</span>
+          </div>
+
+          <div class="macro-row">
+            <div class="macro"><strong>${fmt(r.nutrientes.kcal)}</strong><span>kcal</span></div>
+            <div class="macro"><strong>${fmt(r.nutrientes.proteina)}g</strong><span>proteína</span></div>
+            <div class="macro"><strong>${fmt(r.nutrientes.carbo)}g</strong><span>carbo</span></div>
+            <div class="macro"><strong>${fmt(r.nutrientes.gordura)}g</strong><span>gordura</span></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" onclick="verReceita('${r.id}')">Ver receita</button>
+            <button class="btn secondary" onclick="adicionarAoDiario('${r.id}')">Adicionar ao diário</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function verReceita(id) {
+      receitaSelecionadaId = id;
+      const r = receitas.find(item => item.id === id);
+      const detalhe = document.getElementById("detalheReceita");
+      if (!r) return;
+
+      r.nutrientes = calcularNutrientes(r.ingredientes || []);
+
+      detalhe.innerHTML = `
+        <div class="detail-title">
+          <div>
+            <h3>${escapeHtml(r.nome)}</h3>
+            <span class="badge ${r.tipo}">${tipoLabel(r.tipo)}</span>
+          </div>
+          <button class="btn danger" onclick="excluirReceita('${r.id}')">Excluir</button>
+        </div>
+
+        <p class="small-note">${escapeHtml(r.descricao || "")}</p>
+
+        <h4>Ingredientes vinculados à TACO</h4>
+        <ul class="ingredients">
+          ${(r.ingredientes || []).map(i => {
+            const alimento = alimentosTaco.find(a => a.id === i.alimentoId);
+            return `
+              <li>
+                <span>
+                  ${escapeHtml(i.nome)}
+                  <small>${escapeHtml(alimento ? alimento.grupo : "Alimento não encontrado")} • ${fmt(i.gramasTotal)} g</small>
+                </span>
+                <strong>${escapeHtml(i.quantidade)} ${escapeHtml(i.medida)}</strong>
+              </li>
+            `;
+          }).join("")}
+        </ul>
+
+        <h4>Nutrição total calculada</h4>
+        ${tabelaNutrientes(r.nutrientes)}
+
+        <div class="actions" style="margin-top:14px;">
+          <button class="btn" onclick="adicionarAoDiario('${r.id}')">➕ Adicionar ao diário</button>
+        </div>
+      `;
+    }
+
+    function tabelaNutrientes(n) {
+      return `
+        <table class="nutrition-table">
+          <thead><tr><th>Nutriente</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td>Energia</td><td>${fmt(n.kcal)} kcal</td></tr>
+            <tr><td>Proteínas</td><td>${fmt(n.proteina)} g</td></tr>
+            <tr><td>Carboidratos</td><td>${fmt(n.carbo)} g</td></tr>
+            <tr><td>Gorduras</td><td>${fmt(n.gordura)} g</td></tr>
+            <tr><td>Fibras</td><td>${fmt(n.fibra)} g</td></tr>
+            <tr><td>Cálcio</td><td>${fmt(n.calcio)} mg</td></tr>
+            <tr><td>Ferro</td><td>${fmt(n.ferro)} mg</td></tr>
+            <tr><td>Sódio</td><td>${fmt(n.sodio)} mg</td></tr>
+            <tr><td>Colesterol</td><td>${fmt(n.colesterol)} mg</td></tr>
+          </tbody>
+        </table>
+      `;
+    }
+
+    function adicionarAoDiario(id) {
+      const r = receitas.find(item => item.id === id);
+      if (!r) return;
+
+      r.nutrientes = calcularNutrientes(r.ingredientes || []);
+
+      diario.unshift({
+        id: gerarId(),
+        receitaId: r.id,
+        nome: r.nome,
+        tipo: r.tipo,
+        ingredientes: r.ingredientes,
+        nutrientes: r.nutrientes,
+        data: new Date().toLocaleString("pt-BR")
+      });
+
+      salvarDiario();
+      renderDiario();
+      alert("Receita adicionada ao diário!");
+    }
+
+    function renderDiario() {
+      const box = document.getElementById("diarioLista");
+
+      if (!diario.length) {
+        box.innerHTML = '<div class="empty">Nenhuma receita adicionada ainda.</div>';
+        return;
+      }
+
+      box.innerHTML = diario.map(item => `
+        <div class="diary-item">
+          <div>
+            <strong>${escapeHtml(item.nome)}</strong><br>
+            <span class="small-note">${tipoLabel(item.tipo)} • ${escapeHtml(item.data)}</span>
+          </div>
+          <div>
+            <strong>${fmt(item.nutrientes.kcal)} kcal</strong>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function adicionarLinhaIngrediente(dados = {}) {
+      const editor = document.getElementById("editorIngredientes");
+      const div = document.createElement("div");
+      div.className = "ingredient-line";
+      div.dataset.alimentoId = dados.alimentoId || "";
+
+      div.innerHTML = `
+        <div class="field">
+          <label>Alimento TACO</label>
+          <input class="ingBusca" placeholder="Digite para buscar..." value="${escapeAttr(dados.nome || "")}" autocomplete="off">
+          <div class="suggestions"></div>
+        </div>
+
+        <div class="field">
+          <label>Qtd.</label>
+          <input class="ingQtd" type="number" min="0" step="0.1" value="${escapeAttr(dados.quantidade || 1)}">
+        </div>
+
+        <div class="field">
+          <label>Medida</label>
+          <select class="ingMedida">
+            ${medidasPadrao.map(m => `<option value="${m.nome}" ${dados.medida === m.nome ? "selected" : ""}>${m.nome}</option>`).join("")}
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Gramas</label>
+          <input class="ingGramas" type="number" min="0" step="0.1" value="${escapeAttr(dados.gramasTotal || "")}" placeholder="auto">
+        </div>
+
+        <button class="btn danger" onclick="this.parentElement.remove(); atualizarPreviewNutrientes()">X</button>
+      `;
+
+      const busca = div.querySelector(".ingBusca");
+      const suggestions = div.querySelector(".suggestions");
+      const qtd = div.querySelector(".ingQtd");
+      const medida = div.querySelector(".ingMedida");
+      const gramas = div.querySelector(".ingGramas");
+
+      busca.addEventListener("input", () => mostrarSugestoes(div, busca.value));
+      busca.addEventListener("focus", () => mostrarSugestoes(div, busca.value));
+      qtd.addEventListener("input", () => atualizarGramasLinha(div));
+      medida.addEventListener("change", () => atualizarGramasLinha(div));
+      gramas.addEventListener("input", atualizarPreviewNutrientes);
+
+      document.addEventListener("click", (ev) => {
+        if (!div.contains(ev.target)) suggestions.style.display = "none";
+      });
+
+      editor.appendChild(div);
+
+      if (!dados.gramasTotal) atualizarGramasLinha(div);
+    }
+
+    function mostrarSugestoes(linha, termo) {
+      const box = linha.querySelector(".suggestions");
+      termo = termo.trim().toLowerCase();
+
+      if (termo.length < 2) {
+        box.style.display = "none";
+        return;
+      }
+
+      const resultados = alimentosTaco
+        .filter(a => a.nome.toLowerCase().includes(termo))
+        .slice(0, 20);
+
+      if (!resultados.length) {
+        box.innerHTML = `<button type="button">Nenhum alimento encontrado</button>`;
+        box.style.display = "block";
+        return;
+      }
+
+      box.innerHTML = resultados.map(a => `
+        <button type="button" onclick="selecionarAlimento(this, '${escapeJs(a.id)}')">
+          <b>${escapeHtml(a.nome)}</b>
+          <small>${escapeHtml(a.grupo)} • ${fmt(a.energia_kcal)} kcal/100g • Prot. ${fmt(a.proteina_g)}g</small>
+        </button>
+      `).join("");
+
+      box.style.display = "block";
+    }
+
+    function selecionarAlimento(botao, alimentoId) {
+      const linha = botao.closest(".ingredient-line");
+      const alimento = alimentosTaco.find(a => a.id === alimentoId);
+      if (!alimento) return;
+
+      linha.dataset.alimentoId = alimento.id;
+      linha.querySelector(".ingBusca").value = alimento.nome;
+      linha.querySelector(".suggestions").style.display = "none";
+      atualizarGramasLinha(linha);
+    }
+
+    function atualizarGramasLinha(linha) {
+      const qtd = numero(linha.querySelector(".ingQtd").value);
+      const medidaNome = linha.querySelector(".ingMedida").value;
+      const medida = medidasPadrao.find(m => m.nome === medidaNome) || medidasPadrao[0];
+      linha.querySelector(".ingGramas").value = arred(qtd * medida.gramas);
+      atualizarPreviewNutrientes();
+    }
+
+    function coletarIngredientesFormulario() {
+      return [...document.querySelectorAll(".ingredient-line")].map(linha => {
+        const alimentoId = linha.dataset.alimentoId;
+        const alimento = alimentosTaco.find(a => a.id === alimentoId);
+        const quantidade = numero(linha.querySelector(".ingQtd").value);
+        const medida = linha.querySelector(".ingMedida").value;
+        const gramasTotal = numero(linha.querySelector(".ingGramas").value);
+
+        if (!alimento || !quantidade || !gramasTotal) return null;
+
+        return {
+          alimentoId: alimento.id,
+          nome: alimento.nome,
+          quantidade,
+          medida,
+          gramasPorMedida: gramasTotal / quantidade,
+          gramasTotal
+        };
+      }).filter(Boolean);
+    }
+
+    function atualizarPreviewNutrientes() {
+      const ingredientes = coletarIngredientesFormulario();
+      const n = calcularNutrientes(ingredientes);
+      const box = document.getElementById("previewNutrientes");
+
+      box.innerHTML = `
+        <div class="macro"><strong>${fmt(n.kcal)}</strong><span>kcal</span></div>
+        <div class="macro"><strong>${fmt(n.proteina)}g</strong><span>proteína</span></div>
+        <div class="macro"><strong>${fmt(n.carbo)}g</strong><span>carbo</span></div>
+        <div class="macro"><strong>${fmt(n.gordura)}g</strong><span>gordura</span></div>
+        <div class="macro"><strong>${fmt(n.fibra)}g</strong><span>fibra</span></div>
+        <div class="macro"><strong>${fmt(n.sodio)}mg</strong><span>sódio</span></div>
+        <div class="macro"><strong>${fmt(n.calcio)}mg</strong><span>cálcio</span></div>
+        <div class="macro"><strong>${fmt(n.colesterol)}mg</strong><span>colesterol</span></div>
+      `;
+    }
+
+    function salvarNovaReceita() {
+      const nome = document.getElementById("novaNome").value.trim();
+      if (!nome) {
+        alert("Informe o nome da receita.");
+        return;
+      }
+
+      const ingredientes = coletarIngredientesFormulario();
+
+      if (!ingredientes.length) {
+        alert("Selecione pelo menos um alimento da TACO nos ingredientes.");
+        return;
+      }
+
+      const nova = {
+        id: gerarId(),
+        nome,
+        tipo: document.getElementById("novaTipo").value,
+        descricao: document.getElementById("novaDescricao").value.trim(),
+        ingredientes,
+        nutrientes: calcularNutrientes(ingredientes)
+      };
+
+      receitas.unshift(nova);
+      salvarReceitas();
+      limparFormulario();
+      renderReceitas();
+      verReceita(nova.id);
+      alert("Receita salva com cálculo automático!");
+    }
+
+    function limparFormulario() {
+      document.getElementById("novaNome").value = "";
+      document.getElementById("novaTipo").value = "cafe";
+      document.getElementById("novaDescricao").value = "";
+      document.getElementById("editorIngredientes").innerHTML = "";
+      adicionarLinhaIngrediente();
+      adicionarLinhaIngrediente();
+      atualizarPreviewNutrientes();
+    }
+
+    function limparFiltros() {
+      document.getElementById("buscaReceita").value = "";
+      document.getElementById("filtroTipo").value = "";
+      document.getElementById("ordenarReceitas").value = "nome";
+      renderReceitas();
+    }
+
+    function excluirReceita(id) {
+      if (!confirm("Excluir esta receita?")) return;
+      receitas = receitas.filter(r => r.id !== id);
+      salvarReceitas();
+      renderReceitas();
+      document.getElementById("detalheReceita").innerHTML = `
+        <div class="empty">Receita excluída. Clique em outra receita para visualizar os detalhes.</div>`;
+    }
+
+    function resetarReceitas() {
+      if (!confirm("Restaurar receitas de exemplo? Isso apaga receitas cadastradas nesta tela.")) return;
+      receitas = receitasPadrao();
+      diario = [];
+      salvarReceitas();
+      salvarDiario();
+      renderReceitas();
+      renderDiario();
+      document.getElementById("detalheReceita").innerHTML = `
+        <div class="empty">Clique em uma receita para visualizar ingredientes, medidas caseiras e informações nutricionais calculadas.</div>`;
+    }
+
+    function numero(valor) {
+      if (valor === null || valor === undefined || valor === "") return 0;
+      if (typeof valor === "number") return isNaN(valor) ? 0 : valor;
+      const limpo = String(valor)
+        .replace(",", ".")
+        .replace(/[^\d.-]/g, "");
+      const n = Number(limpo);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function arred(n) {
+      return Math.round((Number(n) || 0) * 10) / 10;
+    }
+
+    function fmt(valor) {
+      const n = arred(valor);
+      return Number.isInteger(n) ? String(n) : String(n).replace(".", ",");
+    }
+
+    function gerarId() {
+      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+    }
+
+    function escapeHtml(texto) {
+      return String(texto ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(texto) {
+      return escapeHtml(texto).replaceAll("`", "&#096;");
+    }
+
+    function escapeJs(texto) {
+      return String(texto).replaceAll("\\", "\\\\").replaceAll("'", "\\'");
+    }
+
+    document.getElementById("buscaReceita").addEventListener("input", renderReceitas);
+    document.getElementById("filtroTipo").addEventListener("change", renderReceitas);
+    document.getElementById("ordenarReceitas").addEventListener("change", renderReceitas);
+
+    carregarBaseTaco().then(() => {
+      adicionarLinhaIngrediente();
+      adicionarLinhaIngrediente();
+    });
+  </script>
+</body>
+</html>
