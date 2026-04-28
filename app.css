@@ -98,3 +98,24 @@
 .micro-card.excesso .micro-percent{background:#fee2e2;color:#991b1b;font-weight:900}
 .micro-card.atenção .micro-percent{background:#fef3c7;color:#854d0e;font-weight:900}
 .micro-excess-note{grid-column:1/-1;border:1px solid #fecaca;background:#fff1f2;color:#7f1d1d;border-radius:16px;padding:12px 14px;font-size:.92rem;line-height:1.35}
+
+
+/* Upgrade: refeição automática */
+.meal-head-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.auto-meal-modal{max-width:720px}
+.auto-meal-note{background:#f1f8e9;border:1px solid #dcefcf;border-radius:16px;padding:12px 14px;margin-bottom:12px;color:#335c24}
+.auto-meal-list{display:grid;gap:10px;margin:12px 0}
+.auto-meal-item{display:flex;justify-content:space-between;gap:14px;align-items:center;background:#fff;border:1px solid #e8ece8;border-radius:18px;padding:14px}
+.auto-meal-item b{display:inline-block;margin-bottom:4px;color:#2f6b36}
+.auto-meal-item span{display:block;font-weight:700}
+.auto-meal-item small{display:block;color:#66706a;margin-top:3px}
+.auto-grams{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.auto-grams input{width:82px;border:1px solid #d8ddd8;border-radius:12px;padding:10px;font-size:15px;background:#fafafa}
+.auto-meal-totals{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.auto-meal-totals span{background:#f6f7f6;border:1px solid #e1e5e1;border-radius:999px;padding:8px 10px;font-weight:700;color:#36453a}
+@media(max-width:720px){
+  .meal-head-actions{width:100%;justify-content:stretch}
+  .meal-head-actions button{flex:1}
+  .auto-meal-item{align-items:flex-start;flex-direction:column}
+  .auto-grams input{width:110px}
+}

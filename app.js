@@ -210,7 +210,7 @@ function label(k){return {kcal:'Calorias',proteina:'Proteínas',carbo:'Carboidra
 function unit(k){return {kcal:' kcal',proteina:' g',carbo:' g',gordura:' g',fibra:' g',calcio:' mg',ferro:' mg',vitc:' mg',retinol:' mcg',zinco:' mg',colesterol:' mg'}[k]||''}
 function renderMissing(){const el=document.getElementById('missingList');if(!el)return;const t=calcTotals();const keys=['kcal','proteina','carbo','gordura','fibra'];const profileMsg=profileIsComplete()?'' : `<div class="meal warning"><div><b>Complete seu perfil</b><br><small>Use idade, peso, altura e objetivo para calcular metas personalizadas.</small></div><a class="pill" href="perfil.html">Editar perfil</a></div>`;el.innerHTML=profileMsg+keys.map(k=>{const meta=NV.targets[k];const falta=Math.max(0,meta-t[k]);const passou=Math.max(0,t[k]-meta);let texto=falta>0?`Faltam aproximadamente ${fmt(falta,k==='kcal'?0:1)}${unit(k)}`:(passou>0?`Meta atingida • passou ${fmt(passou,k==='kcal'?0:1)}${unit(k)}`:'Meta atingida');return `<div class="meal"><div><b>${label(k)}</b><br><small>${texto}</small></div><span class="pill">${pct(t[k],meta)}%</span></div>`}).join('')}
 function renderMicros(){const el=document.getElementById('microCards');if(!el)return;const t=calcTotals();const keys=['vitc','calcio','ferro','retinol','zinco'];el.innerHTML=keys.map(k=>{const meta=NV.targets[k]||0;const atual=t[k]||0;const p=pct(atual,meta);let status='baixo';let msg='Abaixo da meta';if(p>=100){status='ok';msg='Meta atingida';}else if(p>=70){status='medio';msg='Perto da meta';}return `<div class="micro-card ${status}"><div><span>${label(k)}</span><b>${fmt(atual,k==='retinol'?0:1)}${unit(k)}</b><small>${msg} • meta ${fmt(meta,k==='retinol'?0:1)}${unit(k)}</small></div><div class="micro-percent">${p}%</div><div class="progress"><div class="bar" style="width:${p}%"></div></div></div>`}).join('')}
-function renderMeals(){const el=document.getElementById('mealList');if(!el)return;const d=diaryToday();el.innerHTML=NV.meals.map(m=>{const itens=d.filter(x=>x.meal===m);const totals=calcTotals(itens);const itemHtml=itens.map(x=>{const f=byId(x.foodId)||x.food||{};const q=(Number(x.grams)||100)/100;return `<div class="diary-item"><div class="diary-main"><b>${f.nome||'Alimento'}</b><small>${fmt(num(f.kcal)*q)} kcal • ${fmt(num(f.proteina)*q,1)}g proteína • ${fmt(num(f.carbo)*q,1)}g carbo • ${fmt(num(f.gordura)*q,1)}g gordura</small></div><div class="diary-actions"><input type="number" min="1" value="${Number(x.grams)||100}" onchange="updateDiaryGrams('${x.id}',this.value)" title="gramas"><span>g</span><button class="danger-btn" onclick="removeDiary('${x.id}')">Remover</button></div></div>`}).join('');return `<div class="meal meal-block"><div class="meal-head"><div><h3>${m}</h3><small>${itens.length} item(ns) • ${fmt(totals.kcal)} kcal • ${fmt(totals.proteina,1)}g proteína</small></div><button class="ghost" onclick="openAdd('${m}')">+ Adicionar</button></div>${itens.length?`<div class="diary-list">${itemHtml}</div>`:'<div class="empty meal-empty">Nenhum alimento lançado nesta refeição.</div>'}</div>`}).join('')}
+function renderMeals(){const el=document.getElementById('mealList');if(!el)return;const d=diaryToday();el.innerHTML=NV.meals.map(m=>{const itens=d.filter(x=>x.meal===m);const totals=calcTotals(itens);const itemHtml=itens.map(x=>{const f=byId(x.foodId)||x.food||{};const q=(Number(x.grams)||100)/100;return `<div class="diary-item"><div class="diary-main"><b>${f.nome||'Alimento'}</b><small>${fmt(num(f.kcal)*q)} kcal • ${fmt(num(f.proteina)*q,1)}g proteína • ${fmt(num(f.carbo)*q,1)}g carbo • ${fmt(num(f.gordura)*q,1)}g gordura</small></div><div class="diary-actions"><input type="number" min="1" value="${Number(x.grams)||100}" onchange="updateDiaryGrams('${x.id}',this.value)" title="gramas"><span>g</span><button class="danger-btn" onclick="removeDiary('${x.id}')">Remover</button></div></div>`}).join('');return `<div class="meal meal-block"><div class="meal-head"><div><h3>${m}</h3><small>${itens.length} item(ns) • ${fmt(totals.kcal)} kcal • ${fmt(totals.proteina,1)}g proteína</small></div><div class="meal-head-actions"><button class="ghost" onclick="openAutoMeal('${m}')">✨ Montar refeição</button><button class="ghost" onclick="openAdd('${m}')">+ Adicionar</button></div></div>${itens.length?`<div class="diary-list">${itemHtml}</div>`:'<div class="empty meal-empty">Nenhum alimento lançado nesta refeição.</div>'}</div>`}).join('')}
 function openAdd(meal='Almoço', foodId=''){
   const b=document.getElementById('addModal');
   if(!b)return;
@@ -344,6 +344,93 @@ function renderSmartSuggestions(){
     const reasonText=reason ? `Boa fonte de ${reason}` : 'Pode ajudar a completar o dia';
     return `<div class="suggestion-card"><div class="suggestion-top"><div><h3>${food.nome}</h3><small>${food.grupo||'Alimento'} • ${reasonText}</small></div><span class="pill">${fmt(food.kcal)} kcal</span></div><div class="suggestion-metas"><span>${fmt(food.proteina,1)}g prot.</span><span>${fmt(food.fibra,1)}g fibras</span><span>${fmt(food.ferro,1)}mg ferro</span><span>${fmt(food.vitc,1)}mg vit. C</span></div><div class="toolbar suggestion-actions"><button class="primary" onclick="openAdd('Almoço','${food.id}')">Adicionar</button><button class="ghost" onclick="openFoodDetail('${food.id}')">Ver ficha</button></div></div>`;
   }).join('');
+}
+
+
+/* =========================================================
+   Upgrade: Refeição automática
+   Monta uma combinação simples conforme a refeição e o que falta no dia.
+   ========================================================= */
+let currentAutoMealPlan=[];
+function normTxt(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function hasAny(txt, words){txt=normTxt(txt);return words.some(w=>txt.includes(normTxt(w)));}
+function mealSlots(meal){
+  const m=normTxt(meal);
+  if(m.includes('cafe')) return [
+    {name:'Proteína', grams:80, words:['ovo','iogurte','leite','queijo','ricota','coalhada']},
+    {name:'Carboidrato', grams:80, words:['aveia','pao','pão','tapioca','cuscuz','banana','mandioca','batata']},
+    {name:'Fruta ou fibra', grams:100, words:['banana','maca','maçã','mamao','mamão','laranja','morango','abacate','fruta']}
+  ];
+  if(m.includes('lanche')) return [
+    {name:'Fruta', grams:100, words:['banana','maca','maçã','mamao','mamão','laranja','morango','fruta']},
+    {name:'Proteína leve', grams:100, words:['iogurte','leite','ovo','queijo','ricota']},
+    {name:'Complemento', grams:40, words:['aveia','castanha','amendoim','granola','pao','pão']}
+  ];
+  return [
+    {name:'Proteína', grams:100, words:['frango','carne','peixe','ovo','patinho','tilapia','tilápia','sardinha','atum','suino','suíno','porco']},
+    {name:'Carboidrato', grams:120, words:['arroz','batata','mandioca','macarrao','macarrão','cuscuz','milho','inhame']},
+    {name:'Fibra e micronutrientes', grams:100, words:['feijao','feijão','lentilha','grao','grão','brocolis','brócolis','couve','alface','cenoura','abobora','abóbora','verdura','hortalica','hortaliça']}
+  ];
+}
+function autoMealMissing(){
+  const t=calcTotals(), tar=NV.targets;
+  const keys=['kcal','proteina','carbo','gordura','fibra','vitc','calcio','ferro','retinol','zinco'];
+  const m={}; keys.forEach(k=>m[k]=Math.max(0,(tar[k]||0)-(t[k]||0)));
+  return m;
+}
+function autoMealFoodScore(food, slot, missing){
+  const txt=`${food.nome} ${food.grupo}`;
+  let score=hasAny(txt,slot.words)?80:0;
+  if(!score) return 0;
+  score += Math.min(30, num(food.proteina)*1.2) * (missing.proteina>0?1.2:.4);
+  score += Math.min(20, num(food.fibra)*2) * (missing.fibra>0?1.2:.5);
+  score += Math.min(14, num(food.ferro)*4) * (missing.ferro>0?1:.3);
+  score += Math.min(14, num(food.vitc)/8) * (missing.vitc>0?1:.2);
+  score += Math.min(10, num(food.calcio)/120) * (missing.calcio>0?1:.2);
+  if(missing.kcal<250 && num(food.kcal)>350) score-=20;
+  if(num(food.gordura)>30) score-=10;
+  if(hasAny(txt,['preparado','industrializado','frito','doce','refrigerante','bebida alcoólica','alcoolica'])) score-=25;
+  return score;
+}
+function buildAutoMealPlan(meal){
+  const missing=autoMealMissing();
+  const chosen=[];
+  mealSlots(meal).forEach(slot=>{
+    const best=(NV.foods||[])
+      .filter(f=>f && f.nome && !chosen.some(c=>String(c.food.id)===String(f.id)))
+      .map(f=>({food:f, slot:slot.name, grams:slot.grams, score:autoMealFoodScore(f,slot,missing)}))
+      .filter(x=>x.score>0)
+      .sort((a,b)=>b.score-a.score)[0];
+    if(best) chosen.push(best);
+  });
+  return chosen;
+}
+function openAutoMeal(meal='Almoço'){
+  if(!NV.foods || !NV.foods.length){alert('A base de alimentos ainda está carregando.');return;}
+  currentAutoMealPlan=buildAutoMealPlan(meal);
+  const modal=document.getElementById('autoMealModal');
+  const body=document.getElementById('autoMealBody');
+  const title=document.getElementById('autoMealTitle');
+  if(!modal||!body) return;
+  title.textContent=`Sugestão para ${meal}`;
+  if(!currentAutoMealPlan.length){
+    body.innerHTML='<div class="empty">Não encontrei uma combinação automática boa agora. Tente adicionar manualmente ou verificar se a base TACO carregou corretamente.</div>';
+  } else {
+    const totals=currentAutoMealPlan.reduce((a,x)=>{const q=(Number(x.grams)||100)/100;['kcal','proteina','carbo','gordura','fibra','ferro','vitc'].forEach(k=>a[k]+=num(x.food[k])*q);return a;},{kcal:0,proteina:0,carbo:0,gordura:0,fibra:0,ferro:0,vitc:0});
+    body.innerHTML=`<div class="auto-meal-note"><b>Ideia equilibrada:</b> proteína + carboidrato + fibras/micronutrientes. Ajuste as gramas se quiser antes de adicionar.</div><div class="auto-meal-list">${currentAutoMealPlan.map((x,i)=>`<div class="auto-meal-item"><div><b>${x.slot}</b><br><span>${x.food.nome}</span><small>${x.food.grupo||'Alimento'} • ${fmt(x.food.kcal)} kcal/100g</small></div><div class="auto-grams"><input type="number" min="1" value="${x.grams}" onchange="updateAutoMealGram(${i},this.value)"><span>g</span></div></div>`).join('')}</div><div class="auto-meal-totals"><span>${fmt(totals.kcal)} kcal</span><span>${fmt(totals.proteina,1)}g prot.</span><span>${fmt(totals.carbo,1)}g carbo</span><span>${fmt(totals.fibra,1)}g fibras</span></div>`;
+  }
+  modal.dataset.meal=meal;
+  modal.classList.add('open');
+}
+function updateAutoMealGram(i,v){
+  if(currentAutoMealPlan[i]) currentAutoMealPlan[i].grams=Math.max(1,Number(v)||100);
+}
+function closeAutoMeal(){document.getElementById('autoMealModal')?.classList.remove('open')}
+function addAutoMealToDiary(){
+  const meal=document.getElementById('autoMealModal')?.dataset.meal || 'Almoço';
+  if(!currentAutoMealPlan.length) return;
+  currentAutoMealPlan.forEach(x=>addDiary(x.food.id,meal,x.grams));
+  closeAutoMeal();
 }
 
 const nutrientDefs=[
