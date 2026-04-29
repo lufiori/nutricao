@@ -5,6 +5,42 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriVida - Alimentos TBCA</title>
 <link rel="stylesheet" href="app.css?v=alimentos-leve1">
+
+<!-- ALTERAÇÃO: UI melhorada -->
+<style>
+.food-row-simple{
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.food-row-simple h3{
+  margin:0;
+  font-size:0.95rem;
+  font-weight:600;
+}
+
+.food-row-simple:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(31,41,51,.12);
+}
+
+.food-row-simple:hover h3{
+  text-decoration:underline;
+}
+
+.food-row-simple::after{
+  content:"👁️";
+  font-size:18px;
+  opacity:.6;
+}
+
+.food-row-simple:hover::after{
+  opacity:1;
+}
+</style>
+
+
+
 </head>
 <body>
 <header class="topbar">
