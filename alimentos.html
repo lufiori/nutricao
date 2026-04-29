@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriVida - Alimentos TBCA</title>
-<link rel="stylesheet" href="app.css?v=tbca-pro">
+<link rel="stylesheet" href="app.css?v=alimentos-leve1">
 </head>
 <body>
 <header class="topbar">
@@ -24,29 +24,43 @@
   <section class="card soft">
     <h1 class="title">Alimentos</h1>
     <p class="subtitle">
-      Base TBCA normalizada para o NutriVida, com nutrientes por 100g e medidas caseiras.
+      Busca leve na base TBCA. A lista só aparece depois de pesquisar, para deixar o sistema rápido mesmo com a base grande.
     </p>
     <div class="pill" id="tbcaStatus" style="margin-top:12px">Carregando tbca_pronto.json...</div>
   </section>
 
-  <div class="toolbar">
-    <input class="search" id="qFood" placeholder="Buscar alimento na TBCA..." oninput="renderFoodsTBCA()">
-    <select class="search" id="groupFood" onchange="renderFoodsTBCA()">
-      <option value="">Todos os grupos</option>
-    </select>
-    <select class="search" id="sortFood" onchange="renderFoodsTBCA()">
-      <option value="nome">Ordenar por nome</option>
-      <option value="kcal">Menor caloria</option>
-      <option value="proteina">Mais proteína</option>
-      <option value="carbo">Mais carboidrato</option>
-      <option value="fibra">Mais fibra</option>
-      <option value="colesterol">Mais colesterol</option>
-    </select>
-    <button class="ghost" onclick="clearFoodFilters()">Limpar</button>
-  </div>
+  <section class="food-search-shell">
+    <div class="card food-search-card">
+      <div class="food-search-form">
+        <div>
+          <label>Alimento</label>
+          <input class="search" id="qFood" placeholder="Informe o nome do alimento ou parte dele..." onkeydown="if(event.key==='Enter') buscarAlimentos()">
+        </div>
 
-  <section class="tbca-layout">
-    <div id="foodList" class="food-grid"></div>
+        <div>
+          <label>Grupo</label>
+          <select class="search" id="groupFood">
+            <option value="">Todos os grupos</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Tipo de alimento</label>
+          <select class="search" id="typeFood">
+            <option value="">Todos os tipos</option>
+          </select>
+        </div>
+
+        <button class="primary" onclick="buscarAlimentos()">Buscar</button>
+      </div>
+    </div>
+
+    <div id="foodResultsBox" class="card food-search-card">
+      <div class="empty food-empty-start">
+        <b>Busque um alimento para começar</b>
+        Digite parte do nome, escolha filtros se quiser, e clique em Buscar.
+      </div>
+    </div>
   </section>
 </main>
 
@@ -90,20 +104,37 @@
   </div>
 </div>
 
-<script src="app.js?v=tbca-pro"></script>
+<script src="app.js?v=alimentos-leve1"></script>
 <script>
 let tbcaFoods = [];
 let selectedFoodId = null;
+let ultimaBusca = [];
 
 function normalizeText(v){
   return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();
 }
+
 function n(v){ return Number(v ?? 0) || 0; }
-function fmtTBCA(v,d=1){ return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d}); }
+
+function fmtTBCA(v,d=1){
+  return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d});
+}
+
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 function uid(){ return Date.now()+Math.floor(Math.random()*99999); }
-function esc(v){ return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
-function jsEsc(v){ return String(v).replaceAll("\\\\","\\\\\\\\").replaceAll("'","\\\\'"); }
+
+function esc(v){
+  return String(v??'')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function jsEsc(v){
+  return String(v).replaceAll("\\\\","\\\\\\\\").replaceAll("'","\\\\'");
+}
 
 function foodNutrients(food){ return food?.nutrientes100g || {}; }
 function measureNutrients(measure){ return measure?.nutrientes || {}; }
@@ -138,84 +169,96 @@ async function loadTBCA(){
     const json = await r.json();
     tbcaFoods = Array.isArray(json) ? json : (json.alimentos || []);
     tbcaFoods = tbcaFoods.filter(f=>f && f.nome);
-    status.textContent = `Base TBCA carregada: ${tbcaFoods.length} alimentos. Ex.: ${tbcaFoods[0]?.nome || ''}`;
-    populateGroups();
-    renderFoodsTBCA();
+
+    status.textContent = `Base TBCA carregada: ${tbcaFoods.length} alimentos disponíveis.`;
+
+    populateFilters();
   }catch(e){
-    status.textContent = 'Não encontrei tbca_pronto.json. Rode converter_tbca.py e coloque tbca_pronto.json nesta pasta.';
-    document.getElementById('foodList').innerHTML = '<div class="empty">tbca_pronto.json não encontrado.</div>';
+    status.textContent = 'Não encontrei tbca_pronto.json. Coloque o arquivo na mesma pasta deste alimentos.html.';
+    document.getElementById('foodResultsBox').innerHTML = '<div class="empty">tbca_pronto.json não encontrado.</div>';
   }
 }
 
-function populateGroups(){
-  const sel = document.getElementById('groupFood');
+function populateFilters(){
+  const groupSel = document.getElementById('groupFood');
+  const typeSel = document.getElementById('typeFood');
+
   const groups = [...new Set(tbcaFoods.map(f=>f.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  sel.innerHTML = '<option value="">Todos os grupos</option>' + groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+  const types = [...new Set(tbcaFoods.map(f=>f.tipo_alimento).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+
+  groupSel.innerHTML = '<option value="">Todos os grupos</option>' + groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+  typeSel.innerHTML = '<option value="">Todos os tipos</option>' + types.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
 }
 
-function renderFoodsTBCA(){
+function buscarAlimentos(){
   const q = normalizeText(document.getElementById('qFood').value);
   const group = document.getElementById('groupFood').value;
-  const sort = document.getElementById('sortFood').value;
+  const type = document.getElementById('typeFood').value;
 
-  let list = tbcaFoods.filter(f=>{
-    const txt = normalizeText([f.nome,f.descricao,f.grupo,f.tipo_alimento,f.codigo].join(' '));
-    return txt.includes(q) && (!group || f.grupo === group);
-  });
-
-  list.sort((a,b)=>{
-    const A = foodNutrients(a), B = foodNutrients(b);
-    if(sort==='kcal') return n(A.kcal) - n(B.kcal);
-    if(sort==='proteina') return n(B.proteina) - n(A.proteina);
-    if(sort==='carbo') return n(B.carbo) - n(A.carbo);
-    if(sort==='fibra') return n(B.fibra) - n(A.fibra);
-    if(sort==='colesterol') return n(B.colesterol) - n(A.colesterol);
-    return String(a.nome).localeCompare(String(b.nome),'pt-BR');
-  });
-
-  const el = document.getElementById('foodList');
-
-  if(!list.length){
-    el.innerHTML = '<div class="empty">Nenhum alimento encontrado.</div>';
+  if(!q && !group && !type){
+    document.getElementById('foodResultsBox').innerHTML = `
+      <div class="empty food-empty-start">
+        <b>Informe uma busca ou selecione um filtro</b>
+        Para não pesar, a lista não aparece automaticamente.
+      </div>`;
     return;
   }
 
-  el.innerHTML = list.slice(0,120).map(f=>{
-    const nut = foodNutrients(f);
-    return `<article class="card food-card">
-      <div>
-        <h3>${esc(f.nome)}</h3>
-        <p class="subtitle">${esc(f.grupo || '')}</p>
-      </div>
+  let list = tbcaFoods.filter(f=>{
+    const txt = normalizeText([f.nome,f.grupo,f.tipo_alimento,f.codigo].join(' '));
+    return (!q || txt.includes(q)) &&
+           (!group || f.grupo === group) &&
+           (!type || f.tipo_alimento === type);
+  });
 
-      <div class="food-meta">
-        <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
-        <span class="pill">${(f.medidas||[]).length} medida(s)</span>
-      </div>
+  list.sort((a,b)=>String(a.nome).localeCompare(String(b.nome),'pt-BR'));
 
-      <div class="tbca-nutri-mini">
-        <div class="metric"><span>kcal</span><b>${fmtTBCA(nut.kcal,0)}</b></div>
-        <div class="metric"><span>Prot.</span><b>${fmtTBCA(nut.proteina)}g</b></div>
-        <div class="metric"><span>Carbo</span><b>${fmtTBCA(nut.carbo)}g</b></div>
-        <div class="metric"><span>Gord.</span><b>${fmtTBCA(nut.gordura)}g</b></div>
-      </div>
+  ultimaBusca = list;
+  renderResultadoSimples(list);
+}
 
-      <div class="food-actions">
-        <button class="primary" onclick="showFoodDetail('${jsEsc(f.id)}')">Ver detalhes</button>
-        <button class="ghost" onclick="openAddFoodModal('${jsEsc(f.id)}')">Adicionar ao diário</button>
-      </div>
-    </article>`;
-  }).join('');
+function renderResultadoSimples(list){
+  const box = document.getElementById('foodResultsBox');
+
+  if(!list.length){
+    box.innerHTML = '<div class="empty">Nenhum alimento encontrado para esta busca.</div>';
+    return;
+  }
+
+  const limited = list.slice(0,150);
+  box.innerHTML = `
+    <div class="food-results-head">
+      <p class="subtitle"><b>${list.length}</b> resultado(s) encontrado(s). ${list.length > 150 ? 'Mostrando os primeiros 150.' : ''}</p>
+      <button class="ghost" onclick="limparResultados()">Limpar resultados</button>
+    </div>
+
+    <div class="food-results-simple">
+      ${limited.map(f=>`
+        <div class="food-row-simple" onclick="showFoodDetail('${jsEsc(f.id)}')">
+          <div>
+            <h3>${esc(f.nome)}</h3>
+            <small>${esc(f.grupo || 'Sem grupo')}</small>
+          </div>
+          <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function limparResultados(){
+  document.getElementById('qFood').value = '';
+  document.getElementById('groupFood').value = '';
+  document.getElementById('typeFood').value = '';
+  ultimaBusca = [];
+  document.getElementById('foodResultsBox').innerHTML = `
+    <div class="empty food-empty-start">
+      <b>Busque um alimento para começar</b>
+      Digite parte do nome, escolha filtros se quiser, e clique em Buscar.
+    </div>`;
 }
 
 function findFood(id){ return tbcaFoods.find(f => String(f.id) === String(id)); }
-
-function clearFoodFilters(){
-  document.getElementById('qFood').value = '';
-  document.getElementById('groupFood').value = '';
-  document.getElementById('sortFood').value = 'nome';
-  renderFoodsTBCA();
-}
 
 function showFoodDetail(id){
   const f = findFood(id);
@@ -295,7 +338,9 @@ function nutritionTable(nut){
       <tr><td>Ferro</td><td>${fmtTBCA(nut.ferro)} mg</td></tr>
       <tr><td>Sódio</td><td>${fmtTBCA(nut.sodio)} mg</td></tr>
       <tr><td>Colesterol</td><td>${fmtTBCA(nut.colesterol)} mg</td></tr>
-      <tr><td>Vitamina C</td><td>${fmtTBCA(nut.vitc)} mg</td></tr>
+      <tr><td>Vitamina C</td><td>${fmtTBCA(nut.vitamina_c)} mg</td></tr>
+      <tr><td>Vitamina B6</td><td>${fmtTBCA(nut.vitamina_b6)} mg</td></tr>
+      <tr><td>Vitamina B12</td><td>${fmtTBCA(nut.vitamina_b12)} mcg</td></tr>
       <tr><td>Zinco</td><td>${fmtTBCA(nut.zinco)} mg</td></tr>
     </tbody>
   </table></div>`;
@@ -371,8 +416,9 @@ function confirmAddTBCA(meal){
       ferro:nut.ferro,
       sodio:nut.sodio,
       colesterol:nut.colesterol,
-      vitc:nut.vitc,
-      retinol:nut.retinol,
+      vitc:nut.vitamina_c,
+      vitamina_b6:nut.vitamina_b6,
+      vitamina_b12:nut.vitamina_b12,
       zinco:nut.zinco
     },
     meal,
