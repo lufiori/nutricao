@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriVida - Alimentos TBCA</title>
-<link rel="stylesheet" href="app.css?v=tbca2">
+<link rel="stylesheet" href="app.css?v=tbca-pro">
 </head>
 <body>
 <header class="topbar">
@@ -24,10 +24,9 @@
   <section class="card soft">
     <h1 class="title">Alimentos</h1>
     <p class="subtitle">
-      Busca usando a base TBCA, com nutrientes por 100g e medidas caseiras quando disponíveis.
-      Por enquanto o TACO fica guardadinho. 😊
+      Base TBCA normalizada para o NutriVida, com nutrientes por 100g e medidas caseiras.
     </p>
-    <div class="pill" id="tbcaStatus" style="margin-top:12px">Carregando tbca.json...</div>
+    <div class="pill" id="tbcaStatus" style="margin-top:12px">Carregando tbca_pronto.json...</div>
   </section>
 
   <div class="toolbar">
@@ -47,16 +46,9 @@
   </div>
 
   <section class="tbca-layout">
-    <div>
-      <div id="foodList" class="food-grid"></div>
-    </div>
-
-    <aside id="foodDetail" class="card tbca-side">
-      <div class="empty">Clique em um alimento para ver medidas caseiras e composição nutricional.</div>
-    </aside>
+    <div id="foodList" class="food-grid"></div>
   </section>
 </main>
-
 
 <div id="foodDetailModal" class="tbca-detail-modal">
   <div class="tbca-detail-card">
@@ -98,129 +90,51 @@
   </div>
 </div>
 
-<script src="app.js?v=tbca2"></script>
+<script src="app.js?v=tbca-pro"></script>
 <script>
 let tbcaFoods = [];
-let selectedFoodCode = null;
+let selectedFoodId = null;
 
 function normalizeText(v){
-  return String(v||'')
-    .normalize('NFD')
-    .replace(/[\\u0300-\\u036f]/g,'')
-    .toLowerCase()
-    .trim();
+  return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();
 }
-
 function n(v){ return Number(v ?? 0) || 0; }
-
-function fmtTBCA(v,d=1){
-  return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d});
-}
-
+function fmtTBCA(v,d=1){ return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d}); }
 function todayISO(){ return new Date().toISOString().slice(0,10); }
-
 function uid(){ return Date.now()+Math.floor(Math.random()*99999); }
+function esc(v){ return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
+function jsEsc(v){ return String(v).replaceAll("\\\\","\\\\\\\\").replaceAll("'","\\\\'"); }
 
-function esc(v){
-  return String(v??'')
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
-    .replaceAll("'","&#039;");
-}
-
-function jsEsc(v){
-  return String(v).replaceAll("\\\\","\\\\\\\\").replaceAll("'","\\\\'");
-}
-
-function rawNut(obj, names){
-  const fonte = obj || {};
-  for(const name of names){
-    const item = fonte[name];
-    if(item && item.valor !== undefined && item.valor !== null) return n(item.valor);
-  }
-  return 0;
-}
-
-function flat100(food){
-  const f = food?.nutrientes_100g_flat || {};
-  const raw = food?.nutrientes_100g || {};
-  return {
-    kcal: n(f.energia_kcal) || rawNut(raw, ['Energia','Energia kcal']),
-    proteina: n(f.proteina_g) || rawNut(raw, ['Proteína','Proteina']),
-    carbo: n(f.carboidrato_g ?? f.carboidrato_disponivel_g) || rawNut(raw, ['Carboidrato total','Carboidrato disponível']),
-    gordura: n(f.lipideos_g) || rawNut(raw, ['Lipídios','Lipidios']),
-    fibra: n(f.fibra_alimentar_g) || rawNut(raw, ['Fibra alimentar']),
-    calcio: n(f.calcio_mg) || rawNut(raw, ['Cálcio','Calcio']),
-    ferro: n(f.ferro_mg) || rawNut(raw, ['Ferro']),
-    sodio: n(f.sodio_mg) || rawNut(raw, ['Sódio','Sodio']),
-    colesterol: n(f.colesterol_mg) || rawNut(raw, ['Colesterol']),
-    vitc: n(f.vitamina_c_mg) || rawNut(raw, ['Vitamina C']),
-    zinco: n(f.zinco_mg) || rawNut(raw, ['Zinco']),
-    retinol: n(f.retinol_mcg) || rawNut(raw, ['Vitamina A (RAE)','Retinol'])
-  };
-}
-
-function flatMeasure(measure){
-  const f = measure?.nutrientes_flat || {};
-  const raw = measure?.nutrientes || {};
-  return {
-    kcal: n(f.energia_kcal) || rawNut(raw, ['Energia','Energia kcal']),
-    proteina: n(f.proteina_g) || rawNut(raw, ['Proteína','Proteina']),
-    carbo: n(f.carboidrato_g ?? f.carboidrato_disponivel_g) || rawNut(raw, ['Carboidrato total','Carboidrato disponível']),
-    gordura: n(f.lipideos_g) || rawNut(raw, ['Lipídios','Lipidios']),
-    fibra: n(f.fibra_alimentar_g) || rawNut(raw, ['Fibra alimentar']),
-    calcio: n(f.calcio_mg) || rawNut(raw, ['Cálcio','Calcio']),
-    ferro: n(f.ferro_mg) || rawNut(raw, ['Ferro']),
-    sodio: n(f.sodio_mg) || rawNut(raw, ['Sódio','Sodio']),
-    colesterol: n(f.colesterol_mg) || rawNut(raw, ['Colesterol']),
-    vitc: n(f.vitamina_c_mg) || rawNut(raw, ['Vitamina C']),
-    zinco: n(f.zinco_mg) || rawNut(raw, ['Zinco']),
-    retinol: n(f.retinol_mcg) || rawNut(raw, ['Vitamina A (RAE)','Retinol'])
-  };
-}
+function foodNutrients(food){ return food?.nutrientes100g || {}; }
+function measureNutrients(measure){ return measure?.nutrientes || {}; }
 
 function scaleNutrients(base, qty){
   const out = {};
-  Object.keys(base).forEach(k => out[k] = n(base[k]) * qty);
+  Object.keys(base || {}).forEach(k => out[k] = n(base[k]) * qty);
   return out;
 }
 
 function foodMeasures(food){
   const measures = Array.isArray(food?.medidas) ? food.medidas : [];
-  const result = [
-    {
-      id:'100g',
-      nome:'100 g',
-      rotulo:'100 g',
-      quantidade:100,
-      unidade:'g',
-      nutrientes:flat100(food),
-      is100g:true
-    }
-  ];
-
-  measures.forEach((m,idx)=>{
-    result.push({
-      id:'m'+idx,
+  return [
+    { id:'100g', nome:'100 g', rotulo:'100 g', quantidade:100, unidade:'g', nutrientes:foodNutrients(food), is100g:true },
+    ...measures.map((m,idx)=>({
+      id:m.id || ('m'+idx),
       nome:m.nome || m.rotulo || ('Medida '+(idx+1)),
-      rotulo:m.rotulo || `${m.nome||'Medida'} (${m.quantidade||''} ${m.unidade||''})`,
+      rotulo:m.rotulo || m.nome || ('Medida '+(idx+1)),
       quantidade:m.quantidade,
       unidade:m.unidade,
-      nutrientes:flatMeasure(m),
+      nutrientes:measureNutrients(m),
       is100g:false
-    });
-  });
-
-  return result;
+    }))
+  ];
 }
 
 async function loadTBCA(){
   const status = document.getElementById('tbcaStatus');
   try{
-    const r = await fetch('./tbca.json',{cache:'no-store'});
-    if(!r.ok) throw new Error('tbca não encontrado');
+    const r = await fetch('./tbca_pronto.json',{cache:'no-store'});
+    if(!r.ok) throw new Error('tbca_pronto não encontrado');
     const json = await r.json();
     tbcaFoods = Array.isArray(json) ? json : (json.alimentos || []);
     tbcaFoods = tbcaFoods.filter(f=>f && f.nome);
@@ -228,8 +142,8 @@ async function loadTBCA(){
     populateGroups();
     renderFoodsTBCA();
   }catch(e){
-    status.textContent = 'Não encontrei tbca.json. Coloque o arquivo na mesma pasta deste alimentos.html.';
-    document.getElementById('foodList').innerHTML = '<div class="empty">tbca.json não encontrado.</div>';
+    status.textContent = 'Não encontrei tbca_pronto.json. Rode converter_tbca.py e coloque tbca_pronto.json nesta pasta.';
+    document.getElementById('foodList').innerHTML = '<div class="empty">tbca_pronto.json não encontrado.</div>';
   }
 }
 
@@ -250,12 +164,12 @@ function renderFoodsTBCA(){
   });
 
   list.sort((a,b)=>{
-    const A = flat100(a), B = flat100(b);
-    if(sort==='kcal') return A.kcal - B.kcal;
-    if(sort==='proteina') return B.proteina - A.proteina;
-    if(sort==='carbo') return B.carbo - A.carbo;
-    if(sort==='fibra') return B.fibra - A.fibra;
-    if(sort==='colesterol') return B.colesterol - A.colesterol;
+    const A = foodNutrients(a), B = foodNutrients(b);
+    if(sort==='kcal') return n(A.kcal) - n(B.kcal);
+    if(sort==='proteina') return n(B.proteina) - n(A.proteina);
+    if(sort==='carbo') return n(B.carbo) - n(A.carbo);
+    if(sort==='fibra') return n(B.fibra) - n(A.fibra);
+    if(sort==='colesterol') return n(B.colesterol) - n(A.colesterol);
     return String(a.nome).localeCompare(String(b.nome),'pt-BR');
   });
 
@@ -267,7 +181,7 @@ function renderFoodsTBCA(){
   }
 
   el.innerHTML = list.slice(0,120).map(f=>{
-    const nut = flat100(f);
+    const nut = foodNutrients(f);
     return `<article class="card food-card">
       <div>
         <h3>${esc(f.nome)}</h3>
@@ -287,16 +201,14 @@ function renderFoodsTBCA(){
       </div>
 
       <div class="food-actions">
-        <button class="primary" onclick="showFoodDetail('${jsEsc(f.codigo || f.nome)}')">Ver detalhes</button>
-        <button class="ghost" onclick="openAddFoodModal('${jsEsc(f.codigo || f.nome)}')">Adicionar ao diário</button>
+        <button class="primary" onclick="showFoodDetail('${jsEsc(f.id)}')">Ver detalhes</button>
+        <button class="ghost" onclick="openAddFoodModal('${jsEsc(f.id)}')">Adicionar ao diário</button>
       </div>
     </article>`;
   }).join('');
 }
 
-function findFood(code){
-  return tbcaFoods.find(f => String(f.codigo || f.nome) === String(code));
-}
+function findFood(id){ return tbcaFoods.find(f => String(f.id) === String(id)); }
 
 function clearFoodFilters(){
   document.getElementById('qFood').value = '';
@@ -305,11 +217,11 @@ function clearFoodFilters(){
   renderFoodsTBCA();
 }
 
-function showFoodDetail(code){
-  const f = findFood(code);
+function showFoodDetail(id){
+  const f = findFood(id);
   if(!f) return;
 
-  const nut = flat100(f);
+  const nut = foodNutrients(f);
   const measures = foodMeasures(f).filter(m=>!m.is100g);
 
   const content = `
@@ -357,7 +269,7 @@ function showFoodDetail(code){
     </div>
 
     <div class="food-actions" style="margin-top:16px">
-      <button class="primary" onclick="openAddFoodModal('${jsEsc(f.codigo || f.nome)}')">Adicionar ao diário</button>
+      <button class="primary" onclick="openAddFoodModal('${jsEsc(f.id)}')">Adicionar ao diário</button>
       <button class="ghost" onclick="closeFoodDetail()">Fechar</button>
     </div>
   `;
@@ -369,20 +281,6 @@ function showFoodDetail(code){
 function closeFoodDetail(){
   document.getElementById('foodDetailModal').classList.remove('open');
 }
-
-document.addEventListener('keydown', function(ev){
-  if(ev.key === 'Escape'){
-    closeFoodDetail();
-    closeAddFoodModal();
-  }
-});
-
-document.addEventListener('click', function(ev){
-  const modal = document.getElementById('foodDetailModal');
-  if(ev.target === modal) closeFoodDetail();
-});
-
-function nutritionTable
 
 function nutritionTable(nut){
   return `<div class="table-wrap tbca-table"><table>
@@ -403,11 +301,11 @@ function nutritionTable(nut){
   </table></div>`;
 }
 
-function openAddFoodModal(code){
-  const f = findFood(code);
+function openAddFoodModal(id){
+  const f = findFood(id);
   if(!f) return;
 
-  selectedFoodCode = code;
+  selectedFoodId = id;
   document.getElementById('modalFoodName').textContent = f.nome;
   document.getElementById('modalDate').value = todayISO();
 
@@ -421,12 +319,12 @@ function openAddFoodModal(code){
 }
 
 function closeAddFoodModal(){
-  selectedFoodCode = null;
+  selectedFoodId = null;
   document.getElementById('addFoodModal').classList.remove('open');
 }
 
 function selectedMeasure(){
-  const f = findFood(selectedFoodCode);
+  const f = findFood(selectedFoodId);
   if(!f) return null;
   const id = document.getElementById('modalMeasure').value;
   return foodMeasures(f).find(m=>m.id===id);
@@ -449,21 +347,20 @@ function updateModalPreview(){
 }
 
 function confirmAddTBCA(meal){
-  const f = findFood(selectedFoodCode);
+  const f = findFood(selectedFoodId);
   const m = selectedMeasure();
   if(!f || !m) return;
 
   const qty = Math.max(0, n(document.getElementById('modalQty').value) || 1);
   const nut = scaleNutrients(m.nutrientes, qty);
-  const grams = m.unidade === 'g' ? n(m.quantidade) * qty : 100;
 
   const diary = JSON.parse(localStorage.getItem('nv_diary') || '[]');
   diary.push({
     id: uid(),
     tipo: 'tbca',
-    foodId: 'tbca_' + (f.codigo || f.nome),
+    foodId: 'tbca_' + f.id + '_' + m.id,
     food:{
-      id: 'tbca_' + (f.codigo || f.nome),
+      id: 'tbca_' + f.id + '_' + m.id,
       nome: `${f.nome} — ${m.rotulo} × ${fmtTBCA(qty)}`,
       kcal:nut.kcal,
       proteina:nut.proteina,
@@ -497,6 +394,20 @@ function confirmAddTBCA(meal){
     location.href = 'index.html';
   }
 }
+
+document.addEventListener('keydown', function(ev){
+  if(ev.key === 'Escape'){
+    closeFoodDetail();
+    closeAddFoodModal();
+  }
+});
+
+document.addEventListener('click', function(ev){
+  const d = document.getElementById('foodDetailModal');
+  const a = document.getElementById('addFoodModal');
+  if(ev.target === d) closeFoodDetail();
+  if(ev.target === a) closeAddFoodModal();
+});
 
 loadTBCA();
 </script>
