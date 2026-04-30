@@ -992,3 +992,124 @@
   .recipe-metrics{grid-template-columns:repeat(2,1fr)}
   .recipe-admin-grid{grid-template-columns:1fr}
 }
+
+
+/* ===== Receitas PRO - busca TBCA por ingrediente ===== */
+.recipe-pro-builder{
+  margin-top:18px;
+}
+.recipe-builder-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.recipe-builder-full{
+  grid-column:1/-1;
+}
+.recipe-builder-grid textarea.search{
+  min-height:100px;
+}
+.ingredient-pro-list{
+  display:grid;
+  gap:12px;
+  margin-top:10px;
+}
+.ingredient-pro-row{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(240px,1.5fr) 95px minmax(190px,1fr) 44px;
+  gap:10px;
+  align-items:end;
+  background:#fbfcfb;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:12px;
+}
+.ingredient-pro-row label{
+  font-size:.86rem;
+}
+.ingredient-suggestions{
+  position:absolute;
+  top:76px;
+  left:12px;
+  width:min(520px, calc(100% - 24px));
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 18px 42px rgba(31,41,51,.18);
+  display:none;
+  max-height:320px;
+  overflow:auto;
+  z-index:80;
+}
+.ingredient-suggestions.open{
+  display:block;
+}
+.ingredient-suggestion{
+  padding:12px 14px;
+  border-bottom:1px solid #eef1ec;
+  cursor:pointer;
+}
+.ingredient-suggestion:hover{
+  background:#f0f7f1;
+}
+.ingredient-suggestion b{
+  display:block;
+  font-size:.95rem;
+}
+.ingredient-suggestion small{
+  display:block;
+  color:var(--muted);
+  margin-top:3px;
+}
+.ingredient-selected{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:.82rem;
+  min-height:18px;
+}
+.recipe-preview-panel{
+  background:#fbfcfb;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+  margin-top:12px;
+}
+.recipe-preview-panel h3{
+  margin-top:0;
+}
+.ingredient-remove{
+  border:1px solid #fecaca;
+  background:#fff;
+  color:#b91c1c;
+  border-radius:14px;
+  height:42px;
+  cursor:pointer;
+  font-weight:900;
+}
+.ingredient-remove:hover{
+  background:#fff1f2;
+}
+.recipe-pro-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:12px;
+}
+.recipe-help{
+  border:1px dashed #cbd5e1;
+  background:#f8fafc;
+  border-radius:18px;
+  padding:12px;
+  color:var(--muted);
+  line-height:1.45;
+}
+@media(max-width:820px){
+  .recipe-builder-grid{grid-template-columns:1fr}
+  .ingredient-pro-row{grid-template-columns:1fr}
+  .ingredient-suggestions{
+    position:static;
+    width:100%;
+    margin-top:8px;
+  }
+}
