@@ -385,51 +385,6 @@
   .meal-grid{grid-template-columns:1fr}
 }
 
-/* ===== LISTA BONITA TBCA ===== */
-
-.food-results-simple{
-  display:grid;
-  gap:18px;
-  margin-top:16px;
-}
-
-.food-row-simple{
-  background:#fff;
-  border:1px solid #e5e7eb;
-  border-radius:20px;
-  padding:16px;
-  display:grid;
-  grid-template-columns:1fr auto auto;
-  gap:12px;
-  align-items:center;
-  cursor:pointer;
-  transition:.18s ease;
-}
-
-.food-row-simple:hover{
-  transform:translateY(-2px);
-  box-shadow:0 12px 28px rgba(31,41,51,.12);
-}
-
-.food-row-simple h3{
-  margin:0;
-  font-size:0.95rem;
-  font-weight:600;
-}
-
-.food-row-simple:hover h3{
-  text-decoration:underline;
-}
-
-.food-eye{
-  font-size:18px;
-  opacity:.6;
-}
-
-.food-row-simple:hover .food-eye{
-  opacity:1;
-}
-
 
 /* ===== TBCA Profissional normalizado ===== */
 .tbca-layout{display:block !important;}
@@ -467,3 +422,573 @@
 .meal-choice:hover{border-color:var(--brand);background:#f0f7f1}
 @media(max-width:1100px){.food-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){.food-grid{grid-template-columns:1fr}.tbca-detail-grid{grid-template-columns:1fr}.tbca-detail-card{padding:16px;border-radius:22px}.tbca-nutri-mini{grid-template-columns:repeat(2,1fr)}.meal-grid{grid-template-columns:1fr}}
+
+
+/* ===== Alimentos TBCA - busca leve ===== */
+.food-search-shell{
+  display:grid;
+  gap:14px;
+}
+
+.food-search-card{
+  padding:18px;
+}
+
+.food-search-form{
+  display:grid;
+  grid-template-columns: 1.4fr 1fr 1fr auto;
+  gap:12px;
+  align-items:end;
+}
+
+.food-results-simple{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+
+.food-row-simple{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+  cursor:pointer;
+  transition:.16s ease;
+}
+
+.food-row-simple:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 26px rgba(31,41,51,.08);
+  border-color:rgba(47,133,90,.45);
+}
+
+.food-row-simple h3{
+  margin:0;
+  font-size:1rem;
+}
+
+.food-row-simple small{
+  display:block;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.food-row-simple .pill{
+  justify-self:end;
+}
+
+.food-results-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:8px;
+}
+
+.food-results-head .subtitle{
+  margin:0;
+}
+
+.food-empty-start{
+  text-align:center;
+  padding:32px 18px;
+}
+
+.food-empty-start b{
+  display:block;
+  font-size:1.15rem;
+  margin-bottom:8px;
+}
+
+.tbca-detail-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(31,41,51,.42);
+  backdrop-filter:blur(4px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  z-index:1200;
+}
+
+.tbca-detail-modal.open{display:flex}
+
+.tbca-detail-card{
+  width:min(880px,96vw);
+  max-height:88vh;
+  overflow:auto;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:28px;
+  box-shadow:0 30px 80px rgba(31,41,51,.28);
+  padding:22px;
+  animation:tbcaPop .18s ease-out;
+}
+
+@keyframes tbcaPop{
+  from{transform:translateY(12px) scale(.98);opacity:.7}
+  to{transform:translateY(0) scale(1);opacity:1}
+}
+
+.tbca-detail-header{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+
+.tbca-close{
+  width:42px;
+  height:42px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  cursor:pointer;
+  font-size:20px;
+  font-weight:900;
+}
+
+.tbca-close:hover{
+  background:#fff1f2;
+  color:#b91c1c;
+  border-color:#fecaca;
+}
+
+.tbca-detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  align-items:start;
+}
+
+.tbca-modal-section{
+  background:#fbfcfb;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+}
+
+.tbca-modal-section h3{margin-top:0}
+
+.tbca-measures{
+  display:grid;
+  gap:8px;
+  margin-top:10px;
+}
+
+.tbca-measure{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:16px;
+  padding:10px;
+  display:grid;
+  gap:6px;
+}
+
+.tbca-measure-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-weight:800;
+}
+
+.tbca-table table{
+  min-width:0 !important;
+  width:100% !important;
+  table-layout:fixed !important;
+}
+
+.tbca-table th:first-child,
+.tbca-table td:first-child{width:55%}
+
+.tbca-table th:last-child,
+.tbca-table td:last-child{
+  width:45%;
+  text-align:right;
+  font-weight:800;
+}
+
+.tbca-nutri-mini{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.tbca-nutri-mini .metric{padding:10px}
+
+.modal-tbca{
+  position:fixed;
+  inset:0;
+  background:rgba(31,41,51,.35);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:1300;
+}
+
+.modal-tbca.open{display:flex}
+
+.modal-tbca-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:0 24px 60px rgba(31,41,51,.25);
+  max-width:520px;
+  width:100%;
+  padding:18px;
+}
+
+.meal-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin:14px 0;
+}
+
+.meal-choice{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:18px;
+  padding:14px;
+  text-align:left;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.meal-choice:hover{
+  border-color:var(--brand);
+  background:#f0f7f1;
+}
+
+@media(max-width:920px){
+  .food-search-form{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:720px){
+  .food-search-form{grid-template-columns:1fr}
+  .food-row-simple{grid-template-columns:1fr}
+  .food-row-simple .pill{justify-self:start}
+  .tbca-detail-grid{grid-template-columns:1fr}
+  .tbca-detail-card{padding:16px;border-radius:22px}
+  .tbca-nutri-mini{grid-template-columns:repeat(2,1fr)}
+  .meal-grid{grid-template-columns:1fr}
+}
+
+
+/* ===== Ajuste definitivo Alimentos TBCA ===== */
+.food-results-simple{display:grid;gap:18px !important;margin-top:16px;}
+.food-row-simple{
+  background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:16px !important;display:grid;grid-template-columns:1fr auto auto;
+  gap:12px;align-items:center;cursor:pointer !important;transition:.18s ease;
+}
+.food-row-simple:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(31,41,51,.12);border-color:rgba(47,133,90,.45);}
+.food-row-simple h3{margin:0;font-size:.95rem !important;font-weight:600 !important;line-height:1.35;}
+.food-row-simple:hover h3{text-decoration:underline;}
+.food-row-simple small{display:block;color:var(--muted);margin-top:4px;}
+.food-eye{font-size:18px;opacity:.62;transition:.16s ease;}
+.food-row-simple:hover .food-eye{opacity:1;transform:scale(1.08);}
+@media(max-width:720px){.food-row-simple{grid-template-columns:1fr auto}.food-row-simple .pill{justify-self:start}}
+
+
+/* ===== Alimentos TBCA - Favoritos ===== */
+.food-star{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  font-size:18px;
+  transition:.16s ease;
+}
+
+.food-star:hover{
+  transform:scale(1.08);
+  background:#fffbea;
+  border-color:#fde68a;
+}
+
+.food-star.active{
+  background:#fff7cc;
+  border-color:#facc15;
+}
+
+.food-row-simple{
+  grid-template-columns:1fr auto auto auto !important;
+}
+
+.food-row-simple .food-star{
+  justify-self:end;
+}
+
+.favorite-filter-bar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:12px;
+}
+
+@media(max-width:720px){
+  .food-row-simple{
+    grid-template-columns:1fr auto auto !important;
+  }
+  .food-row-simple .pill{
+    grid-column:1 / -1;
+  }
+}
+
+
+/* ===== Receitas TBCA - estilo app ===== */
+.recipes-hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.recipe-search-form{
+  display:grid;
+  grid-template-columns:1.3fr 1fr auto;
+  gap:12px;
+  align-items:end;
+}
+.recipe-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  margin-top:16px;
+}
+.recipe-app-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 8px 22px rgba(31,41,51,.06);
+  cursor:pointer;
+  transition:.18s ease;
+  display:flex;
+  flex-direction:column;
+}
+.recipe-app-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 18px 40px rgba(31,41,51,.12);
+}
+.recipe-img{
+  height:128px;
+  background:linear-gradient(135deg,#eaf7ee,#fff7dc);
+  display:grid;
+  place-items:center;
+  font-size:46px;
+}
+.recipe-card-body{
+  padding:14px;
+  display:grid;
+  gap:10px;
+  flex:1;
+}
+.recipe-card-body h3{
+  margin:0;
+  font-size:1.05rem;
+  line-height:1.3;
+}
+.recipe-card-body .subtitle{
+  min-height:38px;
+}
+.recipe-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.recipe-metric{
+  border:1px solid var(--line);
+  background:#fbfcfb;
+  border-radius:14px;
+  padding:8px;
+  text-align:center;
+}
+.recipe-metric span{
+  display:block;
+  color:var(--muted);
+  font-size:.72rem;
+}
+.recipe-metric b{
+  display:block;
+  font-size:.88rem;
+  margin-top:2px;
+}
+.recipe-card-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.recipe-fav{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  font-size:18px;
+  transition:.16s ease;
+}
+.recipe-fav:hover{
+  transform:scale(1.08);
+  background:#fffbea;
+  border-color:#fde68a;
+}
+.recipe-fav.active{
+  background:#fff7cc;
+  border-color:#facc15;
+}
+.recipe-detail-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(31,41,51,.42);
+  backdrop-filter:blur(4px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  z-index:1200;
+}
+.recipe-detail-modal.open{display:flex}
+.recipe-detail-card{
+  width:min(960px,96vw);
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:30px;
+  box-shadow:0 30px 80px rgba(31,41,51,.28);
+  padding:22px;
+  animation:recipePop .18s ease-out;
+}
+@keyframes recipePop{
+  from{transform:translateY(12px) scale(.98);opacity:.7}
+  to{transform:translateY(0) scale(1);opacity:1}
+}
+.recipe-detail-header{
+  display:grid;
+  grid-template-columns:120px 1fr auto;
+  gap:16px;
+  align-items:start;
+  margin-bottom:16px;
+}
+.recipe-detail-emoji{
+  width:120px;
+  height:120px;
+  border-radius:26px;
+  background:linear-gradient(135deg,#eaf7ee,#fff7dc);
+  display:grid;
+  place-items:center;
+  font-size:56px;
+}
+.recipe-close{
+  width:42px;
+  height:42px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  cursor:pointer;
+  font-size:20px;
+  font-weight:900;
+}
+.recipe-close:hover{
+  background:#fff1f2;
+  color:#b91c1c;
+  border-color:#fecaca;
+}
+.recipe-detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  align-items:start;
+}
+.recipe-section{
+  background:#fbfcfb;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+}
+.recipe-section h3{margin-top:0}
+.recipe-ingredients{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:grid;
+  gap:8px;
+}
+.recipe-ingredients li{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:16px;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+.recipe-ingredients small{
+  display:block;
+  color:var(--muted);
+  margin-top:3px;
+}
+.recipe-steps{
+  margin:0;
+  padding-left:20px;
+  line-height:1.6;
+}
+.recipe-add-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(31,41,51,.35);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:1300;
+}
+.recipe-add-modal.open{display:flex}
+.recipe-add-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:0 24px 60px rgba(31,41,51,.25);
+  max-width:540px;
+  width:100%;
+  padding:18px;
+}
+.recipe-admin{
+  margin-top:18px;
+}
+.recipe-admin-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.recipe-admin-full{grid-column:1/-1}
+.recipe-admin textarea.search{min-height:100px}
+@media(max-width:1100px){
+  .recipe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .recipe-search-form{grid-template-columns:1fr}
+  .recipe-grid{grid-template-columns:1fr}
+  .recipe-detail-header{grid-template-columns:1fr auto}
+  .recipe-detail-emoji{width:90px;height:90px;font-size:42px}
+  .recipe-detail-grid{grid-template-columns:1fr}
+  .recipe-metrics{grid-template-columns:repeat(2,1fr)}
+  .recipe-admin-grid{grid-template-columns:1fr}
+}
