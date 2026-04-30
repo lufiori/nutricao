@@ -233,16 +233,20 @@ function renderResultadoSimples(list){
     </div>
 
     <div class="food-results-simple">
-      ${limited.map(f=>`
-        <div class="food-row-simple" onclick="showFoodDetail('${jsEsc(f.id)}')">
-          <div>
-            <h3>${esc(f.nome)}</h3>
-            <small>${esc(f.grupo || 'Sem grupo')}</small>
-          </div>
-          <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
-          <span class="food-eye" aria-hidden="true">👁️</span>
+    
+    ${limited.map(f=>`
+      <div class="food-row-simple" onclick="showFoodDetail('${jsEsc(f.id)}')">
+        <div>
+          <h3>${esc(f.nome)}</h3>
+          <small>${esc(f.grupo || 'Sem grupo')}</small>
         </div>
-      `).join('')}
+    
+        <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
+    
+        <span class="food-eye">👁️</span>
+      </div>
+    `).join('')}
+      
     </div>
   `;
 }
