@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NutriVida - Alimentos TBCA</title>
-<link rel="stylesheet" href="app.css?v=alimentos-definitivo1">
+<link rel="stylesheet" href="app.css?v=alimentos-fav1">
 </head>
 <body>
 <header class="topbar">
@@ -52,6 +52,11 @@
         </div>
 
         <button class="primary" onclick="buscarAlimentos()">Buscar</button>
+      </div>
+
+      <div class="favorite-filter-bar">
+        <button class="ghost" onclick="mostrarFavoritos()">⭐ Ver favoritos</button>
+        <span class="subtitle">Toque na estrela de um alimento para salvar nos favoritos.</span>
       </div>
     </div>
 
@@ -104,11 +109,49 @@
   </div>
 </div>
 
-<script src="app.js?v=alimentos-definitivo1"></script>
+<script src="app.js?v=alimentos-fav1"></script>
 <script>
 let tbcaFoods = [];
 let selectedFoodId = null;
 let ultimaBusca = [];
+
+const FOOD_FAV_KEY = 'nv_fav_foods_tbca';
+
+function getFoodFavorites(){
+  try{return JSON.parse(localStorage.getItem(FOOD_FAV_KEY)) || [];}catch(e){return [];}
+}
+
+function saveFoodFavorites(ids){
+  localStorage.setItem(FOOD_FAV_KEY, JSON.stringify(ids));
+}
+
+function isFoodFavorite(id){
+  return getFoodFavorites().includes(String(id));
+}
+
+function toggleFoodFavorite(id, ev){
+  if(ev) ev.stopPropagation();
+  id = String(id);
+  let favs = getFoodFavorites();
+  if(favs.includes(id)){
+    favs = favs.filter(x => x !== id);
+  }else{
+    favs.push(id);
+  }
+  saveFoodFavorites(favs);
+  renderResultadoSimples(ultimaBusca);
+}
+
+function mostrarFavoritos(){
+  const favs = getFoodFavorites();
+  if(!favs.length){
+    document.getElementById('foodResultsBox').innerHTML = '<div class="empty">Nenhum alimento favorito ainda.</div>';
+    return;
+  }
+  const list = tbcaFoods.filter(f => favs.includes(String(f.id)));
+  ultimaBusca = list;
+  renderResultadoSimples(list);
+}
 
 function normalizeText(v){
   return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();
@@ -233,20 +276,19 @@ function renderResultadoSimples(list){
     </div>
 
     <div class="food-results-simple">
-    
-    ${limited.map(f=>`
-      <div class="food-row-simple" onclick="showFoodDetail('${jsEsc(f.id)}')">
-        <div>
-          <h3>${esc(f.nome)}</h3>
-          <small>${esc(f.grupo || 'Sem grupo')}</small>
+      ${limited.map(f=>`
+        <div class="food-row-simple" onclick="showFoodDetail('${jsEsc(f.id)}')">
+          <div>
+            <h3>${esc(f.nome)}</h3>
+            <small>${esc(f.grupo || 'Sem grupo')}</small>
+          </div>
+          <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
+          <button class="food-star ${isFoodFavorite(f.id) ? 'active' : ''}" title="Favoritar" onclick="toggleFoodFavorite('${jsEsc(f.id)}', event)">
+            ${isFoodFavorite(f.id) ? '⭐' : '☆'}
+          </button>
+          <span class="food-eye" aria-hidden="true">👁️</span>
         </div>
-    
-        <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
-    
-        <span class="food-eye">👁️</span>
-      </div>
-    `).join('')}
-      
+      `).join('')}
     </div>
   `;
 }
@@ -281,6 +323,9 @@ function showFoodDetail(id){
           <span class="pill">${esc(f.codigo || 'TBCA')}</span>
           <span class="pill">${esc(f.tipo_alimento || '')}</span>
           <span class="pill">${measures.length} medida(s)</span>
+          <button class="food-star ${isFoodFavorite(f.id) ? 'active' : ''}" title="Favoritar" onclick="toggleFoodFavorite('${jsEsc(f.id)}', event); showFoodDetail('${jsEsc(f.id)}')">
+            ${isFoodFavorite(f.id) ? '⭐' : '☆'}
+          </button>
         </div>
       </div>
       <button class="tbca-close" onclick="closeFoodDetail()">×</button>
