@@ -1,718 +1,715 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NutriVida PRO - Receitas</title>
-  <style>
-    :root {
-      --bg: #f7f8fa;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --primary: #16a34a;
-      --primary-dark: #15803d;
-      --soft: #ecfdf5;
-      --danger: #dc2626;
-      --warning: #f59e0b;
-      --radius: 18px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriVida PRO - Receitas TACO</title>
 
-    * { box-sizing: border-box; }
+<style>
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --green:#16a34a;
+  --green-dark:#15803d;
+  --green-soft:#ecfdf5;
+  --orange:#f97316;
+  --red:#dc2626;
+  --shadow:0 10px 28px rgba(15,23,42,.06);
+  --radius:20px;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+*{box-sizing:border-box}
 
-    header {
-      background: var(--card);
-      border-bottom: 1px solid var(--line);
-      padding: 18px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:linear-gradient(180deg,#f9fafb 0%,#f3f4f6 100%);
+  color:var(--text);
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-      color: var(--primary-dark);
-    }
+header{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:18px 22px;
+  position:sticky;
+  top:0;
+  z-index:50;
+}
 
-    header p {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
+.header-wrap{
+  max-width:1200px;
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
 
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
-    }
+.logo-icon{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:var(--green-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:23px;
+}
 
-    .card h2 {
-      margin: 0 0 12px;
-      font-size: 18px;
-    }
+h1{
+  margin:0;
+  color:var(--green-dark);
+  font-size:22px;
+}
 
-    .sub {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: -6px;
-      margin-bottom: 14px;
-    }
+.subtitle{
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
 
-    input, select, button, textarea {
-      font: inherit;
-    }
+.badge{
+  background:var(--green-soft);
+  color:var(--green-dark);
+  border:1px solid #bbf7d0;
+  padding:7px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
 
-    input, select, textarea {
-      width: 100%;
-      padding: 11px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--text);
-      outline: none;
-    }
+main{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:18px;
+}
 
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
-    }
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+}
 
-    button {
-      border: 0;
-      border-radius: 12px;
-      padding: 10px 13px;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
-      font-weight: 700;
-    }
+.card h2{
+  margin:0 0 4px;
+  font-size:19px;
+}
 
-    button:hover {
-      background: var(--primary-dark);
-    }
+.help{
+  margin:0 0 14px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
+}
 
-    button.secondary {
-      background: #f3f4f6;
-      color: var(--text);
-      border: 1px solid var(--line);
-    }
+.notice{
+  background:#fffbeb;
+  border:1px solid #fde68a;
+  color:#92400e;
+  padding:12px;
+  border-radius:16px;
+  font-size:13px;
+  margin-bottom:12px;
+}
 
-    button.secondary:hover {
-      background: #e5e7eb;
-    }
+input,select,button{
+  font:inherit;
+}
 
-    button.danger {
-      background: #fee2e2;
-      color: var(--danger);
-      border: 1px solid #fecaca;
-    }
+input,select{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:12px 13px;
+  outline:none;
+  color:var(--text);
+}
 
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 110px 130px;
-      gap: 10px;
-      align-items: end;
-    }
+input:focus,select:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(22,163,74,.12);
+}
 
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+button{
+  border:0;
+  border-radius:14px;
+  padding:11px 13px;
+  background:var(--green);
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
 
-    .search-list {
-      margin-top: 12px;
-      display: grid;
-      gap: 10px;
-      max-height: 520px;
-      overflow: auto;
-      padding-right: 4px;
-    }
+button:hover{background:var(--green-dark)}
 
-    .food-item {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      background: #fff;
-      display: grid;
-      gap: 8px;
-    }
+button.secondary{
+  background:#f3f4f6;
+  color:var(--text);
+  border:1px solid var(--line);
+}
 
-    .food-title {
-      font-weight: 800;
-      line-height: 1.25;
-    }
+button.secondary:hover{background:#e5e7eb}
 
-    .food-meta {
-      color: var(--muted);
-      font-size: 13px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+button.danger{
+  background:#fee2e2;
+  color:var(--red);
+  border:1px solid #fecaca;
+}
 
-    .pill {
-      background: var(--soft);
-      color: var(--primary-dark);
-      border: 1px solid #bbf7d0;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-    }
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 
-    .food-actions {
-      display: grid;
-      grid-template-columns: 1fr 92px 100px;
-      gap: 8px;
-      align-items: center;
-    }
+.grid3{
+  display:grid;
+  grid-template-columns:1fr 90px 104px;
+  gap:8px;
+  align-items:end;
+}
 
-    .recipe-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-    }
+.status{
+  margin:12px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
 
-    .ingredient {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 11px;
-      background: #fff;
-      display: grid;
-      grid-template-columns: 1fr 90px 36px;
-      gap: 10px;
-      align-items: center;
-    }
+.search-list{
+  margin-top:14px;
+  display:grid;
+  gap:10px;
+  max-height:570px;
+  overflow:auto;
+  padding-right:4px;
+}
 
-    .ingredient strong {
-      display: block;
-      line-height: 1.25;
-    }
+.food{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:13px;
+  background:#fff;
+  display:grid;
+  gap:10px;
+  transition:.15s;
+}
 
-    .ingredient small {
-      color: var(--muted);
-    }
+.food:hover{
+  border-color:#bbf7d0;
+  transform:translateY(-1px);
+  box-shadow:0 8px 20px rgba(15,23,42,.05);
+}
 
-    .totals {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
+.food-title{
+  font-weight:900;
+  line-height:1.28;
+}
 
-    .total-box {
-      background: #f9fafb;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      text-align: center;
-    }
+.food-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  color:var(--muted);
+  font-size:12.5px;
+}
 
-    .total-box b {
-      display: block;
-      font-size: 18px;
-      margin-bottom: 2px;
-    }
+.pill{
+  background:var(--green-soft);
+  border:1px solid #bbf7d0;
+  color:var(--green-dark);
+  padding:4px 8px;
+  border-radius:999px;
+  font-weight:800;
+}
 
-    .total-box span {
-      color: var(--muted);
-      font-size: 12px;
-    }
+.macro{
+  background:#f9fafb;
+  border:1px solid var(--line);
+  padding:4px 8px;
+  border-radius:999px;
+}
 
-    .empty {
-      padding: 18px;
-      color: var(--muted);
-      text-align: center;
-      background: #f9fafb;
-      border: 1px dashed #d1d5db;
-      border-radius: 14px;
-    }
+.recipe-list{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
 
-    .notice {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      color: #92400e;
-      padding: 11px 12px;
-      border-radius: 14px;
-      margin-bottom: 12px;
-      font-size: 13px;
-    }
+.ingredient{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px;
+  background:#fff;
+  display:grid;
+  grid-template-columns:1fr 90px 38px;
+  gap:10px;
+  align-items:center;
+}
 
-    .success {
-      background: var(--soft);
-      border: 1px solid #bbf7d0;
-      color: var(--primary-dark);
-      padding: 11px 12px;
-      border-radius: 14px;
-      margin-top: 12px;
-      font-size: 13px;
-      display: none;
-    }
+.ingredient strong{
+  display:block;
+  line-height:1.25;
+}
 
-    .footer-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
+.ingredient small{
+  color:var(--muted);
+  display:block;
+  margin-top:3px;
+}
 
-    @media (max-width: 900px) {
-      main {
-        grid-template-columns: 1fr;
-      }
+.totals{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:14px;
+}
 
-      .row, .row-2, .food-actions {
-        grid-template-columns: 1fr;
-      }
+.total{
+  background:#f9fafb;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:13px 8px;
+  text-align:center;
+}
 
-      .totals {
-        grid-template-columns: repeat(2, 1fr);
-      }
+.total b{
+  display:block;
+  font-size:19px;
+  color:var(--green-dark);
+}
 
-      .ingredient {
-        grid-template-columns: 1fr 80px 36px;
-      }
-    }
-  </style>
+.total span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.empty{
+  background:#f9fafb;
+  border:1px dashed #d1d5db;
+  border-radius:18px;
+  padding:18px;
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+
+.message{
+  display:none;
+  margin-top:12px;
+  border-radius:16px;
+  padding:12px;
+  font-size:13px;
+}
+
+.saved{
+  margin-top:16px;
+}
+
+.recipe-card{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:18px;
+  padding:13px;
+}
+
+.recipe-card strong{
+  display:block;
+  margin-bottom:6px;
+}
+
+@media(max-width:900px){
+  main{grid-template-columns:1fr;padding:14px}
+  .header-wrap{align-items:flex-start;flex-direction:column}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .totals{grid-template-columns:repeat(2,1fr)}
+  .ingredient{grid-template-columns:1fr 80px 38px}
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>NutriVida PRO - Receitas</h1>
-    <p>Aba Receitas usando TACO como base de ingredientes. A aba Alimentos/TBCA pode continuar como está.</p>
-  </header>
-
-  <main>
-    <section class="card">
-      <h2>Buscar ingrediente na TACO</h2>
-      <p class="sub">Digite arroz, feijão, café, leite, ovo, frango, banana...</p>
-
-      <div class="notice">
-        Este arquivo procura carregar <b>taco.json</b> no mesmo diretório. Se sua base tiver outro nome, altere a variável <b>TACO_URL</b> no começo do script.
+<header>
+  <div class="header-wrap">
+    <div class="logo">
+      <div class="logo-icon">🍽️</div>
+      <div>
+        <h1>NutriVida PRO</h1>
+        <p class="subtitle">Receitas usando TACO como base de ingredientes</p>
       </div>
+    </div>
+    <div class="badge">TACO + Receitas PRO</div>
+  </div>
+</header>
 
-      <input id="busca" type="search" placeholder="Buscar ingrediente..." autocomplete="off" />
+<main>
+  <section class="card">
+    <h2>Buscar ingrediente</h2>
+    <p class="help">Selecione sua TACO e pesquise os ingredientes para montar receitas reais.</p>
 
-      <div class="row-2" style="margin-top:10px;">
-        <select id="categoriaFiltro">
-          <option value="">Todas as categorias</option>
-        </select>
-        <select id="ordenar">
-          <option value="nome">Ordenar por nome</option>
-          <option value="energia">Maior energia</option>
-          <option value="proteina">Maior proteína</option>
-          <option value="carboidrato">Maior carboidrato</option>
-          <option value="lipidio">Maior gordura</option>
-        </select>
-      </div>
+    <div class="notice">
+      Clique em <b>Selecionar arquivo</b> e escolha seu <b>taco.json</b>. A tela foi adaptada ao seu arquivo real.
+    </div>
 
-      <div id="status" class="sub" style="margin-top:12px;">Carregando TACO...</div>
-      <div id="lista" class="search-list"></div>
-    </section>
+    <input type="file" id="file" accept=".json,application/json">
 
-    <section class="card">
-      <h2>Montar receita</h2>
-      <p class="sub">Some os ingredientes, defina rendimento e salve a receita.</p>
+    <div style="height:10px"></div>
 
-      <div class="row-2">
-        <input id="nomeReceita" placeholder="Nome da receita. Ex: Café com leite" />
-        <input id="rendimento" type="number" min="1" step="1" value="1" placeholder="Rendimento/porções" />
-      </div>
+    <input type="search" id="busca" placeholder="Buscar: café, arroz, feijão, ovo, leite...">
 
-      <div id="ingredientes" class="recipe-list">
-        <div class="empty">Nenhum ingrediente adicionado ainda.</div>
-      </div>
+    <div class="grid2" style="margin-top:10px">
+      <select id="grupo">
+        <option value="">Todos os grupos</option>
+      </select>
 
-      <div class="totals">
-        <div class="total-box"><b id="totKcal">0</b><span>kcal totais</span></div>
-        <div class="total-box"><b id="totProt">0</b><span>proteínas</span></div>
-        <div class="total-box"><b id="totCarb">0</b><span>carboidratos</span></div>
-        <div class="total-box"><b id="totLip">0</b><span>gorduras</span></div>
-      </div>
+      <select id="ordem">
+        <option value="nome">Ordenar por nome</option>
+        <option value="kcal">Maior energia</option>
+        <option value="prot">Maior proteína</option>
+        <option value="carb">Maior carboidrato</option>
+        <option value="gord">Maior gordura</option>
+      </select>
+    </div>
 
-      <div class="totals">
-        <div class="total-box"><b id="porKcal">0</b><span>kcal/porção</span></div>
-        <div class="total-box"><b id="porProt">0</b><span>prot./porção</span></div>
-        <div class="total-box"><b id="porCarb">0</b><span>carb./porção</span></div>
-        <div class="total-box"><b id="porLip">0</b><span>gord./porção</span></div>
-      </div>
+    <div id="status" class="status">Aguardando seleção do arquivo TACO.</div>
+    <div id="lista" class="search-list">
+      <div class="empty">Depois de carregar a TACO, os alimentos aparecerão aqui.</div>
+    </div>
+  </section>
 
-      <div class="footer-actions">
-        <button onclick="salvarReceita()">Salvar receita</button>
-        <button class="secondary" onclick="exportarReceitas()">Exportar JSON</button>
-        <button class="danger" onclick="limparReceita()">Limpar</button>
-      </div>
+  <section class="card">
+    <h2>Montar receita</h2>
+    <p class="help">Adicione ingredientes, ajuste as quantidades e veja os totais automaticamente.</p>
 
-      <div id="msg" class="success"></div>
+    <div class="grid2">
+      <input id="nomeReceita" placeholder="Nome da receita">
+      <input id="rendimento" type="number" min="1" value="1" placeholder="Porções">
+    </div>
 
-      <h2 style="margin-top:20px;">Receitas salvas</h2>
-      <div id="receitasSalvas" class="recipe-list"></div>
-    </section>
-  </main>
+    <div id="ingredientes" class="recipe-list">
+      <div class="empty">Nenhum ingrediente adicionado ainda.</div>
+    </div>
+
+    <div class="totals">
+      <div class="total"><b id="totKcal">0</b><span>kcal totais</span></div>
+      <div class="total"><b id="totProt">0g</b><span>proteína</span></div>
+      <div class="total"><b id="totCarb">0g</b><span>carboidrato</span></div>
+      <div class="total"><b id="totGord">0g</b><span>gordura</span></div>
+    </div>
+
+    <div class="totals">
+      <div class="total"><b id="porKcal">0</b><span>kcal/porção</span></div>
+      <div class="total"><b id="porProt">0g</b><span>prot./porção</span></div>
+      <div class="total"><b id="porCarb">0g</b><span>carb./porção</span></div>
+      <div class="total"><b id="porGord">0g</b><span>gord./porção</span></div>
+    </div>
+
+    <div class="actions">
+      <button onclick="salvarReceita()">Salvar receita</button>
+      <button class="secondary" onclick="exportarReceitas()">Exportar receitas</button>
+      <button class="danger" onclick="limparReceita()">Limpar</button>
+    </div>
+
+    <div id="msg" class="message"></div>
+
+    <div class="saved">
+      <h2>Receitas salvas</h2>
+      <div id="salvas" class="recipe-list"></div>
+    </div>
+  </section>
+</main>
 
 <script>
-const TACO_URL = "taco.json";
-
-let tacoOriginal = [];
 let alimentos = [];
-let ingredientesReceita = [];
-let receitasSalvas = JSON.parse(localStorage.getItem("nutrivida_receitas_pro") || "[]");
+let ingredientes = [];
+let receitas = JSON.parse(localStorage.getItem("nutrivida_receitas_pro") || "[]");
 
-const medidasCaseiras = {
-  "arroz": [
-    { nome: "colher de sopa", gramas: 25 },
-    { nome: "escumadeira", gramas: 80 },
-    { nome: "xícara", gramas: 160 }
-  ],
-  "feijao": [
-    { nome: "colher de sopa", gramas: 25 },
-    { nome: "concha pequena", gramas: 80 },
-    { nome: "concha média", gramas: 120 }
-  ],
-  "cafe": [
-    { nome: "xícara pequena", gramas: 50 },
-    { nome: "xícara média", gramas: 100 },
-    { nome: "caneca", gramas: 200 }
-  ],
-  "leite": [
-    { nome: "colher de sopa", gramas: 15 },
-    { nome: "copo americano", gramas: 165 },
-    { nome: "xícara", gramas: 240 }
-  ],
-  "ovo": [
-    { nome: "1 unidade pequena", gramas: 45 },
-    { nome: "1 unidade média", gramas: 50 },
-    { nome: "1 unidade grande", gramas: 60 }
-  ],
-  "manteiga": [
-    { nome: "ponta de faca", gramas: 5 },
-    { nome: "colher de chá", gramas: 8 },
-    { nome: "colher de sopa", gramas: 20 }
-  ],
-  "margarina": [
-    { nome: "ponta de faca", gramas: 5 },
-    { nome: "colher de chá", gramas: 8 },
-    { nome: "colher de sopa", gramas: 20 }
-  ],
-  "azeite": [
-    { nome: "colher de chá", gramas: 4 },
-    { nome: "colher de sopa", gramas: 13 }
-  ],
-  "oleo": [
-    { nome: "colher de chá", gramas: 4 },
-    { nome: "colher de sopa", gramas: 13 }
-  ],
-  "default": [
-    { nome: "gramas", gramas: 100 },
-    { nome: "colher de sopa", gramas: 20 },
-    { nome: "xícara", gramas: 100 }
-  ]
+const medidas = {
+  cafe: [{n:"xícara pequena",g:50},{n:"xícara média",g:100},{n:"caneca",g:200}],
+  arroz: [{n:"colher de sopa",g:25},{n:"escumadeira",g:80},{n:"xícara",g:160}],
+  feijao: [{n:"colher de sopa",g:25},{n:"concha pequena",g:80},{n:"concha média",g:120}],
+  leite: [{n:"colher de sopa",g:15},{n:"copo americano",g:165},{n:"xícara",g:240}],
+  ovo: [{n:"1 unidade pequena",g:45},{n:"1 unidade média",g:50},{n:"1 unidade grande",g:60}],
+  manteiga: [{n:"ponta de faca",g:5},{n:"colher de chá",g:8},{n:"colher de sopa",g:20}],
+  margarina: [{n:"ponta de faca",g:5},{n:"colher de chá",g:8},{n:"colher de sopa",g:20}],
+  default: [{n:"100 g",g:100},{n:"50 g",g:50},{n:"colher de sopa",g:20}]
 };
 
-function normalizarTexto(txt) {
-  return String(txt || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
+function norm(t){
+  return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 }
 
-function pegarCampo(obj, nomes, padrao = "") {
-  for (const nome of nomes) {
-    if (obj[nome] !== undefined && obj[nome] !== null && obj[nome] !== "") return obj[nome];
+function num(v){
+  if(v===null || v===undefined || v==="" || v==="NA" || v==="Tr") return 0;
+  const n = parseFloat(String(v).replace(",","."));
+  return isFinite(n) ? n : 0;
+}
+
+function fmt(v){
+  return num(v).toLocaleString("pt-BR",{maximumFractionDigits:1});
+}
+
+function medidasDo(nome){
+  const n = norm(nome);
+  for(const k of Object.keys(medidas)){
+    if(k !== "default" && n.includes(k)) return medidas[k];
   }
-  return padrao;
+  return medidas.default;
 }
 
-function numero(valor) {
-  if (valor === undefined || valor === null || valor === "" || valor === "NA" || valor === "Tr") return 0;
-  const limpo = String(valor).replace(",", ".").replace(/[^\d.-]/g, "");
-  const n = parseFloat(limpo);
-  return Number.isFinite(n) ? n : 0;
-}
+document.getElementById("file").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(!file) return;
 
-function mapearAlimento(item, index) {
-  const nome = pegarCampo(item, ["nome", "Nome", "descricao", "Descrição", "alimento", "Alimento", "description"], "Alimento sem nome");
-  const categoria = pegarCampo(item, ["categoria", "Categoria", "grupo", "Grupo"], "Sem categoria");
+  const reader = new FileReader();
+  reader.onload = evt=>{
+    try{
+      const json = JSON.parse(evt.target.result);
+      const base = Array.isArray(json) ? json : json.alimentos;
 
-  return {
-    id: pegarCampo(item, ["id", "ID", "codigo", "Código", "cod"], "taco_" + index),
-    nome,
-    nomeBusca: normalizarTexto(nome),
-    categoria,
-    energia: numero(pegarCampo(item, ["energia_kcal", "Energia_kcal", "kcal", "Kcal", "Energia", "energia"], 0)),
-    proteina: numero(pegarCampo(item, ["proteina_g", "Proteina_g", "Proteína", "proteina", "protein"], 0)),
-    carboidrato: numero(pegarCampo(item, ["carboidrato_g", "Carboidrato_g", "Carboidrato", "carboidrato", "carbohydrate"], 0)),
-    lipidio: numero(pegarCampo(item, ["lipidio_g", "Lipidio_g", "Lipídio", "lipidio", "gordura", "Gordura", "fat"], 0)),
-    original: item
-  };
-}
+      if(!Array.isArray(base)){
+        throw new Error("Não encontrei a lista alimentos dentro do JSON.");
+      }
 
-async function carregarTaco() {
-  const status = document.getElementById("status");
+      alimentos = base.map((a,i)=>({
+        id: a.numero || i,
+        nome: a.descricao_alimento || "Sem nome",
+        busca: norm(a.descricao_alimento || ""),
+        grupo: a.grupo || "Sem grupo",
+        kcal: num(a.energia_kcal),
+        prot: num(a.proteina_g),
+        carb: num(a.carboidrato_g),
+        gord: num(a.lipideos_g),
+        fibra: num(a.fibra_alimentar_g),
+        sodio: num(a.sodio_mg),
+        colesterol: num(a.colesterol_mg)
+      })).filter(a=>a.nome !== "Sem nome");
 
-  try {
-    const resp = await fetch(TACO_URL);
-    if (!resp.ok) throw new Error("Não foi possível carregar " + TACO_URL);
-
-    tacoOriginal = await resp.json();
-
-    if (!Array.isArray(tacoOriginal)) {
-      if (Array.isArray(tacoOriginal.alimentos)) tacoOriginal = tacoOriginal.alimentos;
-      else if (Array.isArray(tacoOriginal.data)) tacoOriginal = tacoOriginal.data;
-      else throw new Error("Formato do taco.json não reconhecido.");
+      preencherGrupos();
+      renderBusca();
+      document.getElementById("status").textContent = alimentos.length + " alimentos carregados com sucesso.";
+    }catch(err){
+      document.getElementById("status").textContent = "Erro: " + err.message;
     }
+  };
+  reader.readAsText(file, "UTF-8");
+});
 
-    alimentos = tacoOriginal.map(mapearAlimento).filter(a => a.nome && a.nome !== "Alimento sem nome");
-    preencherCategorias();
-    renderizarBusca();
-
-    status.textContent = alimentos.length + " alimentos carregados da TACO.";
-  } catch (e) {
-    status.innerHTML = "Não consegui carregar o <b>taco.json</b>. Confira se ele está na mesma pasta deste HTML.";
-    document.getElementById("lista").innerHTML = `<div class="empty">Erro: ${e.message}</div>`;
-  }
-}
-
-function preencherCategorias() {
-  const select = document.getElementById("categoriaFiltro");
-  const categorias = [...new Set(alimentos.map(a => a.categoria).filter(Boolean))].sort();
-  categorias.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    select.appendChild(opt);
+function preencherGrupos(){
+  const sel = document.getElementById("grupo");
+  sel.innerHTML = '<option value="">Todos os grupos</option>';
+  [...new Set(alimentos.map(a=>a.grupo))].sort().forEach(g=>{
+    const op = document.createElement("option");
+    op.value = g;
+    op.textContent = g;
+    sel.appendChild(op);
   });
 }
 
-function obterMedidas(nome) {
-  const n = normalizarTexto(nome);
-  for (const chave of Object.keys(medidasCaseiras)) {
-    if (chave !== "default" && n.includes(chave)) return medidasCaseiras[chave];
-  }
-  return medidasCaseiras.default;
-}
+document.getElementById("busca").addEventListener("input", renderBusca);
+document.getElementById("grupo").addEventListener("change", renderBusca);
+document.getElementById("ordem").addEventListener("change", renderBusca);
+document.getElementById("rendimento").addEventListener("input", renderIngredientes);
 
-function renderizarBusca() {
-  const termo = normalizarTexto(document.getElementById("busca").value);
-  const categoria = document.getElementById("categoriaFiltro").value;
-  const ordenar = document.getElementById("ordenar").value;
+function renderBusca(){
   const lista = document.getElementById("lista");
+  const termo = norm(document.getElementById("busca").value);
+  const grupo = document.getElementById("grupo").value;
+  const ordem = document.getElementById("ordem").value;
 
-  let filtrados = alimentos.filter(a => {
-    const okBusca = !termo || a.nomeBusca.includes(termo);
-    const okCategoria = !categoria || a.categoria === categoria;
-    return okBusca && okCategoria;
-  });
-
-  filtrados.sort((a, b) => {
-    if (ordenar === "energia") return b.energia - a.energia;
-    if (ordenar === "proteina") return b.proteina - a.proteina;
-    if (ordenar === "carboidrato") return b.carboidrato - a.carboidrato;
-    if (ordenar === "lipidio") return b.lipidio - a.lipidio;
-    return a.nome.localeCompare(b.nome, "pt-BR");
-  });
-
-  filtrados = filtrados.slice(0, 80);
-
-  if (!filtrados.length) {
-    lista.innerHTML = `<div class="empty">Nenhum ingrediente encontrado.</div>`;
+  if(!alimentos.length){
+    lista.innerHTML = '<div class="empty">Carregue o taco.json para começar.</div>';
     return;
   }
 
-  lista.innerHTML = filtrados.map((a, idx) => {
-    const medidas = obterMedidas(a.nome);
-    const options = medidas.map(m => `<option value="${m.gramas}">${m.nome} (${m.gramas}g/ml)</option>`).join("");
+  let arr = alimentos.filter(a=>
+    (!termo || a.busca.includes(termo)) &&
+    (!grupo || a.grupo === grupo)
+  );
+
+  arr.sort((a,b)=>{
+    if(ordem==="kcal") return b.kcal-a.kcal;
+    if(ordem==="prot") return b.prot-a.prot;
+    if(ordem==="carb") return b.carb-a.carb;
+    if(ordem==="gord") return b.gord-a.gord;
+    return a.nome.localeCompare(b.nome,"pt-BR");
+  });
+
+  arr = arr.slice(0,80);
+
+  if(!arr.length){
+    lista.innerHTML = '<div class="empty">Nenhum alimento encontrado.</div>';
+    return;
+  }
+
+  lista.innerHTML = arr.map((a,idx)=>{
+    const ms = medidasDo(a.nome);
+    const ops = ms.map(m=>`<option value="${m.g}">${m.n} (${m.g}g/ml)</option>`).join("");
+
     return `
-      <div class="food-item">
+      <div class="food">
         <div class="food-title">${a.nome}</div>
         <div class="food-meta">
-          <span class="pill">${a.categoria}</span>
-          <span>${fmt(a.energia)} kcal</span>
-          <span>P: ${fmt(a.proteina)}g</span>
-          <span>C: ${fmt(a.carboidrato)}g</span>
-          <span>G: ${fmt(a.lipidio)}g</span>
+          <span class="pill">${a.grupo}</span>
+          <span class="macro">${fmt(a.kcal)} kcal</span>
+          <span class="macro">P ${fmt(a.prot)}g</span>
+          <span class="macro">C ${fmt(a.carb)}g</span>
+          <span class="macro">G ${fmt(a.gord)}g</span>
+          <span class="macro">Fibra ${fmt(a.fibra)}g</span>
         </div>
-        <div class="food-actions">
-          <select id="medida_${idx}" onchange="document.getElementById('qtd_${idx}').value=this.value">${options}</select>
-          <input id="qtd_${idx}" type="number" min="0" step="1" value="${medidas[0].gramas}" />
-          <button onclick="adicionarIngrediente('${a.id}', ${idx})">Adicionar</button>
+        <div class="grid3">
+          <select id="med_${idx}" onchange="document.getElementById('qtd_${idx}').value=this.value">${ops}</select>
+          <input id="qtd_${idx}" type="number" min="0" step="1" value="${ms[0].g}">
+          <button onclick="addIngrediente('${a.id}', ${idx})">Adicionar</button>
         </div>
       </div>
     `;
   }).join("");
 }
 
-function adicionarIngrediente(id, idxTela) {
-  const alimento = alimentos.find(a => String(a.id) === String(id));
-  if (!alimento) return;
+function addIngrediente(id, idx){
+  const a = alimentos.find(x=>String(x.id)===String(id));
+  if(!a) return;
 
-  const qtdInput = document.getElementById("qtd_" + idxTela);
-  const gramas = numero(qtdInput ? qtdInput.value : 100) || 100;
+  const qtd = num(document.getElementById("qtd_"+idx).value) || 100;
 
-  ingredientesReceita.push({
-    id: alimento.id,
-    nome: alimento.nome,
-    categoria: alimento.categoria,
-    gramas,
-    energia: alimento.energia,
-    proteina: alimento.proteina,
-    carboidrato: alimento.carboidrato,
-    lipidio: alimento.lipidio
-  });
-
-  renderizarIngredientes();
-  mostrarMsg("Ingrediente adicionado: " + alimento.nome);
+  ingredientes.push({...a, gramas:qtd});
+  renderIngredientes();
+  msg("Ingrediente adicionado: " + a.nome);
 }
 
-function removerIngrediente(index) {
-  ingredientesReceita.splice(index, 1);
-  renderizarIngredientes();
+function calc(item,campo){
+  return num(item[campo]) * num(item.gramas) / 100;
 }
 
-function atualizarGramas(index, valor) {
-  ingredientesReceita[index].gramas = numero(valor);
-  renderizarIngredientes(false);
+function totais(){
+  return ingredientes.reduce((t,i)=>{
+    t.kcal += calc(i,"kcal");
+    t.prot += calc(i,"prot");
+    t.carb += calc(i,"carb");
+    t.gord += calc(i,"gord");
+    t.fibra += calc(i,"fibra");
+    t.sodio += calc(i,"sodio");
+    t.colesterol += calc(i,"colesterol");
+    return t;
+  },{kcal:0,prot:0,carb:0,gord:0,fibra:0,sodio:0,colesterol:0});
 }
 
-function calcularItem(item, campo) {
-  return (numero(item[campo]) * numero(item.gramas)) / 100;
-}
-
-function calcularTotais() {
-  return ingredientesReceita.reduce((acc, item) => {
-    acc.energia += calcularItem(item, "energia");
-    acc.proteina += calcularItem(item, "proteina");
-    acc.carboidrato += calcularItem(item, "carboidrato");
-    acc.lipidio += calcularItem(item, "lipidio");
-    return acc;
-  }, { energia: 0, proteina: 0, carboidrato: 0, lipidio: 0 });
-}
-
-function renderizarIngredientes(refazerLista = true) {
+function renderIngredientes(){
   const box = document.getElementById("ingredientes");
 
-  if (refazerLista) {
-    if (!ingredientesReceita.length) {
-      box.innerHTML = `<div class="empty">Nenhum ingrediente adicionado ainda.</div>`;
-    } else {
-      box.innerHTML = ingredientesReceita.map((item, i) => `
-        <div class="ingredient">
-          <div>
-            <strong>${item.nome}</strong>
-            <small>${fmt(calcularItem(item, "energia"))} kcal | P ${fmt(calcularItem(item, "proteina"))}g | C ${fmt(calcularItem(item, "carboidrato"))}g | G ${fmt(calcularItem(item, "lipidio"))}g</small>
-          </div>
-          <input type="number" min="0" step="1" value="${item.gramas}" onchange="atualizarGramas(${i}, this.value)" />
-          <button class="danger" onclick="removerIngrediente(${i})">×</button>
+  if(!ingredientes.length){
+    box.innerHTML = '<div class="empty">Nenhum ingrediente adicionado ainda.</div>';
+  }else{
+    box.innerHTML = ingredientes.map((i,idx)=>`
+      <div class="ingredient">
+        <div>
+          <strong>${i.nome}</strong>
+          <small>${fmt(calc(i,"kcal"))} kcal | P ${fmt(calc(i,"prot"))}g | C ${fmt(calc(i,"carb"))}g | G ${fmt(calc(i,"gord"))}g</small>
         </div>
-      `).join("");
-    }
+        <input type="number" min="0" step="1" value="${i.gramas}" onchange="ingredientes[${idx}].gramas=num(this.value); renderIngredientes();">
+        <button class="danger" onclick="ingredientes.splice(${idx},1); renderIngredientes();">×</button>
+      </div>
+    `).join("");
   }
 
-  const t = calcularTotais();
-  const rend = Math.max(1, numero(document.getElementById("rendimento").value) || 1);
+  const t = totais();
+  const r = Math.max(1, num(document.getElementById("rendimento").value) || 1);
 
-  document.getElementById("totKcal").textContent = fmt(t.energia);
-  document.getElementById("totProt").textContent = fmt(t.proteina) + "g";
-  document.getElementById("totCarb").textContent = fmt(t.carboidrato) + "g";
-  document.getElementById("totLip").textContent = fmt(t.lipidio) + "g";
+  document.getElementById("totKcal").textContent = fmt(t.kcal);
+  document.getElementById("totProt").textContent = fmt(t.prot)+"g";
+  document.getElementById("totCarb").textContent = fmt(t.carb)+"g";
+  document.getElementById("totGord").textContent = fmt(t.gord)+"g";
 
-  document.getElementById("porKcal").textContent = fmt(t.energia / rend);
-  document.getElementById("porProt").textContent = fmt(t.proteina / rend) + "g";
-  document.getElementById("porCarb").textContent = fmt(t.carboidrato / rend) + "g";
-  document.getElementById("porLip").textContent = fmt(t.lipidio / rend) + "g";
+  document.getElementById("porKcal").textContent = fmt(t.kcal/r);
+  document.getElementById("porProt").textContent = fmt(t.prot/r)+"g";
+  document.getElementById("porCarb").textContent = fmt(t.carb/r)+"g";
+  document.getElementById("porGord").textContent = fmt(t.gord/r)+"g";
 }
 
-function salvarReceita() {
+function salvarReceita(){
   const nome = document.getElementById("nomeReceita").value.trim();
+  if(!nome) return msg("Digite o nome da receita.", true);
+  if(!ingredientes.length) return msg("Adicione pelo menos um ingrediente.", true);
 
-  if (!nome) {
-    mostrarMsg("Dê um nome para a receita antes de salvar.", true);
-    return;
-  }
+  const t = totais();
+  const r = Math.max(1, num(document.getElementById("rendimento").value) || 1);
 
-  if (!ingredientesReceita.length) {
-    mostrarMsg("Adicione pelo menos um ingrediente.", true);
-    return;
-  }
-
-  const totais = calcularTotais();
-  const rendimento = Math.max(1, numero(document.getElementById("rendimento").value) || 1);
-
-  const receita = {
-    id: "receita_" + Date.now(),
+  receitas.push({
+    id:"receita_"+Date.now(),
     nome,
-    rendimento,
-    fonte: "TACO",
-    ingredientes: ingredientesReceita,
-    totais,
-    porcao: {
-      energia: totais.energia / rendimento,
-      proteina: totais.proteina / rendimento,
-      carboidrato: totais.carboidrato / rendimento,
-      lipidio: totais.lipidio / rendimento
-    },
-    criada_em: new Date().toISOString()
-  };
+    rendimento:r,
+    fonte:"TACO",
+    ingredientes,
+    totais:t,
+    porcao:{
+      kcal:t.kcal/r,
+      prot:t.prot/r,
+      carb:t.carb/r,
+      gord:t.gord/r,
+      fibra:t.fibra/r,
+      sodio:t.sodio/r,
+      colesterol:t.colesterol/r
+    }
+  });
 
-  receitasSalvas.push(receita);
-  localStorage.setItem("nutrivida_receitas_pro", JSON.stringify(receitasSalvas));
-  renderizarReceitasSalvas();
-  mostrarMsg("Receita salva com sucesso.");
+  localStorage.setItem("nutrivida_receitas_pro", JSON.stringify(receitas));
+  renderSalvas();
+  msg("Receita salva com sucesso.");
 }
 
-function limparReceita() {
-  ingredientesReceita = [];
+function limparReceita(){
+  ingredientes = [];
   document.getElementById("nomeReceita").value = "";
   document.getElementById("rendimento").value = 1;
-  renderizarIngredientes();
+  renderIngredientes();
 }
 
-function renderizarReceitasSalvas() {
-  const box = document.getElementById("receitasSalvas");
-
-  if (!receitasSalvas.length) {
-    box.innerHTML = `<div class="empty">Nenhuma receita salva ainda.</div>`;
+function renderSalvas(){
+  const box = document.getElementById("salvas");
+  if(!receitas.length){
+    box.innerHTML = '<div class="empty">Nenhuma receita salva ainda.</div>';
     return;
   }
 
-  box.innerHTML = receitasSalvas.slice().reverse().map(r => `
-    <div class="food-item">
-      <div class="food-title">${r.nome}</div>
+  box.innerHTML = receitas.slice().reverse().map(r=>`
+    <div class="recipe-card">
+      <strong>${r.nome}</strong>
       <div class="food-meta">
-        <span class="pill">${r.fonte || "TACO"}</span>
-        <span>${r.rendimento} porção(ões)</span>
-        <span>${fmt(r.porcao.energia)} kcal/porção</span>
-        <span>P ${fmt(r.porcao.proteina)}g</span>
-        <span>C ${fmt(r.porcao.carboidrato)}g</span>
-        <span>G ${fmt(r.porcao.lipidio)}g</span>
+        <span class="pill">${r.fonte}</span>
+        <span class="macro">${r.rendimento} porção(ões)</span>
+        <span class="macro">${fmt(r.porcao.kcal)} kcal/porção</span>
+        <span class="macro">P ${fmt(r.porcao.prot)}g</span>
+        <span class="macro">C ${fmt(r.porcao.carb)}g</span>
+        <span class="macro">G ${fmt(r.porcao.gord)}g</span>
       </div>
     </div>
   `).join("");
 }
 
-function exportarReceitas() {
-  const blob = new Blob([JSON.stringify(receitasSalvas, null, 2)], { type: "application/json" });
+function exportarReceitas(){
+  const blob = new Blob([JSON.stringify(receitas,null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -721,28 +718,17 @@ function exportarReceitas() {
   URL.revokeObjectURL(url);
 }
 
-function mostrarMsg(texto, erro = false) {
-  const msg = document.getElementById("msg");
-  msg.textContent = texto;
-  msg.style.display = "block";
-  msg.style.background = erro ? "#fee2e2" : "#ecfdf5";
-  msg.style.borderColor = erro ? "#fecaca" : "#bbf7d0";
-  msg.style.color = erro ? "#991b1b" : "#15803d";
-  setTimeout(() => msg.style.display = "none", 2600);
+function msg(texto, erro=false){
+  const m = document.getElementById("msg");
+  m.textContent = texto;
+  m.style.display = "block";
+  m.style.background = erro ? "#fee2e2" : "#ecfdf5";
+  m.style.border = erro ? "1px solid #fecaca" : "1px solid #bbf7d0";
+  m.style.color = erro ? "#991b1b" : "#15803d";
+  setTimeout(()=>m.style.display="none",2600);
 }
 
-function fmt(n) {
-  n = numero(n);
-  return n.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
-}
-
-document.getElementById("busca").addEventListener("input", renderizarBusca);
-document.getElementById("categoriaFiltro").addEventListener("change", renderizarBusca);
-document.getElementById("ordenar").addEventListener("change", renderizarBusca);
-document.getElementById("rendimento").addEventListener("input", () => renderizarIngredientes(false));
-
-renderizarReceitasSalvas();
-carregarTaco();
+renderSalvas();
 </script>
 </body>
 </html>
