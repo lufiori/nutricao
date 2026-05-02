@@ -392,9 +392,9 @@ button.danger{
       </select>
     </div>
 
-    <div id="status" class="status">Aguardando seleção do arquivo TACO.</div>
+    <div id="status" class="status">Tentando carregar taco.json automaticamente...</div>
     <div id="lista" class="search-list">
-      <div class="empty">Depois de carregar a TACO, os alimentos aparecerão aqui.</div>
+      <div class="empty">Tentando carregar a TACO automaticamente...</div>
     </div>
   </section>
 
@@ -441,6 +441,8 @@ button.danger{
 </main>
 
 <script>
+const TACO_URL = "./taco.json";
+
 let alimentos = [];
 let ingredientes = [];
 let receitas = JSON.parse(localStorage.getItem("nutrivida_receitas_pro") || "[]");
@@ -478,6 +480,48 @@ function medidasDo(nome){
   return medidas.default;
 }
 
+function processarTaco(json, origem){
+  const base = Array.isArray(json) ? json : json.alimentos;
+
+  if(!Array.isArray(base)){
+    throw new Error("Não encontrei a lista alimentos dentro do JSON.");
+  }
+
+  alimentos = base.map((a,i)=>({
+    id: a.numero || i,
+    nome: a.descricao_alimento || "Sem nome",
+    busca: norm(a.descricao_alimento || ""),
+    grupo: a.grupo || "Sem grupo",
+    kcal: num(a.energia_kcal),
+    prot: num(a.proteina_g),
+    carb: num(a.carboidrato_g),
+    gord: num(a.lipideos_g),
+    fibra: num(a.fibra_alimentar_g),
+    sodio: num(a.sodio_mg),
+    colesterol: num(a.colesterol_mg)
+  })).filter(a=>a.nome !== "Sem nome");
+
+  preencherGrupos();
+  renderBusca();
+  document.getElementById("status").textContent = alimentos.length + " alimentos carregados com sucesso (" + origem + ").";
+}
+
+async function carregarTacoAutomatico(){
+  try{
+    const resp = await fetch(TACO_URL, { cache: "no-store" });
+
+    if(!resp.ok){
+      throw new Error("Arquivo não encontrado em " + TACO_URL + " - status " + resp.status);
+    }
+
+    const json = await resp.json();
+    processarTaco(json, "automático");
+  }catch(err){
+    document.getElementById("status").textContent = "Não carregou automático. Confirme se o arquivo está como taco.json na mesma pasta ou selecione manualmente.";
+    document.getElementById("lista").innerHTML = '<div class="empty">Falha no automático: ' + err.message + '<br><br>Use o botão de seleção manual acima.</div>';
+  }
+}
+
 document.getElementById("file").addEventListener("change", e=>{
   const file = e.target.files[0];
   if(!file) return;
@@ -486,29 +530,7 @@ document.getElementById("file").addEventListener("change", e=>{
   reader.onload = evt=>{
     try{
       const json = JSON.parse(evt.target.result);
-      const base = Array.isArray(json) ? json : json.alimentos;
-
-      if(!Array.isArray(base)){
-        throw new Error("Não encontrei a lista alimentos dentro do JSON.");
-      }
-
-      alimentos = base.map((a,i)=>({
-        id: a.numero || i,
-        nome: a.descricao_alimento || "Sem nome",
-        busca: norm(a.descricao_alimento || ""),
-        grupo: a.grupo || "Sem grupo",
-        kcal: num(a.energia_kcal),
-        prot: num(a.proteina_g),
-        carb: num(a.carboidrato_g),
-        gord: num(a.lipideos_g),
-        fibra: num(a.fibra_alimentar_g),
-        sodio: num(a.sodio_mg),
-        colesterol: num(a.colesterol_mg)
-      })).filter(a=>a.nome !== "Sem nome");
-
-      preencherGrupos();
-      renderBusca();
-      document.getElementById("status").textContent = alimentos.length + " alimentos carregados com sucesso.";
+      processarTaco(json, "manual");
     }catch(err){
       document.getElementById("status").textContent = "Erro: " + err.message;
     }
@@ -729,6 +751,7 @@ function msg(texto, erro=false){
 }
 
 renderSalvas();
+carregarTacoAutomatico();
 </script>
 </body>
 </html>
