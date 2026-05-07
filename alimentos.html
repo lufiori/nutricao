@@ -5,191 +5,426 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NutriVida - Alimentos TBCA + TACO</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;--green:#16a34a;--green2:#15803d;--soft:#ecfdf5;--blue:#2563eb;--blueSoft:#eff6ff;--orange:#f97316;--orangeSoft:#fff7ed;--shadow:0 10px 28px rgba(15,23,42,.06);--radius:20px}
+:root{
+  --bg:#f6f7f9;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;
+  --green:#16a34a;--green2:#15803d;--soft:#ecfdf5;
+  --blue:#2563eb;--blueSoft:#eff6ff;--orange:#f97316;--orangeSoft:#fff7ed;
+  --shadow:0 10px 28px rgba(15,23,42,.06);--radius:20px;
+}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f9fafb,#f3f4f6);color:var(--text)}
 header{background:#fff;border-bottom:1px solid var(--line);padding:18px 22px;position:sticky;top:0;z-index:20}
 .wrap{max-width:1220px;margin:auto}
 .head{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.logo{display:flex;gap:12px;align-items:center}.icon{width:42px;height:42px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:23px}
-h1{font-size:22px;color:var(--green2);margin:0}.sub{color:var(--muted);font-size:13px;margin:3px 0 0}
+.logo{display:flex;gap:12px;align-items:center}
+.icon{width:42px;height:42px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:23px}
+h1{font-size:22px;color:var(--green2);margin:0}
+.sub{color:var(--muted);font-size:13px;margin:3px 0 0}
 .badge{display:inline-block;background:var(--soft);color:var(--green2);border:1px solid #bbf7d0;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800}
-main{max-width:1220px;margin:auto;padding:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
-h2{font-size:19px;margin:0 0 5px}.help{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.45}
+main{max-width:1220px;margin:auto;padding:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+h2{font-size:19px;margin:0 0 5px}
+.help{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.45}
 .notice{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:12px;border-radius:16px;font-size:13px;margin-bottom:12px}
-input,select,button{font:inherit}input,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;outline:none}
+input,select,button{font:inherit}
+input,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;outline:none}
 input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
-button{border:0;border-radius:14px;padding:10px 13px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}button:hover{background:var(--green2)}
-button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}button.light:hover{background:#e5e7eb}
-.grid4{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.statusGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.status{background:#f9fafb;border:1px solid var(--line);border-radius:15px;padding:11px;color:var(--muted);font-size:13px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
-.manual{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.manual.open{display:block}
-.topResults{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.count{color:var(--muted);font-size:13px}
-.sectionTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:18px 0 10px}.sectionTitle h3{margin:0;font-size:17px}
-.source{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid var(--line)}.tbca{background:var(--blueSoft);color:var(--blue);border-color:#bfdbfe}.taco{background:var(--orangeSoft);color:#c2410c;border-color:#fed7aa}
-.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.food{border:1px solid var(--line);background:#fff;border-radius:18px;padding:14px;display:grid;gap:10px}.food:hover{box-shadow:0 8px 20px rgba(15,23,42,.05)}
-.foodTop{display:flex;justify-content:space-between;gap:10px}.title{font-weight:900;line-height:1.25}.group{color:var(--muted);font-size:12.5px;margin-top:3px}
-.macros{display:flex;flex-wrap:wrap;gap:7px}.macro{background:#f9fafb;border:1px solid var(--line);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:700}
-.details{display:none;background:#f9fafb;border:1px solid var(--line);border-radius:16px;padding:11px}.details.open{display:block}.detailGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.detail{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}.detail b{display:block;font-size:13px}.detail span{color:var(--muted);font-size:12px}
-.rawGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.rawItem{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;font-size:12px}.rawItem b{display:block;color:#374151}.rawItem span{color:var(--muted)}
+button{border:0;border-radius:14px;padding:10px 13px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}
+button:hover{background:var(--green2)}
+button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}
+button.light:hover{background:#e5e7eb}
+.grid4{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.statusGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.status{background:#f9fafb;border:1px solid var(--line);border-radius:15px;padding:11px;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.manual{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.manual.open{display:block}
+.topResults{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.count{color:var(--muted);font-size:13px}
+.sectionTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:18px 0 10px}
+.sectionTitle h3{margin:0;font-size:17px}
+.source{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid var(--line)}
+.tbca{background:var(--blueSoft);color:var(--blue);border-color:#bfdbfe}
+.taco{background:var(--orangeSoft);color:#c2410c;border-color:#fed7aa}
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.food{border:1px solid var(--line);background:#fff;border-radius:18px;padding:14px;display:grid;gap:10px}
+.food:hover{box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.foodTop{display:flex;justify-content:space-between;gap:10px}
+.title{font-weight:900;line-height:1.25}
+.group{color:var(--muted);font-size:12.5px;margin-top:3px}
+.type{font-size:12px;color:#4b5563;margin-top:3px}
+.macros{display:flex;flex-wrap:wrap;gap:7px}
+.macro{background:#f9fafb;border:1px solid var(--line);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.details{display:none;background:#f9fafb;border:1px solid var(--line);border-radius:16px;padding:11px}
+.details.open{display:block}
+.detailGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.detail{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
+.detail b{display:block;font-size:13px}
+.detail span{color:var(--muted);font-size:12px}
+.medidas{margin-top:12px}
+.medida{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin-top:6px;font-size:12px}
+.medida b{display:block}
 .empty{background:#f9fafb;border:1px dashed #d1d5db;border-radius:18px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
-@media(max-width:900px){header{position:static}.head{align-items:flex-start;flex-direction:column}main{padding:14px}.grid4,.grid2,.statusGrid{grid-template-columns:1fr}.results{grid-template-columns:1fr}.detailGrid,.rawGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){
+  header{position:static}.head{align-items:flex-start;flex-direction:column}
+  main{padding:14px}.grid4,.grid2,.statusGrid{grid-template-columns:1fr}
+  .results{grid-template-columns:1fr}.detailGrid{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
-<header><div class="wrap head"><div class="logo"><div class="icon">🔎</div><div><h1>NutriVida - Alimentos</h1><p class="sub">Consulta com duas bases: TBCA + TACO</p></div></div><div><span class="badge">TBCA</span> <span class="badge">TACO</span></div></div></header>
+<header>
+  <div class="wrap head">
+    <div class="logo">
+      <div class="icon">🔎</div>
+      <div>
+        <h1>NutriVida - Alimentos</h1>
+        <p class="sub">Consulta com duas bases: TBCA + TACO</p>
+      </div>
+    </div>
+    <div><span class="badge">TBCA</span> <span class="badge">TACO</span></div>
+  </div>
+</header>
 
 <main>
 <section class="card">
-<h2>Consulta de alimentos</h2>
-<p class="help">Pesquise uma vez e compare os resultados da TBCA e da TACO na mesma tela.</p>
-<div class="notice">Versão corrigida: a TBCA agora tenta identificar automaticamente os campos de nutrientes, mesmo que os nomes no JSON estejam diferentes.</div>
+  <h2>Consulta de alimentos</h2>
+  <p class="help">Pesquise uma vez e compare os resultados da TBCA e da TACO na mesma tela.</p>
+  <div class="notice">
+    Esta versão foi ajustada para o seu <b>tbca_pronto.json</b>, lendo os nutrientes dentro de <b>nutrientes100g</b>.
+    A TACO continua em <b>taco.json</b>.
+  </div>
 
-<div class="grid4">
-<input id="busca" type="search" placeholder="Buscar: café, arroz, feijão, frango...">
-<select id="fonte"><option value="ambas">Mostrar TBCA + TACO</option><option value="tbca">Somente TBCA</option><option value="taco">Somente TACO</option></select>
-<select id="grupo"><option value="">Todos os grupos</option></select>
-<select id="ordem"><option value="nome">Ordenar por nome</option><option value="kcal">Maior energia</option><option value="proteina">Maior proteína</option><option value="carbo">Maior carboidrato</option><option value="gordura">Maior gordura</option><option value="fibra">Maior fibra</option></select>
-</div>
+  <div class="grid4">
+    <input id="busca" type="search" placeholder="Buscar: café, arroz, feijão, frango...">
+    <select id="fonte">
+      <option value="ambas">Mostrar TBCA + TACO</option>
+      <option value="tbca">Somente TBCA</option>
+      <option value="taco">Somente TACO</option>
+    </select>
+    <select id="grupo"><option value="">Todos os grupos</option></select>
+    <select id="ordem">
+      <option value="nome">Ordenar por nome</option>
+      <option value="kcal">Maior energia</option>
+      <option value="proteina">Maior proteína</option>
+      <option value="carbo">Maior carboidrato</option>
+      <option value="gordura">Maior gordura</option>
+      <option value="fibra">Maior fibra</option>
+    </select>
+  </div>
 
-<div class="statusGrid"><div id="statusTbca" class="status">TBCA: tentando carregar...</div><div id="statusTaco" class="status">TACO: tentando carregar...</div></div>
+  <div class="statusGrid">
+    <div id="statusTbca" class="status">TBCA: tentando carregar tbca_pronto.json...</div>
+    <div id="statusTaco" class="status">TACO: tentando carregar taco.json...</div>
+  </div>
 
-<div class="tabs">
-<button class="light tab active" id="tabTodos" onclick="setModo('todos')">Todos</button>
-<button class="light tab" id="tabSimples" onclick="setModo('simples')">Ingredientes simples</button>
-<button class="light tab" id="tabPreparados" onclick="setModo('preparados')">Preparados</button>
-<button class="light" onclick="document.getElementById('manual').classList.toggle('open')">Carregar manualmente</button>
-</div>
+  <div class="tabs">
+    <button class="light tab active" id="tabTodos" onclick="setModo('todos')">Todos</button>
+    <button class="light tab" id="tabSimples" onclick="setModo('simples')">Ingredientes simples</button>
+    <button class="light tab" id="tabPreparados" onclick="setModo('preparados')">Preparados</button>
+    <button class="light" onclick="document.getElementById('manual').classList.toggle('open')">Carregar manualmente</button>
+  </div>
 
-<div id="manual" class="manual">
-<div class="grid2">
-<div><p class="help"><b>TBCA manual</b></p><input id="fileTbca" type="file" accept=".json,application/json"></div>
-<div><p class="help"><b>TACO manual</b></p><input id="fileTaco" type="file" accept=".json,application/json"></div>
-</div>
-</div>
+  <div id="manual" class="manual">
+    <div class="grid2">
+      <div><p class="help"><b>TBCA manual</b></p><input id="fileTbca" type="file" accept=".json,application/json"></div>
+      <div><p class="help"><b>TACO manual</b></p><input id="fileTaco" type="file" accept=".json,application/json"></div>
+    </div>
+  </div>
 </section>
 
 <section class="card">
-<div class="topResults"><h2>Resultados</h2><div id="contador" class="count">Carregando bases...</div></div>
-<div id="resultados"><div class="empty">Aguarde o carregamento automático ou use o carregamento manual.</div></div>
+  <div class="topResults">
+    <h2>Resultados</h2>
+    <div id="contador" class="count">Carregando bases...</div>
+  </div>
+  <div id="resultados"><div class="empty">Aguarde o carregamento automático ou use o carregamento manual.</div></div>
 </section>
 </main>
 
 <script>
-const TBCA_URLS=["./tbca.json","./TBCA.json","./alimentos_tbca.json","./tbca_amigavel.json","./tbca_nutrivida.json","./tbca_base.json","./dados_tbca.json","./base_tbca.json"];
-const TACO_URL="./taco.json";
-let tbca=[], taco=[], todos=[], modo="todos";
+const TBCA_URLS = ["./tbca_pronto.json","./tbca.json","./TBCA.json","./alimentos_tbca.json","./tbca_amigavel.json"];
+const TACO_URL = "./taco.json";
+
+let tbca = [];
+let taco = [];
+let todos = [];
+let modo = "todos";
 
 function norm(t){return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
-function cleanKey(k){return norm(k).replace(/[^a-z0-9]/g,"")}
-function num(v){if(v==null||v===""||v==="NA"||v==="Tr"||v==="-"||v==="--")return 0;let n=parseFloat(String(v).replace(",",".").replace(/[^\d.-]/g,""));return isFinite(n)?n:0}
+function num(v){if(v===null||v===undefined||v===""||v==="NA"||v==="Tr"||v==="-"||v==="--")return 0;let n=parseFloat(String(v).replace(",",".").replace(/[^\d.-]/g,""));return isFinite(n)?n:0}
 function fmt(v){return num(v).toLocaleString("pt-BR",{maximumFractionDigits:1})}
-function arr(json){return Array.isArray(json)?json:(Array.isArray(json.alimentos)?json.alimentos:(Array.isArray(json.data)?json.data:(Array.isArray(json.items)?json.items:[])))}
+function arr(json){return Array.isArray(json)?json:(Array.isArray(json.alimentos)?json.alimentos:(Array.isArray(json.data)?json.data:[]))}
 function any(o,ks,p=""){for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k]}return p}
 
-function fuzzy(o, palavras, evitar=[]){
-  if(!o) return 0;
-  const keys=Object.keys(o);
-  for(const k of keys){
-    const ck=cleanKey(k);
-    const ok=palavras.every(p=>ck.includes(cleanKey(p)));
-    const bad=evitar.some(e=>ck.includes(cleanKey(e)));
-    if(ok && !bad) return num(o[k]);
-  }
-  return 0;
-}
+function mapTbca(a,i){
+  const n = a.nutrientes100g || {};
+  const nome = a.nome || a.descricao || a.descricao_alimento || "Sem nome";
 
-function nomeCampo(o){
-  return any(o,["nome","Nome","descricao","Descrição","descricao_alimento","Alimento","alimento","description","food_name","nome_alimento","nomeAlimento","nome_do_alimento"],"Sem nome");
-}
-function grupoCampo(o){
-  return any(o,["grupo","Grupo","categoria","Categoria","group","category","origem","classificacao","classificação"],"Sem grupo");
-}
-function rawNutrientes(o){
-  const proibidos=["id","codigo","cod","numero","nome","descricao","alimento","grupo","categoria","fonte","origem","classificacao"];
-  let lista=[];
-  Object.keys(o||{}).forEach(k=>{
-    const ck=cleanKey(k);
-    if(proibidos.some(p=>ck.includes(cleanKey(p)))) return;
-    const v=o[k];
-    if(v===null||v===undefined||v==="") return;
-    const n=num(v);
-    if(n!==0 || String(v)==="0" || v===0) lista.push({k,v:n});
-  });
-  return lista.slice(0,40);
+  return {
+    id:"tbca_"+(a.id || a.codigo || i),
+    fonte:"TBCA",
+    nome:nome,
+    busca:norm(nome),
+    grupo:a.grupo || "Sem grupo",
+    tipo:a.tipo_alimento || "",
+    kcal:num(n.kcal),
+    proteina:num(n.proteina),
+    carbo:num(n.carbo),
+    gordura:num(n.gordura),
+    fibra:num(n.fibra),
+    sodio:num(n.sodio),
+    colesterol:num(n.colesterol),
+    calcio:num(n.calcio),
+    ferro:num(n.ferro),
+    vitamina_c:num(n.vitamina_c),
+    vitamina_b6:num(n.vitamina_b6),
+    vitamina_b12:num(n.vitamina_b12),
+    zinco:num(n.zinco),
+    medidas:Array.isArray(a.medidas) ? a.medidas : []
+  };
 }
 
 function mapTaco(a,i){
- let nome=nomeCampo(a);
- return {id:"taco_"+(a.numero||i),fonte:"TACO",nome,busca:norm(nome),grupo:grupoCampo(a),
- kcal:num(a.energia_kcal),proteina:num(a.proteina_g),carbo:num(a.carboidrato_g),gordura:num(a.lipideos_g),fibra:num(a.fibra_alimentar_g),sodio:num(a.sodio_mg),colesterol:num(a.colesterol_mg),calcio:num(a.calcio_mg),ferro:num(a.ferro_mg),vitamina_c:num(a.vitamina_c_mg),raw:rawNutrientes(a)}
-}
-function mapTbca(a,i){
- let nome=nomeCampo(a);
- return {id:"tbca_"+any(a,["id","codigo","Código","cod","numero"],i),fonte:"TBCA",nome,busca:norm(nome),grupo:grupoCampo(a),
- kcal:num(any(a,["energia_kcal","Energia_kcal","kcal","Kcal","Energia","energia","calorias","Calorias","valor_energetico","Valor energético","valorEnergetico"],0)) || fuzzy(a,["energia"],["kj"]) || fuzzy(a,["kcal"]) || fuzzy(a,["caloria"]),
- proteina:num(any(a,["proteina_g","Proteina_g","Proteína","proteina","protein","proteinas","proteína_g"],0)) || fuzzy(a,["protein"]) || fuzzy(a,["proteina"]),
- carbo:num(any(a,["carboidrato_g","Carboidrato_g","Carboidrato","carboidrato","carbo","carbohydrate","carboidratos"],0)) || fuzzy(a,["carbo"]),
- gordura:num(any(a,["lipideos_g","lipidio_g","Lipidio_g","Lipídeos","lipideos","lipídios","gordura","Gordura","fat","total_lipid"],0)) || fuzzy(a,["lipid"]) || fuzzy(a,["gordura"]) || fuzzy(a,["fat"]),
- fibra:num(any(a,["fibra_alimentar_g","fibra_g","Fibra","fibra","fibra alimentar","dietary_fiber"],0)) || fuzzy(a,["fibra"]),
- sodio:num(any(a,["sodio_mg","Sodio_mg","Sódio","sodio","sodium"],0)) || fuzzy(a,["sodio"]) || fuzzy(a,["sodium"]),
- colesterol:num(any(a,["colesterol_mg","Colesterol_mg","Colesterol","colesterol","cholesterol"],0)) || fuzzy(a,["colesterol"]) || fuzzy(a,["cholesterol"]),
- calcio:num(any(a,["calcio_mg","Calcio_mg","Cálcio","calcio","calcium"],0)) || fuzzy(a,["calcio"]) || fuzzy(a,["calcium"]),
- ferro:num(any(a,["ferro_mg","Ferro_mg","Ferro","ferro","iron"],0)) || fuzzy(a,["ferro"]) || fuzzy(a,["iron"]),
- vitamina_c:num(any(a,["vitamina_c_mg","Vitamina_c_mg","Vitamina C","vitamina_c","vitamin_c"],0)) || fuzzy(a,["vitamina","c"]) || fuzzy(a,["vitamin","c"]),
- raw:rawNutrientes(a)}
+  const nome = a.descricao_alimento || a.nome || a.descricao || "Sem nome";
+
+  return {
+    id:"taco_"+(a.numero || i),
+    fonte:"TACO",
+    nome:nome,
+    busca:norm(nome),
+    grupo:a.grupo || "Sem grupo",
+    tipo:"",
+    kcal:num(a.energia_kcal),
+    proteina:num(a.proteina_g),
+    carbo:num(a.carboidrato_g),
+    gordura:num(a.lipideos_g),
+    fibra:num(a.fibra_alimentar_g),
+    sodio:num(a.sodio_mg),
+    colesterol:num(a.colesterol_mg),
+    calcio:num(a.calcio_mg),
+    ferro:num(a.ferro_mg),
+    vitamina_c:num(a.vitamina_c_mg),
+    vitamina_b6:num(a.piridoxina_mg),
+    vitamina_b12:0,
+    zinco:num(a.zinco_mg),
+    medidas:[]
+  };
 }
 
-function atualizar(){todos=[...tbca,...taco];grupos();render()}
-function grupos(){let sel=document.getElementById("grupo"), val=sel.value;sel.innerHTML='<option value="">Todos os grupos</option>';[...new Set(todos.map(a=>a.grupo).filter(Boolean))].sort().forEach(g=>{let op=document.createElement("option");op.value=g;op.textContent=g;sel.appendChild(op)});sel.value=val}
+function atualizar(){
+  todos = [...tbca, ...taco];
+  preencherGrupos();
+  render();
+}
+
+function preencherGrupos(){
+  const sel = document.getElementById("grupo");
+  const val = sel.value;
+  sel.innerHTML = '<option value="">Todos os grupos</option>';
+  [...new Set(todos.map(a=>a.grupo).filter(Boolean))].sort().forEach(g=>{
+    const op = document.createElement("option");
+    op.value = g;
+    op.textContent = g;
+    sel.appendChild(op);
+  });
+  sel.value = val;
+}
 
 async function carregarAuto(){
- let ok=false, ultimo="";
- for(const url of TBCA_URLS){try{let r=await fetch(url,{cache:"no-store"});if(!r.ok)throw new Error("status "+r.status);tbca=arr(await r.json()).map(mapTbca).filter(a=>a.nome!=="Sem nome");statusTbca.textContent="TBCA: "+tbca.length+" carregados de "+url;ok=true;break}catch(e){ultimo=url+" "+e.message}}
- if(!ok)statusTbca.textContent="TBCA: não carregou automático. Último erro: "+ultimo;
- try{let r=await fetch(TACO_URL,{cache:"no-store"});if(!r.ok)throw new Error(r.status);taco=arr(await r.json()).map(mapTaco).filter(a=>a.nome!=="Sem nome");statusTaco.textContent="TACO: "+taco.length+" carregados automaticamente."}catch(e){statusTaco.textContent="TACO: não carregou automático. Confirme taco.json ou use manual."}
- atualizar()
+  let okTbca = false;
+  let ultimo = "";
+
+  for(const url of TBCA_URLS){
+    try{
+      const r = await fetch(url,{cache:"no-store"});
+      if(!r.ok) throw new Error("status "+r.status);
+      const json = await r.json();
+      tbca = arr(json).map(mapTbca).filter(a=>a.nome && a.nome !== "Sem nome");
+      document.getElementById("statusTbca").textContent = "TBCA: "+tbca.length+" alimentos carregados de "+url;
+      okTbca = true;
+      break;
+    }catch(e){
+      ultimo = url+" ("+e.message+")";
+    }
+  }
+
+  if(!okTbca){
+    document.getElementById("statusTbca").textContent = "TBCA: não carregou automático. Último erro: "+ultimo;
+  }
+
+  try{
+    const r = await fetch(TACO_URL,{cache:"no-store"});
+    if(!r.ok) throw new Error("status "+r.status);
+    taco = arr(await r.json()).map(mapTaco).filter(a=>a.nome && a.nome !== "Sem nome");
+    document.getElementById("statusTaco").textContent = "TACO: "+taco.length+" alimentos carregados de taco.json";
+  }catch(e){
+    document.getElementById("statusTaco").textContent = "TACO: não carregou automático. Confirme taco.json ou use manual.";
+  }
+
+  atualizar();
 }
 
 function manual(id,fonte){
- document.getElementById(id).addEventListener("change",e=>{
-  let f=e.target.files[0]; if(!f)return;
-  let rd=new FileReader();
-  rd.onload=ev=>{try{let json=JSON.parse(ev.target.result); if(fonte==="TBCA"){tbca=arr(json).map(mapTbca).filter(a=>a.nome!=="Sem nome");statusTbca.textContent="TBCA: "+tbca.length+" carregados manualmente."}else{taco=arr(json).map(mapTaco).filter(a=>a.nome!=="Sem nome");statusTaco.textContent="TACO: "+taco.length+" carregados manualmente."} atualizar()}catch(err){alert("Erro ao carregar "+fonte+": "+err.message)}};
-  rd.readAsText(f,"UTF-8");
- })
+  document.getElementById(id).addEventListener("change",e=>{
+    const f=e.target.files[0];
+    if(!f) return;
+    const rd=new FileReader();
+    rd.onload=ev=>{
+      try{
+        const json=JSON.parse(ev.target.result);
+        if(fonte==="TBCA"){
+          tbca=arr(json).map(mapTbca).filter(a=>a.nome && a.nome !== "Sem nome");
+          document.getElementById("statusTbca").textContent="TBCA: "+tbca.length+" alimentos carregados manualmente.";
+        }else{
+          taco=arr(json).map(mapTaco).filter(a=>a.nome && a.nome !== "Sem nome");
+          document.getElementById("statusTaco").textContent="TACO: "+taco.length+" alimentos carregados manualmente.";
+        }
+        atualizar();
+      }catch(err){
+        alert("Erro ao carregar "+fonte+": "+err.message);
+      }
+    };
+    rd.readAsText(f,"UTF-8");
+  });
 }
-function setModo(m){modo=m;document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));if(m==="todos")tabTodos.classList.add("active");if(m==="simples")tabSimples.classList.add("active");if(m==="preparados")tabPreparados.classList.add("active");render()}
-function preparado(a){let t=norm(a.nome+" "+a.grupo);return ["preparado","cozido","assado","frito","grelhado","refogado","molho","sopa","bolo","bife","estrogonofe","salada","cuscuz","feijoada"].some(x=>t.includes(x))}
+
+function setModo(m){
+  modo=m;
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+  if(m==="todos") document.getElementById("tabTodos").classList.add("active");
+  if(m==="simples") document.getElementById("tabSimples").classList.add("active");
+  if(m==="preparados") document.getElementById("tabPreparados").classList.add("active");
+  render();
+}
+
+function preparado(a){
+  const t = norm(a.nome+" "+a.grupo+" "+a.tipo);
+  return t.includes("preparacao") || t.includes("preparação") || t.includes("preparado") ||
+         t.includes("cozido") || t.includes("assado") || t.includes("frito") ||
+         t.includes("grelhado") || t.includes("refogado") || t.includes("molho") ||
+         t.includes("sopa") || t.includes("bolo") || t.includes("bife") ||
+         t.includes("estrogonofe") || t.includes("salada") || t.includes("cuscuz") ||
+         t.includes("feijoada");
+}
+
 function filtro(base){
- let termo=norm(busca.value), ft=fonte.value, gr=grupo.value, ord=ordem.value;
- let out=base.filter(a=>(!termo||a.busca.includes(termo))&&(ft==="ambas"||norm(a.fonte)===ft)&&(!gr||a.grupo===gr)&&(modo==="todos"||(modo==="simples"?!preparado(a):preparado(a))));
- out.sort((a,b)=>ord==="kcal"?b.kcal-a.kcal:ord==="proteina"?b.proteina-a.proteina:ord==="carbo"?b.carbo-a.carbo:ord==="gordura"?b.gordura-a.gordura:ord==="fibra"?b.fibra-a.fibra:a.nome.localeCompare(b.nome,"pt-BR"));
- return out;
+  const termo = norm(document.getElementById("busca").value);
+  const ft = document.getElementById("fonte").value;
+  const gr = document.getElementById("grupo").value;
+  const ord = document.getElementById("ordem").value;
+
+  let out = base.filter(a=>{
+    const okBusca = !termo || a.busca.includes(termo);
+    const okFonte = ft==="ambas" || norm(a.fonte)===ft;
+    const okGrupo = !gr || a.grupo===gr;
+    const okModo = modo==="todos" || (modo==="simples" ? !preparado(a) : preparado(a));
+    return okBusca && okFonte && okGrupo && okModo;
+  });
+
+  out.sort((a,b)=>{
+    if(ord==="kcal") return b.kcal-a.kcal;
+    if(ord==="proteina") return b.proteina-a.proteina;
+    if(ord==="carbo") return b.carbo-a.carbo;
+    if(ord==="gordura") return b.gordura-a.gordura;
+    if(ord==="fibra") return b.fibra-a.fibra;
+    return a.nome.localeCompare(b.nome,"pt-BR");
+  });
+
+  return out;
 }
-function rawHtml(a){
- if(!a.raw || !a.raw.length) return "";
- return `<h4 style="margin:12px 0 8px">Nutrientes detectados no JSON original</h4><div class="rawGrid">${a.raw.map(x=>`<div class="rawItem"><b>${x.k}</b><span>${fmt(x.v)}</span></div>`).join("")}</div>`;
+
+function medidasHtml(a){
+  if(a.fonte !== "TBCA" || !a.medidas || !a.medidas.length) return "";
+  const itens = a.medidas.slice(0,6).map(m=>{
+    const n = m.nutrientes || {};
+    return `<div class="medida">
+      <b>${m.rotulo || m.nome || "Medida"}</b>
+      kcal ${fmt(n.kcal)} | P ${fmt(n.proteina)}g | C ${fmt(n.carbo)}g | G ${fmt(n.gordura)}g | Fibra ${fmt(n.fibra)}g
+    </div>`;
+  }).join("");
+
+  return `<div class="medidas"><b>Medidas caseiras TBCA</b>${itens}</div>`;
 }
+
 function card(a){
- let cls=a.fonte==="TBCA"?"tbca":"taco", id=("det_"+a.id).replace(/[^a-zA-Z0-9_]/g,"");
- return `<div class="food"><div class="foodTop"><div><div class="title">${a.nome}</div><div class="group">${a.grupo}</div></div><span class="source ${cls}">${a.fonte}</span></div><div class="macros"><span class="macro">${fmt(a.kcal)} kcal</span><span class="macro">P ${fmt(a.proteina)}g</span><span class="macro">C ${fmt(a.carbo)}g</span><span class="macro">G ${fmt(a.gordura)}g</span><span class="macro">Fibra ${fmt(a.fibra)}g</span></div><button class="light" onclick="document.getElementById('${id}').classList.toggle('open')">Ver detalhes</button><div id="${id}" class="details"><div class="detailGrid"><div class="detail"><b>${fmt(a.kcal)}</b><span>Energia kcal</span></div><div class="detail"><b>${fmt(a.proteina)}g</b><span>Proteína</span></div><div class="detail"><b>${fmt(a.carbo)}g</b><span>Carboidrato</span></div><div class="detail"><b>${fmt(a.gordura)}g</b><span>Gorduras</span></div><div class="detail"><b>${fmt(a.fibra)}g</b><span>Fibra</span></div><div class="detail"><b>${fmt(a.sodio)}mg</b><span>Sódio</span></div><div class="detail"><b>${fmt(a.colesterol)}mg</b><span>Colesterol</span></div><div class="detail"><b>${fmt(a.calcio)}mg</b><span>Cálcio</span></div><div class="detail"><b>${fmt(a.ferro)}mg</b><span>Ferro</span></div><div class="detail"><b>${fmt(a.vitamina_c)}mg</b><span>Vitamina C</span></div></div>${rawHtml(a)}</div></div>`
+  const cls = a.fonte==="TBCA" ? "tbca" : "taco";
+  const id = ("det_"+a.id).replace(/[^a-zA-Z0-9_]/g,"");
+
+  return `<div class="food">
+    <div class="foodTop">
+      <div>
+        <div class="title">${a.nome}</div>
+        <div class="group">${a.grupo}</div>
+        ${a.tipo ? `<div class="type">${a.tipo}</div>` : ""}
+      </div>
+      <span class="source ${cls}">${a.fonte}</span>
+    </div>
+
+    <div class="macros">
+      <span class="macro">${fmt(a.kcal)} kcal</span>
+      <span class="macro">P ${fmt(a.proteina)}g</span>
+      <span class="macro">C ${fmt(a.carbo)}g</span>
+      <span class="macro">G ${fmt(a.gordura)}g</span>
+      <span class="macro">Fibra ${fmt(a.fibra)}g</span>
+    </div>
+
+    <button class="light" onclick="document.getElementById('${id}').classList.toggle('open')">Ver detalhes</button>
+
+    <div id="${id}" class="details">
+      <div class="detailGrid">
+        <div class="detail"><b>${fmt(a.kcal)}</b><span>Energia kcal</span></div>
+        <div class="detail"><b>${fmt(a.proteina)}g</b><span>Proteína</span></div>
+        <div class="detail"><b>${fmt(a.carbo)}g</b><span>Carboidrato</span></div>
+        <div class="detail"><b>${fmt(a.gordura)}g</b><span>Gorduras</span></div>
+        <div class="detail"><b>${fmt(a.fibra)}g</b><span>Fibra</span></div>
+        <div class="detail"><b>${fmt(a.sodio)}mg</b><span>Sódio</span></div>
+        <div class="detail"><b>${fmt(a.colesterol)}mg</b><span>Colesterol</span></div>
+        <div class="detail"><b>${fmt(a.calcio)}mg</b><span>Cálcio</span></div>
+        <div class="detail"><b>${fmt(a.ferro)}mg</b><span>Ferro</span></div>
+        <div class="detail"><b>${fmt(a.vitamina_c)}mg</b><span>Vitamina C</span></div>
+        <div class="detail"><b>${fmt(a.vitamina_b6)}mg</b><span>Vitamina B6</span></div>
+        <div class="detail"><b>${fmt(a.vitamina_b12)}mcg</b><span>Vitamina B12</span></div>
+        <div class="detail"><b>${fmt(a.zinco)}mg</b><span>Zinco</span></div>
+      </div>
+      ${medidasHtml(a)}
+    </div>
+  </div>`;
 }
-function bloco(titulo,lista,cls){return lista.length?`<div class="sectionTitle"><h3>${titulo}</h3><span class="source ${cls}">${lista.length} exibidos</span></div><div class="results">${lista.map(card).join("")}</div>`:""}
+
+function bloco(titulo,lista,cls){
+  return lista.length ? `<div class="sectionTitle"><h3>${titulo}</h3><span class="source ${cls}">${lista.length} exibidos</span></div><div class="results">${lista.map(card).join("")}</div>` : "";
+}
+
 function render(){
- if(!todos.length){contador.textContent="Nenhuma base carregada.";resultados.innerHTML='<div class="empty">Nenhuma base carregada. Confira os nomes dos arquivos ou carregue manualmente.</div>';return}
- let tr=filtro(tbca).slice(0,80), ta=filtro(taco).slice(0,80);
- if(fonte.value==="tbca")ta=[]; if(fonte.value==="taco")tr=[];
- contador.textContent=(tr.length+ta.length)+" resultado(s) exibido(s).";
- let h=bloco("Resultados TBCA",tr,"tbca")+bloco("Resultados TACO",ta,"taco");
- resultados.innerHTML=h||'<div class="empty">Nenhum alimento encontrado com esses filtros.</div>';
+  if(!todos.length){
+    document.getElementById("contador").textContent="Nenhuma base carregada.";
+    document.getElementById("resultados").innerHTML='<div class="empty">Nenhuma base carregada. Confira os nomes dos arquivos ou carregue manualmente.</div>';
+    return;
+  }
+
+  let tr = filtro(tbca).slice(0,80);
+  let ta = filtro(taco).slice(0,80);
+
+  if(document.getElementById("fonte").value==="tbca") ta=[];
+  if(document.getElementById("fonte").value==="taco") tr=[];
+
+  document.getElementById("contador").textContent=(tr.length+ta.length)+" resultado(s) exibido(s).";
+
+  const html = bloco("Resultados TBCA",tr,"tbca") + bloco("Resultados TACO",ta,"taco");
+  document.getElementById("resultados").innerHTML = html || '<div class="empty">Nenhum alimento encontrado com esses filtros.</div>';
 }
-["busca","fonte","grupo","ordem"].forEach(id=>document.getElementById(id).addEventListener("input",render));
-document.getElementById("fonte").addEventListener("change",render);
-document.getElementById("grupo").addEventListener("change",render);
-document.getElementById("ordem").addEventListener("change",render);
-manual("fileTbca","TBCA");manual("fileTaco","TACO");carregarAuto();
+
+["busca","fonte","grupo","ordem"].forEach(id=>{
+  document.getElementById(id).addEventListener("input",render);
+  document.getElementById(id).addEventListener("change",render);
+});
+
+manual("fileTbca","TBCA");
+manual("fileTaco","TACO");
+carregarAuto();
 </script>
 </body>
 </html>
