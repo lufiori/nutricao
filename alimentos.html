@@ -1,511 +1,144 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NutriVida - Alimentos TBCA</title>
-<link rel="stylesheet" href="app.css?v=alimentos-fav1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriVida - Alimentos TBCA + TACO</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;--green:#16a34a;--green2:#15803d;--soft:#ecfdf5;--blue:#2563eb;--blueSoft:#eff6ff;--orange:#f97316;--orangeSoft:#fff7ed;--shadow:0 10px 28px rgba(15,23,42,.06);--radius:20px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f9fafb,#f3f4f6);color:var(--text)}
+header{background:#fff;border-bottom:1px solid var(--line);padding:18px 22px;position:sticky;top:0;z-index:20}
+.wrap{max-width:1220px;margin:auto}
+.head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.logo{display:flex;gap:12px;align-items:center}.icon{width:42px;height:42px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:23px}
+h1{font-size:22px;color:var(--green2);margin:0}.sub{color:var(--muted);font-size:13px;margin:3px 0 0}
+.badge{display:inline-block;background:var(--soft);color:var(--green2);border:1px solid #bbf7d0;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800}
+main{max-width:1220px;margin:auto;padding:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+h2{font-size:19px;margin:0 0 5px}.help{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.45}
+.notice{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:12px;border-radius:16px;font-size:13px;margin-bottom:12px}
+input,select,button{font:inherit}input,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;outline:none}
+input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+button{border:0;border-radius:14px;padding:10px 13px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}button:hover{background:var(--green2)}
+button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}button.light:hover{background:#e5e7eb}
+.grid4{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.statusGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.status{background:#f9fafb;border:1px solid var(--line);border-radius:15px;padding:11px;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.manual{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.manual.open{display:block}
+.topResults{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.count{color:var(--muted);font-size:13px}
+.sectionTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:18px 0 10px}.sectionTitle h3{margin:0;font-size:17px}
+.source{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid var(--line)}.tbca{background:var(--blueSoft);color:var(--blue);border-color:#bfdbfe}.taco{background:var(--orangeSoft);color:#c2410c;border-color:#fed7aa}
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.food{border:1px solid var(--line);background:#fff;border-radius:18px;padding:14px;display:grid;gap:10px}.food:hover{box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.foodTop{display:flex;justify-content:space-between;gap:10px}.title{font-weight:900;line-height:1.25}.group{color:var(--muted);font-size:12.5px;margin-top:3px}
+.macros{display:flex;flex-wrap:wrap;gap:7px}.macro{background:#f9fafb;border:1px solid var(--line);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.details{display:none;background:#f9fafb;border:1px solid var(--line);border-radius:16px;padding:11px}.details.open{display:block}.detailGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.detail{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}.detail b{display:block;font-size:13px}.detail span{color:var(--muted);font-size:12px}
+.empty{background:#f9fafb;border:1px dashed #d1d5db;border-radius:18px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
+@media(max-width:900px){header{position:static}.head{align-items:flex-start;flex-direction:column}main{padding:14px}.grid4,.grid2,.statusGrid{grid-template-columns:1fr}.results{grid-template-columns:1fr}.detailGrid{grid-template-columns:repeat(2,1fr)}}
+</style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="index.html"><span class="logo">🌿</span>NutriVida</a>
-    <nav class="desktop-nav">
-      <a class="navbtn" href="index.html">Hoje</a>
-      <a class="navbtn active" href="alimentos.html">Alimentos</a>
-      <a class="navbtn" href="receitas.html">Receitas</a>
-      <a class="navbtn" href="favoritos.html">Favoritos</a>
-      <a class="navbtn" href="perfil.html">Perfil</a>
-    </nav>
-  </div>
-</header>
+<header><div class="wrap head"><div class="logo"><div class="icon">🔎</div><div><h1>NutriVida - Alimentos</h1><p class="sub">Consulta com duas bases: TBCA + TACO</p></div></div><div><span class="badge">TBCA</span> <span class="badge">TACO</span></div></div></header>
 
-<main class="app">
-  <section class="card soft">
-    <h1 class="title">Alimentos</h1>
-    <p class="subtitle">
-      Busca leve na base TBCA. A lista só aparece depois de pesquisar, para deixar o sistema rápido mesmo com a base grande.
-    </p>
-    <div class="pill" id="tbcaStatus" style="margin-top:12px">Carregando tbca_pronto.json...</div>
-  </section>
+<main>
+<section class="card">
+<h2>Consulta de alimentos</h2>
+<p class="help">Pesquise uma vez e compare os resultados da TBCA e da TACO na mesma tela.</p>
+<div class="notice">Esta página tenta carregar automaticamente <b>tbca.json</b> e <b>taco.json</b> na mesma pasta do HTML. Se algum não carregar, use o carregamento manual.</div>
 
-  <section class="food-search-shell">
-    <div class="card food-search-card">
-      <div class="food-search-form">
-        <div>
-          <label>Alimento</label>
-          <input class="search" id="qFood" placeholder="Informe o nome do alimento ou parte dele..." onkeydown="if(event.key==='Enter') buscarAlimentos()">
-        </div>
+<div class="grid4">
+<input id="busca" type="search" placeholder="Buscar: café, arroz, feijão, frango...">
+<select id="fonte"><option value="ambas">Mostrar TBCA + TACO</option><option value="tbca">Somente TBCA</option><option value="taco">Somente TACO</option></select>
+<select id="grupo"><option value="">Todos os grupos</option></select>
+<select id="ordem"><option value="nome">Ordenar por nome</option><option value="kcal">Maior energia</option><option value="proteina">Maior proteína</option><option value="carbo">Maior carboidrato</option><option value="gordura">Maior gordura</option><option value="fibra">Maior fibra</option></select>
+</div>
 
-        <div>
-          <label>Grupo</label>
-          <select class="search" id="groupFood">
-            <option value="">Todos os grupos</option>
-          </select>
-        </div>
+<div class="statusGrid"><div id="statusTbca" class="status">TBCA: tentando carregar...</div><div id="statusTaco" class="status">TACO: tentando carregar...</div></div>
 
-        <div>
-          <label>Tipo de alimento</label>
-          <select class="search" id="typeFood">
-            <option value="">Todos os tipos</option>
-          </select>
-        </div>
+<div class="tabs">
+<button class="light tab active" id="tabTodos" onclick="setModo('todos')">Todos</button>
+<button class="light tab" id="tabSimples" onclick="setModo('simples')">Ingredientes simples</button>
+<button class="light tab" id="tabPreparados" onclick="setModo('preparados')">Preparados</button>
+<button class="light" onclick="document.getElementById('manual').classList.toggle('open')">Carregar manualmente</button>
+</div>
 
-        <button class="primary" onclick="buscarAlimentos()">Buscar</button>
-      </div>
+<div id="manual" class="manual">
+<div class="grid2">
+<div><p class="help"><b>TBCA manual</b></p><input id="fileTbca" type="file" accept=".json,application/json"></div>
+<div><p class="help"><b>TACO manual</b></p><input id="fileTaco" type="file" accept=".json,application/json"></div>
+</div>
+</div>
+</section>
 
-      <div class="favorite-filter-bar">
-        <button class="ghost" onclick="mostrarFavoritos()">⭐ Ver favoritos</button>
-        <span class="subtitle">Toque na estrela de um alimento para salvar nos favoritos.</span>
-      </div>
-    </div>
-
-    <div id="foodResultsBox" class="card food-search-card">
-      <div class="empty food-empty-start">
-        <b>Busque um alimento para começar</b>
-        Digite parte do nome, escolha filtros se quiser, e clique em Buscar.
-      </div>
-    </div>
-  </section>
+<section class="card">
+<div class="topResults"><h2>Resultados</h2><div id="contador" class="count">Carregando bases...</div></div>
+<div id="resultados"><div class="empty">Aguarde o carregamento automático ou use o carregamento manual.</div></div>
+</section>
 </main>
 
-<div id="foodDetailModal" class="tbca-detail-modal">
-  <div class="tbca-detail-card">
-    <div id="foodDetailModalContent"></div>
-  </div>
-</div>
-
-<div id="addFoodModal" class="modal-tbca">
-  <div class="modal-tbca-card">
-    <h2 style="margin-top:0">Adicionar ao diário</h2>
-    <p class="subtitle" id="modalFoodName"></p>
-
-    <div class="grid grid2" style="margin-top:12px">
-      <div>
-        <label>Data</label>
-        <input class="search" id="modalDate" type="date">
-      </div>
-      <div>
-        <label>Medida</label>
-        <select class="search" id="modalMeasure" onchange="updateModalPreview()"></select>
-      </div>
-    </div>
-
-    <div style="margin-top:12px">
-      <label>Quantidade</label>
-      <input class="search" id="modalQty" type="number" min="0.1" step="0.1" value="1" oninput="updateModalPreview()">
-    </div>
-
-    <div id="modalPreview" class="card" style="box-shadow:none;background:#fbfcfb;margin-top:12px"></div>
-
-    <div class="meal-grid">
-      <button class="meal-choice" onclick="confirmAddTBCA('Café da manhã')">☕ Café da manhã</button>
-      <button class="meal-choice" onclick="confirmAddTBCA('Almoço')">🍛 Almoço</button>
-      <button class="meal-choice" onclick="confirmAddTBCA('Lanche')">🍌 Lanche</button>
-      <button class="meal-choice" onclick="confirmAddTBCA('Jantar')">🍽️ Jantar</button>
-    </div>
-
-    <button class="ghost" onclick="closeAddFoodModal()">Cancelar</button>
-  </div>
-</div>
-
-<script src="app.js?v=alimentos-fav1"></script>
 <script>
-let tbcaFoods = [];
-let selectedFoodId = null;
-let ultimaBusca = [];
+const TBCA_URL="./tbca.json", TACO_URL="./taco.json";
+let tbca=[], taco=[], todos=[], modo="todos";
 
-const FOOD_FAV_KEY = 'nv_fav_foods_tbca';
+function norm(t){return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
+function num(v){if(v==null||v===""||v==="NA"||v==="Tr"||v==="-"||v==="--")return 0;let n=parseFloat(String(v).replace(",",".").replace(/[^\d.-]/g,""));return isFinite(n)?n:0}
+function fmt(v){return num(v).toLocaleString("pt-BR",{maximumFractionDigits:1})}
+function any(o,ks,p=""){for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k]}return p}
+function arr(json){return Array.isArray(json)?json:(Array.isArray(json.alimentos)?json.alimentos:(Array.isArray(json.data)?json.data:(Array.isArray(json.items)?json.items:[])))}
 
-function getFoodFavorites(){
-  try{return JSON.parse(localStorage.getItem(FOOD_FAV_KEY)) || [];}catch(e){return [];}
+function mapTaco(a,i){
+ let nome=any(a,["descricao_alimento","nome","descricao","alimento"],"Sem nome");
+ return {id:"taco_"+(a.numero||i),fonte:"TACO",nome,busca:norm(nome),grupo:any(a,["grupo","categoria"],"Sem grupo"),kcal:num(a.energia_kcal),proteina:num(a.proteina_g),carbo:num(a.carboidrato_g),gordura:num(a.lipideos_g),fibra:num(a.fibra_alimentar_g),sodio:num(a.sodio_mg),colesterol:num(a.colesterol_mg),calcio:num(a.calcio_mg),ferro:num(a.ferro_mg),vitamina_c:num(a.vitamina_c_mg)}
+}
+function mapTbca(a,i){
+ let nome=any(a,["nome","Nome","descricao","Descrição","descricao_alimento","Alimento","alimento","description","food_name","nome_alimento"],"Sem nome");
+ return {id:"tbca_"+any(a,["id","codigo","Código","cod","numero"],i),fonte:"TBCA",nome,busca:norm(nome),grupo:any(a,["grupo","Grupo","categoria","Categoria","group","category","origem","classificacao"],"Sem grupo"),kcal:num(any(a,["energia_kcal","Energia_kcal","kcal","Kcal","Energia","energia"],0)),proteina:num(any(a,["proteina_g","Proteina_g","Proteína","proteina","protein"],0)),carbo:num(any(a,["carboidrato_g","Carboidrato_g","Carboidrato","carboidrato","carbo","carbohydrate"],0)),gordura:num(any(a,["lipideos_g","lipidio_g","Lipidio_g","Lipídeos","gordura","Gordura","fat"],0)),fibra:num(any(a,["fibra_alimentar_g","fibra_g","Fibra","fibra"],0)),sodio:num(any(a,["sodio_mg","Sodio_mg","Sódio","sodio"],0)),colesterol:num(any(a,["colesterol_mg","Colesterol_mg","Colesterol","colesterol"],0)),calcio:num(any(a,["calcio_mg","Calcio_mg","Cálcio","calcio"],0)),ferro:num(any(a,["ferro_mg","Ferro_mg","Ferro","ferro"],0)),vitamina_c:num(any(a,["vitamina_c_mg","Vitamina_c_mg","Vitamina C","vitamina_c"],0))}
 }
 
-function saveFoodFavorites(ids){
-  localStorage.setItem(FOOD_FAV_KEY, JSON.stringify(ids));
+function atualizar(){todos=[...tbca,...taco];grupos();render()}
+function grupos(){let sel=document.getElementById("grupo"), val=sel.value;sel.innerHTML='<option value="">Todos os grupos</option>';[...new Set(todos.map(a=>a.grupo).filter(Boolean))].sort().forEach(g=>{let op=document.createElement("option");op.value=g;op.textContent=g;sel.appendChild(op)});sel.value=val}
+
+async function carregarAuto(){
+ try{let r=await fetch(TBCA_URL,{cache:"no-store"});if(!r.ok)throw new Error(r.status);tbca=arr(await r.json()).map(mapTbca).filter(a=>a.nome!=="Sem nome");statusTbca.textContent="TBCA: "+tbca.length+" carregados automaticamente."}catch(e){statusTbca.textContent="TBCA: não carregou automático. Confirme tbca.json ou use manual."}
+ try{let r=await fetch(TACO_URL,{cache:"no-store"});if(!r.ok)throw new Error(r.status);taco=arr(await r.json()).map(mapTaco).filter(a=>a.nome!=="Sem nome");statusTaco.textContent="TACO: "+taco.length+" carregados automaticamente."}catch(e){statusTaco.textContent="TACO: não carregou automático. Confirme taco.json ou use manual."}
+ atualizar()
 }
 
-function isFoodFavorite(id){
-  return getFoodFavorites().includes(String(id));
+function manual(id,fonte){
+ document.getElementById(id).addEventListener("change",e=>{
+  let f=e.target.files[0]; if(!f)return;
+  let rd=new FileReader();
+  rd.onload=ev=>{try{let json=JSON.parse(ev.target.result); if(fonte==="TBCA"){tbca=arr(json).map(mapTbca).filter(a=>a.nome!=="Sem nome");statusTbca.textContent="TBCA: "+tbca.length+" carregados manualmente."}else{taco=arr(json).map(mapTaco).filter(a=>a.nome!=="Sem nome");statusTaco.textContent="TACO: "+taco.length+" carregados manualmente."} atualizar()}catch(err){alert("Erro ao carregar "+fonte+": "+err.message)}};
+  rd.readAsText(f,"UTF-8");
+ })
 }
 
-function toggleFoodFavorite(id, ev){
-  if(ev) ev.stopPropagation();
-  id = String(id);
-  let favs = getFoodFavorites();
-  if(favs.includes(id)){
-    favs = favs.filter(x => x !== id);
-  }else{
-    favs.push(id);
-  }
-  saveFoodFavorites(favs);
-  renderResultadoSimples(ultimaBusca);
+function setModo(m){modo=m;document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));if(m==="todos")tabTodos.classList.add("active");if(m==="simples")tabSimples.classList.add("active");if(m==="preparados")tabPreparados.classList.add("active");render()}
+function preparado(a){let t=norm(a.nome+" "+a.grupo);return ["preparado","cozido","assado","frito","grelhado","refogado","molho","sopa","bolo","bife","estrogonofe","salada","cuscuz","feijoada"].some(x=>t.includes(x))}
+function filtro(base){
+ let termo=norm(busca.value), ft=fonte.value, gr=grupo.value, ord=ordem.value;
+ let out=base.filter(a=>(!termo||a.busca.includes(termo))&&(ft==="ambas"||norm(a.fonte)===ft)&&(!gr||a.grupo===gr)&&(modo==="todos"||(modo==="simples"?!preparado(a):preparado(a))));
+ out.sort((a,b)=>ord==="kcal"?b.kcal-a.kcal:ord==="proteina"?b.proteina-a.proteina:ord==="carbo"?b.carbo-a.carbo:ord==="gordura"?b.gordura-a.gordura:ord==="fibra"?b.fibra-a.fibra:a.nome.localeCompare(b.nome,"pt-BR"));
+ return out;
+}
+function card(a){
+ let cls=a.fonte==="TBCA"?"tbca":"taco", id=("det_"+a.id).replace(/[^a-zA-Z0-9_]/g,"");
+ return `<div class="food"><div class="foodTop"><div><div class="title">${a.nome}</div><div class="group">${a.grupo}</div></div><span class="source ${cls}">${a.fonte}</span></div><div class="macros"><span class="macro">${fmt(a.kcal)} kcal</span><span class="macro">P ${fmt(a.proteina)}g</span><span class="macro">C ${fmt(a.carbo)}g</span><span class="macro">G ${fmt(a.gordura)}g</span><span class="macro">Fibra ${fmt(a.fibra)}g</span></div><button class="light" onclick="document.getElementById('${id}').classList.toggle('open')">Ver detalhes</button><div id="${id}" class="details"><div class="detailGrid"><div class="detail"><b>${fmt(a.kcal)}</b><span>Energia kcal</span></div><div class="detail"><b>${fmt(a.proteina)}g</b><span>Proteína</span></div><div class="detail"><b>${fmt(a.carbo)}g</b><span>Carboidrato</span></div><div class="detail"><b>${fmt(a.gordura)}g</b><span>Gorduras</span></div><div class="detail"><b>${fmt(a.fibra)}g</b><span>Fibra</span></div><div class="detail"><b>${fmt(a.sodio)}mg</b><span>Sódio</span></div><div class="detail"><b>${fmt(a.colesterol)}mg</b><span>Colesterol</span></div><div class="detail"><b>${fmt(a.calcio)}mg</b><span>Cálcio</span></div><div class="detail"><b>${fmt(a.ferro)}mg</b><span>Ferro</span></div><div class="detail"><b>${fmt(a.vitamina_c)}mg</b><span>Vitamina C</span></div></div></div></div>`
+}
+function bloco(titulo,lista,cls){return lista.length?`<div class="sectionTitle"><h3>${titulo}</h3><span class="source ${cls}">${lista.length} exibidos</span></div><div class="results">${lista.map(card).join("")}</div>`:""}
+function render(){
+ if(!todos.length){contador.textContent="Nenhuma base carregada.";resultados.innerHTML='<div class="empty">Nenhuma base carregada. Confira os nomes dos arquivos ou carregue manualmente.</div>';return}
+ let tr=filtro(tbca).slice(0,80), ta=filtro(taco).slice(0,80);
+ if(fonte.value==="tbca")ta=[]; if(fonte.value==="taco")tr=[];
+ contador.textContent=(tr.length+ta.length)+" resultado(s) exibido(s).";
+ let h=bloco("Resultados TBCA",tr,"tbca")+bloco("Resultados TACO",ta,"taco");
+ resultados.innerHTML=h||'<div class="empty">Nenhum alimento encontrado com esses filtros.</div>';
 }
 
-function mostrarFavoritos(){
-  const favs = getFoodFavorites();
-  if(!favs.length){
-    document.getElementById('foodResultsBox').innerHTML = '<div class="empty">Nenhum alimento favorito ainda.</div>';
-    return;
-  }
-  const list = tbcaFoods.filter(f => favs.includes(String(f.id)));
-  ultimaBusca = list;
-  renderResultadoSimples(list);
-}
-
-function normalizeText(v){
-  return String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim();
-}
-
-function n(v){ return Number(v ?? 0) || 0; }
-
-function fmtTBCA(v,d=1){
-  return (Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d});
-}
-
-function todayISO(){ return new Date().toISOString().slice(0,10); }
-function uid(){ return Date.now()+Math.floor(Math.random()*99999); }
-
-function esc(v){
-  return String(v??'')
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
-    .replaceAll("'","&#039;");
-}
-
-function jsEsc(v){
-  return String(v).replaceAll("\\\\","\\\\\\\\").replaceAll("'","\\\\'");
-}
-
-function foodNutrients(food){ return food?.nutrientes100g || {}; }
-function measureNutrients(measure){ return measure?.nutrientes || {}; }
-
-function scaleNutrients(base, qty){
-  const out = {};
-  Object.keys(base || {}).forEach(k => out[k] = n(base[k]) * qty);
-  return out;
-}
-
-function foodMeasures(food){
-  const measures = Array.isArray(food?.medidas) ? food.medidas : [];
-  return [
-    { id:'100g', nome:'100 g', rotulo:'100 g', quantidade:100, unidade:'g', nutrientes:foodNutrients(food), is100g:true },
-    ...measures.map((m,idx)=>({
-      id:m.id || ('m'+idx),
-      nome:m.nome || m.rotulo || ('Medida '+(idx+1)),
-      rotulo:m.rotulo || m.nome || ('Medida '+(idx+1)),
-      quantidade:m.quantidade,
-      unidade:m.unidade,
-      nutrientes:measureNutrients(m),
-      is100g:false
-    }))
-  ];
-}
-
-async function loadTBCA(){
-  const status = document.getElementById('tbcaStatus');
-  try{
-    const r = await fetch('./tbca_pronto.json',{cache:'no-store'});
-    if(!r.ok) throw new Error('tbca_pronto não encontrado');
-    const json = await r.json();
-    tbcaFoods = Array.isArray(json) ? json : (json.alimentos || []);
-    tbcaFoods = tbcaFoods.filter(f=>f && f.nome);
-
-    status.textContent = `Base TBCA carregada: ${tbcaFoods.length} alimentos disponíveis.`;
-
-    populateFilters();
-  }catch(e){
-    status.textContent = 'Não encontrei tbca_pronto.json. Coloque o arquivo na mesma pasta deste alimentos.html.';
-    document.getElementById('foodResultsBox').innerHTML = '<div class="empty">tbca_pronto.json não encontrado.</div>';
-  }
-}
-
-function populateFilters(){
-  const groupSel = document.getElementById('groupFood');
-  const typeSel = document.getElementById('typeFood');
-
-  const groups = [...new Set(tbcaFoods.map(f=>f.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  const types = [...new Set(tbcaFoods.map(f=>f.tipo_alimento).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-
-  groupSel.innerHTML = '<option value="">Todos os grupos</option>' + groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
-  typeSel.innerHTML = '<option value="">Todos os tipos</option>' + types.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
-}
-
-function buscarAlimentos(){
-  const q = normalizeText(document.getElementById('qFood').value);
-  const group = document.getElementById('groupFood').value;
-  const type = document.getElementById('typeFood').value;
-
-  if(!q && !group && !type){
-    document.getElementById('foodResultsBox').innerHTML = `
-      <div class="empty food-empty-start">
-        <b>Informe uma busca ou selecione um filtro</b>
-        Para não pesar, a lista não aparece automaticamente.
-      </div>`;
-    return;
-  }
-
-  let list = tbcaFoods.filter(f=>{
-    const txt = normalizeText([f.nome,f.grupo,f.tipo_alimento,f.codigo].join(' '));
-    return (!q || txt.includes(q)) &&
-           (!group || f.grupo === group) &&
-           (!type || f.tipo_alimento === type);
-  });
-
-  list.sort((a,b)=>String(a.nome).localeCompare(String(b.nome),'pt-BR'));
-
-  ultimaBusca = list;
-  renderResultadoSimples(list);
-}
-
-function renderResultadoSimples(list){
-  const box = document.getElementById('foodResultsBox');
-
-  if(!list.length){
-    box.innerHTML = '<div class="empty">Nenhum alimento encontrado para esta busca.</div>';
-    return;
-  }
-
-  const limited = list.slice(0,150);
-  box.innerHTML = `
-    <div class="food-results-head">
-      <p class="subtitle"><b>${list.length}</b> resultado(s) encontrado(s). ${list.length > 150 ? 'Mostrando os primeiros 150.' : ''}</p>
-      <button class="ghost" onclick="limparResultados()">Limpar resultados</button>
-    </div>
-
-    <div class="food-results-simple">
-      ${limited.map(f=>`
-        <div class="food-row-simple" onclick="showFoodDetail('${jsEsc(f.id)}')">
-          <div>
-            <h3>${esc(f.nome)}</h3>
-            <small>${esc(f.grupo || 'Sem grupo')}</small>
-          </div>
-          <span class="pill">${esc(f.tipo_alimento || 'TBCA')}</span>
-          <button class="food-star ${isFoodFavorite(f.id) ? 'active' : ''}" title="Favoritar" onclick="toggleFoodFavorite('${jsEsc(f.id)}', event)">
-            ${isFoodFavorite(f.id) ? '⭐' : '☆'}
-          </button>
-          <span class="food-eye" aria-hidden="true">👁️</span>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-function limparResultados(){
-  document.getElementById('qFood').value = '';
-  document.getElementById('groupFood').value = '';
-  document.getElementById('typeFood').value = '';
-  ultimaBusca = [];
-  document.getElementById('foodResultsBox').innerHTML = `
-    <div class="empty food-empty-start">
-      <b>Busque um alimento para começar</b>
-      Digite parte do nome, escolha filtros se quiser, e clique em Buscar.
-    </div>`;
-}
-
-function findFood(id){ return tbcaFoods.find(f => String(f.id) === String(id)); }
-
-function showFoodDetail(id){
-  const f = findFood(id);
-  if(!f) return;
-
-  const nut = foodNutrients(f);
-  const measures = foodMeasures(f).filter(m=>!m.is100g);
-
-  const content = `
-    <div class="tbca-detail-header">
-      <div>
-        <h2 style="margin:0 0 6px">${esc(f.nome)}</h2>
-        <p class="subtitle" style="margin:0">${esc(f.grupo || '')}</p>
-        <div class="food-meta" style="margin-top:12px">
-          <span class="pill">${esc(f.codigo || 'TBCA')}</span>
-          <span class="pill">${esc(f.tipo_alimento || '')}</span>
-          <span class="pill">${measures.length} medida(s)</span>
-          <button class="food-star ${isFoodFavorite(f.id) ? 'active' : ''}" title="Favoritar" onclick="toggleFoodFavorite('${jsEsc(f.id)}', event); showFoodDetail('${jsEsc(f.id)}')">
-            ${isFoodFavorite(f.id) ? '⭐' : '☆'}
-          </button>
-        </div>
-      </div>
-      <button class="tbca-close" onclick="closeFoodDetail()">×</button>
-    </div>
-
-    <div class="tbca-nutri-mini" style="margin-bottom:16px">
-      <div class="metric"><span>kcal</span><b>${fmtTBCA(nut.kcal,0)}</b></div>
-      <div class="metric"><span>Proteína</span><b>${fmtTBCA(nut.proteina)}g</b></div>
-      <div class="metric"><span>Carbo</span><b>${fmtTBCA(nut.carbo)}g</b></div>
-      <div class="metric"><span>Gordura</span><b>${fmtTBCA(nut.gordura)}g</b></div>
-    </div>
-
-    <div class="tbca-detail-grid">
-      <section class="tbca-modal-section">
-        <h3>Nutrientes por 100g</h3>
-        ${nutritionTable(nut)}
-      </section>
-
-      <section class="tbca-modal-section">
-        <h3>Medidas caseiras</h3>
-        <div class="tbca-measures">
-          ${measures.length ? measures.slice(0,12).map(m=>{
-            const mn = m.nutrientes;
-            return `<div class="tbca-measure">
-              <div class="tbca-measure-head">
-                <span>${esc(m.rotulo)}</span>
-                <span>${fmtTBCA(mn.kcal,0)} kcal</span>
-              </div>
-              <small class="subtitle">Prot. ${fmtTBCA(mn.proteina)}g • Carbo ${fmtTBCA(mn.carbo)}g • Gord. ${fmtTBCA(mn.gordura)}g</small>
-            </div>`;
-          }).join('') : '<div class="empty">Sem medidas caseiras cadastradas para este alimento.</div>'}
-        </div>
-      </section>
-    </div>
-
-    <div class="food-actions" style="margin-top:16px">
-      <button class="primary" onclick="openAddFoodModal('${jsEsc(f.id)}')">Adicionar ao diário</button>
-      <button class="ghost" onclick="closeFoodDetail()">Fechar</button>
-    </div>
-  `;
-
-  document.getElementById('foodDetailModalContent').innerHTML = content;
-  document.getElementById('foodDetailModal').classList.add('open');
-}
-
-function closeFoodDetail(){
-  document.getElementById('foodDetailModal').classList.remove('open');
-}
-
-function nutritionTable(nut){
-  return `<div class="table-wrap tbca-table"><table>
-    <thead><tr><th>Nutriente</th><th>Total</th></tr></thead>
-    <tbody>
-      <tr><td>Energia</td><td>${fmtTBCA(nut.kcal,0)} kcal</td></tr>
-      <tr><td>Proteínas</td><td>${fmtTBCA(nut.proteina)} g</td></tr>
-      <tr><td>Carboidratos</td><td>${fmtTBCA(nut.carbo)} g</td></tr>
-      <tr><td>Gorduras</td><td>${fmtTBCA(nut.gordura)} g</td></tr>
-      <tr><td>Fibras</td><td>${fmtTBCA(nut.fibra)} g</td></tr>
-      <tr><td>Cálcio</td><td>${fmtTBCA(nut.calcio)} mg</td></tr>
-      <tr><td>Ferro</td><td>${fmtTBCA(nut.ferro)} mg</td></tr>
-      <tr><td>Sódio</td><td>${fmtTBCA(nut.sodio)} mg</td></tr>
-      <tr><td>Colesterol</td><td>${fmtTBCA(nut.colesterol)} mg</td></tr>
-      <tr><td>Vitamina C</td><td>${fmtTBCA(nut.vitamina_c)} mg</td></tr>
-      <tr><td>Vitamina B6</td><td>${fmtTBCA(nut.vitamina_b6)} mg</td></tr>
-      <tr><td>Vitamina B12</td><td>${fmtTBCA(nut.vitamina_b12)} mcg</td></tr>
-      <tr><td>Zinco</td><td>${fmtTBCA(nut.zinco)} mg</td></tr>
-    </tbody>
-  </table></div>`;
-}
-
-function openAddFoodModal(id){
-  const f = findFood(id);
-  if(!f) return;
-
-  selectedFoodId = id;
-  document.getElementById('modalFoodName').textContent = f.nome;
-  document.getElementById('modalDate').value = todayISO();
-
-  const sel = document.getElementById('modalMeasure');
-  const measures = foodMeasures(f);
-  sel.innerHTML = measures.map(m => `<option value="${m.id}">${esc(m.rotulo)}</option>`).join('');
-  document.getElementById('modalQty').value = '1';
-
-  updateModalPreview();
-  document.getElementById('addFoodModal').classList.add('open');
-}
-
-function closeAddFoodModal(){
-  selectedFoodId = null;
-  document.getElementById('addFoodModal').classList.remove('open');
-}
-
-function selectedMeasure(){
-  const f = findFood(selectedFoodId);
-  if(!f) return null;
-  const id = document.getElementById('modalMeasure').value;
-  return foodMeasures(f).find(m=>m.id===id);
-}
-
-function updateModalPreview(){
-  const m = selectedMeasure();
-  if(!m) return;
-  const qty = Math.max(0, n(document.getElementById('modalQty').value) || 1);
-  const nut = scaleNutrients(m.nutrientes, qty);
-  document.getElementById('modalPreview').innerHTML = `
-    <b>${esc(m.rotulo)}</b> × ${fmtTBCA(qty)}
-    <div class="tbca-nutri-mini" style="margin-top:10px">
-      <div class="metric"><span>kcal</span><b>${fmtTBCA(nut.kcal,0)}</b></div>
-      <div class="metric"><span>Prot.</span><b>${fmtTBCA(nut.proteina)}g</b></div>
-      <div class="metric"><span>Carbo</span><b>${fmtTBCA(nut.carbo)}g</b></div>
-      <div class="metric"><span>Gord.</span><b>${fmtTBCA(nut.gordura)}g</b></div>
-    </div>
-  `;
-}
-
-function confirmAddTBCA(meal){
-  const f = findFood(selectedFoodId);
-  const m = selectedMeasure();
-  if(!f || !m) return;
-
-  const qty = Math.max(0, n(document.getElementById('modalQty').value) || 1);
-  const nut = scaleNutrients(m.nutrientes, qty);
-
-  const diary = JSON.parse(localStorage.getItem('nv_diary') || '[]');
-  diary.push({
-    id: uid(),
-    tipo: 'tbca',
-    foodId: 'tbca_' + f.id + '_' + m.id,
-    food:{
-      id: 'tbca_' + f.id + '_' + m.id,
-      nome: `${f.nome} — ${m.rotulo} × ${fmtTBCA(qty)}`,
-      kcal:nut.kcal,
-      proteina:nut.proteina,
-      carbo:nut.carbo,
-      gordura:nut.gordura,
-      fibra:nut.fibra,
-      calcio:nut.calcio,
-      ferro:nut.ferro,
-      sodio:nut.sodio,
-      colesterol:nut.colesterol,
-      vitc:nut.vitamina_c,
-      vitamina_b6:nut.vitamina_b6,
-      vitamina_b12:nut.vitamina_b12,
-      zinco:nut.zinco
-    },
-    meal,
-    grams:100,
-    when:document.getElementById('modalDate').value || todayISO(),
-    tbca:{
-      codigo:f.codigo,
-      medida:m.rotulo,
-      quantidade:qty,
-      unidade:m.unidade,
-      quantidade_medida:m.quantidade
-    }
-  });
-
-  localStorage.setItem('nv_diary', JSON.stringify(diary));
-  closeAddFoodModal();
-
-  if(confirm('Alimento adicionado ao diário! Deseja abrir o Hoje agora?')){
-    location.href = 'index.html';
-  }
-}
-
-document.addEventListener('keydown', function(ev){
-  if(ev.key === 'Escape'){
-    closeFoodDetail();
-    closeAddFoodModal();
-  }
-});
-
-document.addEventListener('click', function(ev){
-  const d = document.getElementById('foodDetailModal');
-  const a = document.getElementById('addFoodModal');
-  if(ev.target === d) closeFoodDetail();
-  if(ev.target === a) closeAddFoodModal();
-});
-
-loadTBCA();
+["busca","fonte","grupo","ordem"].forEach(id=>document.getElementById(id).addEventListener("input",render));
+document.getElementById("fonte").addEventListener("change",render);
+document.getElementById("grupo").addEventListener("change",render);
+document.getElementById("ordem").addEventListener("change",render);
+manual("fileTbca","TBCA"); manual("fileTaco","TACO"); carregarAuto();
 </script>
 </body>
 </html>
