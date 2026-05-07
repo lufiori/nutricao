@@ -1,14 +1,478 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NutriVida</title><link rel="stylesheet" href="app.css?v=tbca-pro"></head><body>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="index.html"><span class="logo">🌿</span>NutriVida</a><nav class="desktop-nav"><button class="navbtn active" data-tab="hoje" onclick="switchHome('hoje')">Hoje</button><button class="navbtn" data-tab="necessidades" onclick="switchHome('necessidades')">Necessidades</button><a class="navbtn" href="alimentos.html">Alimentos</a><a class="navbtn" href="receitas.html">Receitas</a><a class="navbtn" href="favoritos.html">Favoritos</a><a class="navbtn" href="perfil.html">Perfil</a></nav></div></header>
-<main class="app">
-<section class="hero"><div class="card soft"><h1 class="title">Seu dia alimentar, simples e completo.</h1><p class="subtitle">Registre refeições, acompanhe metas e veja rapidamente o que ainda falta no seu dia.</p><div class="toolbar"><button class="primary" onclick="openAdd('Almoço')">+ Adicionar alimento</button><a class="ghost" href="receitas.html">Ver receitas</a></div></div><div class="card pc-panel"><h2 class="title">Atalhos</h2><div class="grid"><a class="meal" href="alimentos.html"><b>🍎 Alimentos</b><span>buscar</span></a><a class="meal" href="favoritos.html"><b>⭐ Favoritos</b><span>abrir</span></a><a class="meal" href="perfil.html"><b>⚙️ Perfil</b><span>ajustar</span></a></div></div></section>
-<div class="tabs"><button class="tab active" data-tab="hoje" onclick="switchHome('hoje')">Hoje</button><button class="tab" data-tab="necessidades" onclick="switchHome('necessidades')">Necessidades diárias</button></div>
-<section id="hoje" class="screen active"><div class="section-title"><h2>Resumo do dia</h2><button class="ghost" onclick="clearToday()">Limpar dia</button></div><div id="summaryCards" class="grid grid4"></div><div class="section-title"><h2>Refeições</h2><button class="primary" onclick="openAdd('Almoço')">Adicionar</button></div><div id="mealList" class="meal-list"></div><div class="section-title"><h2>Falta no seu dia</h2><span class="pill">metas principais</span></div><div id="missingList" class="grid"></div><div class="section-title"><h2>Sugestões inteligentes</h2><span class="pill">baseado no que falta</span></div><div id="smartSuggestions" class="suggestion-grid"></div><div class="section-title"><h2>Vitaminas e minerais</h2><span class="pill">micronutrientes</span></div><div id="microCards" class="micro-grid"></div></section>
-<section id="necessidades" class="screen"><div class="section-title"><h2>Necessidades diárias</h2><a class="ghost" href="perfil.html">Editar perfil</a></div><div class="card"><p class="subtitle">Tabela com meta, consumo atual e percentual atingido.</p><div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Nutriente</th><th>Meta diária</th><th>Consumido hoje</th><th>%</th></tr></thead><tbody id="needsTable"></tbody></table></div></div></section>
-</main>
-<div class="more-menu" id="moreMenu"><a href="alimentos.html">🍎 Alimentos</a><a href="receitas.html">📖 Receitas</a><a href="favoritos.html">⭐ Favoritos</a><a href="perfil.html">⚙️ Perfil</a></div>
-<nav class="bottom-nav"><div class="bottom-nav-inner"><button class="active" onclick="switchHome('hoje')">🏠<br>Hoje</button><button onclick="switchHome('necessidades')">🎯<br>Necessidades</button><button data-more onclick="openMore()">☰<br>Mais</button></div></nav>
-<div class="modal-back" id="addModal"><div class="modal modal-add-simple"><div class="modal-head"><h2>Adicionar alimento</h2><button class="close" onclick="closeAdd()">Fechar</button></div><div class="field"><label>Busque e toque no alimento</label><input id="modalFoodSearch" class="search" placeholder="Digite arroz, frango, banana..." oninput="fillFoodSelect()"></div><div id="modalFoodResults" class="food-pick-list compact"></div><div id="modalSelectedBox" class="selected-food-box" style="display:none"></div><input type="hidden" id="modalFood"><div class="formrow simple-add-row"><div class="field"><label>Refeição</label><select id="modalMeal"><option>Café da manhã</option><option>Almoço</option><option>Lanche</option><option>Jantar</option></select></div><div class="field"><label>Quantidade em gramas</label><input id="modalGrams" type="number" value="100"></div></div><div class="quick-grams"><button type="button" onclick="setModalGrams(50)">50g</button><button type="button" onclick="setModalGrams(100)">100g</button><button type="button" onclick="setModalGrams(150)">150g</button><button type="button" onclick="setModalGrams(200)">200g</button></div><div class="toolbar"><button id="modalAddBtn" class="primary" onclick="submitAdd()" disabled>Escolha um alimento</button></div></div></div>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NutriVida</title>
+<link rel="stylesheet" href="app.css?v=tbca-pro">
 
-<div class="modal-back" id="autoMealModal"><div class="modal auto-meal-modal"><div class="modal-head"><div><h2 id="autoMealTitle">Sugestão de refeição</h2><p class="subtitle">Gerada automaticamente com base no que falta no seu dia.</p></div><button class="close" onclick="closeAutoMeal()">Fechar</button></div><div id="autoMealBody"></div><div class="toolbar"><button class="primary" onclick="addAutoMealToDiary()">Adicionar tudo ao diário</button><button class="ghost" onclick="openAutoMeal(document.getElementById('autoMealModal').dataset.meal || 'Almoço')">Gerar outra sugestão</button></div></div></div>
-<script src="medidas.js?v=tbca-pro"></script><script src="app.js?v=tbca-pro"></script><script>loadFoods().then(()=>{fillFoodSelect();renderHome()})</script></body></html>
+<style>
+/* ===== AJUSTE LIMPO PARA A HOME DO NUTRIVIDA ===== */
+body{
+  background:#f7f8fa;
+}
+
+.topbar{
+  background:#fff;
+  border-bottom:1px solid #e5e7eb;
+  box-shadow:0 2px 10px rgba(15,23,42,.03);
+}
+
+.app{
+  max-width:1120px;
+  margin:0 auto;
+  padding:18px;
+}
+
+.hero-clean{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.home-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+.home-title{
+  margin:0;
+  color:#15803d;
+  font-size:24px;
+  line-height:1.2;
+}
+
+.home-subtitle{
+  color:#6b7280;
+  margin:8px 0 0;
+  font-size:14px;
+  line-height:1.45;
+}
+
+.quick-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+
+.clean-shortcuts{
+  display:grid;
+  gap:10px;
+}
+
+.clean-shortcut{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  background:#f9fafb;
+  text-decoration:none;
+  color:#1f2937;
+}
+
+.clean-shortcut b{
+  font-size:14px;
+}
+
+.clean-shortcut span{
+  color:#6b7280;
+  font-size:12px;
+}
+
+.home-layout{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+.clean-section{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+
+.clean-section.compact{
+  padding:14px 16px;
+}
+
+.section-title{
+  margin-bottom:12px;
+}
+
+.section-title h2{
+  font-size:18px;
+}
+
+.home-mini-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.home-mini-title h2{
+  margin:0;
+  font-size:18px;
+}
+
+.home-mini-title p{
+  margin:3px 0 0;
+  color:#6b7280;
+  font-size:13px;
+}
+
+.clean-two-cols{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.clean-hidden-start{
+  display:none;
+}
+
+#summaryCards.grid4{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+#mealList.meal-list{
+  margin-top:4px;
+}
+
+#missingList.grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+#smartSuggestions.suggestion-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+#microCards.micro-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.tabs{
+  display:none;
+}
+
+.desktop-nav .navbtn{
+  white-space:nowrap;
+}
+
+.bottom-nav{
+  display:none;
+}
+
+.more-menu{
+  display:none;
+}
+
+.simple-more-links{
+  display:none;
+}
+
+@media(max-width:900px){
+  .app{
+    padding:12px;
+    padding-bottom:84px;
+  }
+
+  .hero-clean{
+    grid-template-columns:1fr;
+  }
+
+  .clean-two-cols{
+    grid-template-columns:1fr;
+  }
+
+  #summaryCards.grid4{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  #missingList.grid,
+  #smartSuggestions.suggestion-grid,
+  #microCards.micro-grid{
+    grid-template-columns:1fr;
+  }
+
+  .desktop-nav{
+    display:none;
+  }
+
+  .simple-more-links{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-top:12px;
+  }
+
+  .simple-more-links a{
+    text-align:center;
+    font-size:12px;
+    padding:10px 6px;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    background:#f9fafb;
+    color:#1f2937;
+    text-decoration:none;
+  }
+
+  .bottom-nav{
+    display:block;
+  }
+}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="logo">🌿</span>NutriVida</a>
+
+    <nav class="desktop-nav">
+      <button class="navbtn active" data-tab="hoje" onclick="switchHome('hoje')">Hoje</button>
+      <button class="navbtn" data-tab="necessidades" onclick="switchHome('necessidades')">Necessidades</button>
+      <a class="navbtn" href="alimentos.html">Alimentos</a>
+      <a class="navbtn" href="receitas.html">Receitas</a>
+      <a class="navbtn" href="favoritos.html">Favoritos</a>
+      <a class="navbtn" href="perfil.html">Perfil</a>
+    </nav>
+  </div>
+</header>
+
+<main class="app">
+
+  <section class="hero-clean">
+    <div class="home-card">
+      <h1 class="home-title">Seu dia alimentar</h1>
+      <p class="home-subtitle">
+        Registre refeições rapidamente e veja, sem complicação, como está seu consumo no dia.
+      </p>
+
+      <div class="quick-actions">
+        <button class="primary" onclick="openAdd('Almoço')">+ Adicionar alimento</button>
+        <a class="ghost" href="alimentos.html">Buscar alimentos</a>
+        <a class="ghost" href="receitas.html">Receitas</a>
+      </div>
+
+      <div class="simple-more-links">
+        <a href="alimentos.html">🍎<br>Alimentos</a>
+        <a href="receitas.html">📖<br>Receitas</a>
+        <a href="favoritos.html">⭐<br>Favoritos</a>
+        <a href="perfil.html">⚙️<br>Perfil</a>
+      </div>
+    </div>
+
+    <div class="home-card">
+      <h2 class="title" style="font-size:18px;margin-bottom:10px;">Atalhos</h2>
+      <div class="clean-shortcuts">
+        <a class="clean-shortcut" href="alimentos.html">
+          <b>🍎 Alimentos</b>
+          <span>TBCA + TACO</span>
+        </a>
+        <a class="clean-shortcut" href="favoritos.html">
+          <b>⭐ Favoritos</b>
+          <span>rápido</span>
+        </a>
+        <a class="clean-shortcut" href="perfil.html">
+          <b>⚙️ Perfil</b>
+          <span>metas</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="hoje" onclick="switchHome('hoje')">Hoje</button>
+    <button class="tab" data-tab="necessidades" onclick="switchHome('necessidades')">Necessidades diárias</button>
+  </div>
+
+  <section id="hoje" class="screen active">
+    <div class="home-layout">
+
+      <section class="clean-section compact">
+        <div class="home-mini-title">
+          <div>
+            <h2>Resumo do dia</h2>
+            <p>Principais números de hoje.</p>
+          </div>
+          <button class="ghost" onclick="clearToday()">Limpar dia</button>
+        </div>
+        <div id="summaryCards" class="grid grid4"></div>
+      </section>
+
+      <section class="clean-section">
+        <div class="home-mini-title">
+          <div>
+            <h2>Refeições</h2>
+            <p>O que você já registrou hoje.</p>
+          </div>
+          <button class="primary" onclick="openAdd('Almoço')">Adicionar</button>
+        </div>
+        <div id="mealList" class="meal-list"></div>
+      </section>
+
+      <div class="clean-two-cols">
+        <section class="clean-section">
+          <div class="home-mini-title">
+            <div>
+              <h2>Falta no seu dia</h2>
+              <p>Metas principais ainda pendentes.</p>
+            </div>
+          </div>
+          <div id="missingList" class="grid"></div>
+        </section>
+
+        <section class="clean-section">
+          <div class="home-mini-title">
+            <div>
+              <h2>Sugestões</h2>
+              <p>Ideias com base no que falta.</p>
+            </div>
+          </div>
+          <div id="smartSuggestions" class="suggestion-grid"></div>
+        </section>
+      </div>
+
+      <section class="clean-section">
+        <div class="home-mini-title">
+          <div>
+            <h2>Vitaminas e minerais</h2>
+            <p>Resumo dos micronutrientes.</p>
+          </div>
+        </div>
+        <div id="microCards" class="micro-grid"></div>
+      </section>
+
+    </div>
+  </section>
+
+  <section id="necessidades" class="screen">
+    <section class="clean-section">
+      <div class="home-mini-title">
+        <div>
+          <h2>Necessidades diárias</h2>
+          <p>Meta, consumo atual e percentual atingido.</p>
+        </div>
+        <a class="ghost" href="perfil.html">Editar perfil</a>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px">
+        <table>
+          <thead>
+            <tr>
+              <th>Nutriente</th>
+              <th>Meta diária</th>
+              <th>Consumido hoje</th>
+              <th>%</th>
+            </tr>
+          </thead>
+          <tbody id="needsTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<div class="more-menu" id="moreMenu">
+  <a href="alimentos.html">🍎 Alimentos</a>
+  <a href="receitas.html">📖 Receitas</a>
+  <a href="favoritos.html">⭐ Favoritos</a>
+  <a href="perfil.html">⚙️ Perfil</a>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="active" onclick="switchHome('hoje')">🏠<br>Hoje</button>
+    <button onclick="switchHome('necessidades')">🎯<br>Necessidades</button>
+    <button data-more onclick="openMore()">☰<br>Mais</button>
+  </div>
+</nav>
+
+<div class="modal-back" id="addModal">
+  <div class="modal modal-add-simple">
+    <div class="modal-head">
+      <h2>Adicionar alimento</h2>
+      <button class="close" onclick="closeAdd()">Fechar</button>
+    </div>
+
+    <div class="field">
+      <label>Busque e toque no alimento</label>
+      <input id="modalFoodSearch" class="search" placeholder="Digite arroz, frango, banana..." oninput="fillFoodSelect()">
+    </div>
+
+    <div id="modalFoodResults" class="food-pick-list compact"></div>
+    <div id="modalSelectedBox" class="selected-food-box" style="display:none"></div>
+    <input type="hidden" id="modalFood">
+
+    <div class="formrow simple-add-row">
+      <div class="field">
+        <label>Refeição</label>
+        <select id="modalMeal">
+          <option>Café da manhã</option>
+          <option>Almoço</option>
+          <option>Lanche</option>
+          <option>Jantar</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Quantidade em gramas</label>
+        <input id="modalGrams" type="number" value="100">
+      </div>
+    </div>
+
+    <div class="quick-grams">
+      <button type="button" onclick="setModalGrams(50)">50g</button>
+      <button type="button" onclick="setModalGrams(100)">100g</button>
+      <button type="button" onclick="setModalGrams(150)">150g</button>
+      <button type="button" onclick="setModalGrams(200)">200g</button>
+    </div>
+
+    <div class="toolbar">
+      <button id="modalAddBtn" class="primary" onclick="submitAdd()" disabled>Escolha um alimento</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="autoMealModal">
+  <div class="modal auto-meal-modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="autoMealTitle">Sugestão de refeição</h2>
+        <p class="subtitle">Gerada automaticamente com base no que falta no seu dia.</p>
+      </div>
+      <button class="close" onclick="closeAutoMeal()">Fechar</button>
+    </div>
+
+    <div id="autoMealBody"></div>
+
+    <div class="toolbar">
+      <button class="primary" onclick="addAutoMealToDiary()">Adicionar tudo ao diário</button>
+      <button class="ghost" onclick="openAutoMeal(document.getElementById('autoMealModal').dataset.meal || 'Almoço')">Gerar outra sugestão</button>
+    </div>
+  </div>
+</div>
+
+<script src="medidas.js?v=tbca-pro"></script>
+<script src="app.js?v=tbca-pro"></script>
+<script>
+loadFoods().then(()=>{
+  fillFoodSelect();
+  renderHome();
+});
+</script>
+</body>
+</html>
