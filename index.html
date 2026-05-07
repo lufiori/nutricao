@@ -281,7 +281,7 @@ body{
 
 .nv-sheet{
   width:100%;
-  max-width:430px;
+  max-width:500px;
   background:#fff;
   border-radius:26px 26px 0 0;
   padding:18px;
@@ -338,16 +338,19 @@ body{
   display:flex;
   gap:8px;
   margin-bottom:12px;
+  overflow-x:auto;
+  padding-bottom:2px;
 }
 
 .nv-source-row button{
   border:1px solid var(--line);
   background:#f9fafb;
-  padding:8px 10px;
+  padding:8px 11px;
   border-radius:999px;
   font-weight:700;
   font-size:12px;
   cursor:pointer;
+  white-space:nowrap;
 }
 
 .nv-source-row button.active{
@@ -450,7 +453,7 @@ body{
 
   .nv-sheet{
     border-radius:26px;
-    max-height:80vh;
+    max-height:82vh;
   }
 }
 </style>
@@ -571,7 +574,7 @@ body{
     <div class="nv-sheet-head">
       <div>
         <h2 id="sheetMealTitle">Adicionar alimento</h2>
-        <p id="sheetStatus">Carregando alimentos...</p>
+        <p id="sheetStatus">Busque ou escolha uma sugestão rápida</p>
       </div>
 
       <button onclick="closeMealSheet()">✕</button>
@@ -586,13 +589,13 @@ body{
     >
 
     <div class="nv-source-row">
-      <button id="filterAmbas" class="active" onclick="setFonteFiltro('ambas')">Todas</button>
-      <button id="filterTbca" onclick="setFonteFiltro('TBCA')">TBCA</button>
-      <button id="filterTaco" onclick="setFonteFiltro('TACO')">TACO</button>
+      <button id="filterTodos" class="active" onclick="setTipoFiltro('todos')">Todos</button>
+      <button id="filterSimples" onclick="setTipoFiltro('simples')">Ingredientes simples</button>
+      <button id="filterPreparados" onclick="setTipoFiltro('preparados')">Preparados</button>
     </div>
 
     <div id="foodList" class="nv-food-list">
-      <div class="nv-empty">Carregando bases...</div>
+      <div class="nv-empty">Carregando alimentos...</div>
     </div>
 
     <div id="selectedBox" class="nv-selected"></div>
@@ -613,7 +616,7 @@ const TACO_URL = "./taco.json";
 let alimentos = [];
 let selectedFood = null;
 let currentMeal = "Almoço";
-let fonteFiltro = "ambas";
+let tipoFiltro = "todos";
 
 let diario = JSON.parse(localStorage.getItem("nutrivida_home_diario") || "[]");
 
@@ -647,6 +650,7 @@ function mapTbca(a, i){
     nome,
     busca: norm(nome),
     grupo: a.grupo || "",
+    tipo: a.tipo_alimento || "",
     kcal: num(n.kcal),
     proteina: num(n.proteina),
     carbo: num(n.carbo),
@@ -663,6 +667,7 @@ function mapTaco(a, i){
     nome,
     busca: norm(nome),
     grupo: a.grupo || "",
+    tipo: "",
     kcal: num(a.energia_kcal),
     proteina: num(a.proteina_g),
     carbo: num(a.carboidrato_g),
@@ -696,20 +701,53 @@ async function carregarBases(){
 
   document.getElementById("sheetStatus").textContent = alimentos.length
     ? alimentos.length + " alimentos disponíveis"
-    : "Não carregou as bases. Confira tbca_pronto.json e taco.json.";
+    : "Não carregou os alimentos. Confira tbca_pronto.json e taco.json.";
 
   renderFoodList();
   renderResumo();
 }
 
-function setFonteFiltro(fonte){
-  fonteFiltro = fonte;
+
+function prioridadeInicial(a){
+  const n = norm(a.nome);
+  const prioridades = [
+    "arroz", "feijao", "frango", "ovo", "banana", "pao", "leite", "cafe",
+    "batata", "macarrao", "carne", "alface", "tomate", "maca", "aveia"
+  ];
+
+  const idx = prioridades.findIndex(p => n.includes(p));
+  return idx === -1 ? 999 : idx;
+}
+
+function parecePreparado(a){
+  const t = norm((a.nome || "") + " " + (a.grupo || "") + " " + (a.tipo || ""));
+
+  return t.includes("preparacao") ||
+         t.includes("preparação") ||
+         t.includes("preparado") ||
+         t.includes("cozido") ||
+         t.includes("assado") ||
+         t.includes("frito") ||
+         t.includes("grelhado") ||
+         t.includes("refogado") ||
+         t.includes("molho") ||
+         t.includes("sopa") ||
+         t.includes("bolo") ||
+         t.includes("bife") ||
+         t.includes("estrogonofe") ||
+         t.includes("salada") ||
+         t.includes("cuscuz") ||
+         t.includes("feijoada");
+}
+
+function setTipoFiltro(tipo){
+  tipoFiltro = tipo;
 
   document.querySelectorAll(".nv-source-row button").forEach(b => b.classList.remove("active"));
 
-  if(fonte === "ambas") document.getElementById("filterAmbas").classList.add("active");
-  if(fonte === "TBCA") document.getElementById("filterTbca").classList.add("active");
-  if(fonte === "TACO") document.getElementById("filterTaco").classList.add("active");
+  if(tipo === "todos") document.getElementById("filterTodos").classList.add("active");
+  if(tipo === "simples") document.getElementById("filterSimples").classList.add("active");
+  if(tipo === "preparados") document.getElementById("filterPreparados").classList.add("active");
 
   renderFoodList();
 }
@@ -720,9 +758,24 @@ function renderFoodList(){
 
   let lista = alimentos.filter(a => {
     const okBusca = !termo || a.busca.includes(termo);
-    const okFonte = fonteFiltro === "ambas" || a.fonte === fonteFiltro;
-    return okBusca && okFonte;
-  }).slice(0, 40);
+    let okTipo = true;
+
+    if(tipoFiltro === "simples") okTipo = !parecePreparado(a);
+    if(tipoFiltro === "preparados") okTipo = parecePreparado(a);
+
+    return okBusca && okTipo;
+  });
+
+  if(!termo){
+    lista.sort((a,b) => {
+      const pa = prioridadeInicial(a);
+      const pb = prioridadeInicial(b);
+      if(pa !== pb) return pa - pb;
+      return a.nome.localeCompare(b.nome, "pt-BR");
+    });
+  }
+
+  lista = lista.slice(0, 40);
 
   if(!lista.length){
     box.innerHTML = '<div class="nv-empty">Nenhum alimento encontrado.</div>';
@@ -732,7 +785,7 @@ function renderFoodList(){
   box.innerHTML = lista.map(a => `
     <button class="nv-food-item" onclick="selectFood('${a.id}')">
       <strong>${a.nome}</strong>
-      <span>${fmt(a.kcal)} kcal • ${a.fonte}</span>
+      <span>${fmt(a.kcal)} kcal • ${a.fonte === "TBCA" ? "base principal" : "base complementar"}</span>
     </button>
   `).join("");
 }
@@ -746,7 +799,7 @@ function selectFood(id){
   box.classList.add("open");
   box.innerHTML = `
     <strong>${selectedFood.nome}</strong>
-    ${fmt(selectedFood.kcal)} kcal por 100g • ${selectedFood.fonte}
+    ${fmt(selectedFood.kcal)} kcal por 100g • ${selectedFood.fonte === "TBCA" ? "base principal" : "base complementar"}
   `;
 
   document.getElementById("addBtn").disabled = false;
