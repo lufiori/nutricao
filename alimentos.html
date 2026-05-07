@@ -32,8 +32,9 @@ button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}b
 .foodTop{display:flex;justify-content:space-between;gap:10px}.title{font-weight:900;line-height:1.25}.group{color:var(--muted);font-size:12.5px;margin-top:3px}
 .macros{display:flex;flex-wrap:wrap;gap:7px}.macro{background:#f9fafb;border:1px solid var(--line);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:700}
 .details{display:none;background:#f9fafb;border:1px solid var(--line);border-radius:16px;padding:11px}.details.open{display:block}.detailGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.detail{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}.detail b{display:block;font-size:13px}.detail span{color:var(--muted);font-size:12px}
+.rawGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.rawItem{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;font-size:12px}.rawItem b{display:block;color:#374151}.rawItem span{color:var(--muted)}
 .empty{background:#f9fafb;border:1px dashed #d1d5db;border-radius:18px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
-@media(max-width:900px){header{position:static}.head{align-items:flex-start;flex-direction:column}main{padding:14px}.grid4,.grid2,.statusGrid{grid-template-columns:1fr}.results{grid-template-columns:1fr}.detailGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){header{position:static}.head{align-items:flex-start;flex-direction:column}main{padding:14px}.grid4,.grid2,.statusGrid{grid-template-columns:1fr}.results{grid-template-columns:1fr}.detailGrid,.rawGrid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -43,7 +44,7 @@ button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}b
 <section class="card">
 <h2>Consulta de alimentos</h2>
 <p class="help">Pesquise uma vez e compare os resultados da TBCA e da TACO na mesma tela.</p>
-<div class="notice">Esta página tenta carregar automaticamente <b>tbca.json</b> e <b>taco.json</b> na mesma pasta do HTML. Se algum não carregar, use o carregamento manual.</div>
+<div class="notice">Versão corrigida: a TBCA agora tenta identificar automaticamente os campos de nutrientes, mesmo que os nomes no JSON estejam diferentes.</div>
 
 <div class="grid4">
 <input id="busca" type="search" placeholder="Buscar: café, arroz, feijão, frango...">
@@ -76,29 +77,77 @@ button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}b
 </main>
 
 <script>
-const TBCA_URL="./tbca.json", TACO_URL="./taco.json";
+const TBCA_URLS=["./tbca.json","./TBCA.json","./alimentos_tbca.json","./tbca_amigavel.json","./tbca_nutrivida.json","./tbca_base.json","./dados_tbca.json","./base_tbca.json"];
+const TACO_URL="./taco.json";
 let tbca=[], taco=[], todos=[], modo="todos";
 
 function norm(t){return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
+function cleanKey(k){return norm(k).replace(/[^a-z0-9]/g,"")}
 function num(v){if(v==null||v===""||v==="NA"||v==="Tr"||v==="-"||v==="--")return 0;let n=parseFloat(String(v).replace(",",".").replace(/[^\d.-]/g,""));return isFinite(n)?n:0}
 function fmt(v){return num(v).toLocaleString("pt-BR",{maximumFractionDigits:1})}
-function any(o,ks,p=""){for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k]}return p}
 function arr(json){return Array.isArray(json)?json:(Array.isArray(json.alimentos)?json.alimentos:(Array.isArray(json.data)?json.data:(Array.isArray(json.items)?json.items:[])))}
+function any(o,ks,p=""){for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k]}return p}
+
+function fuzzy(o, palavras, evitar=[]){
+  if(!o) return 0;
+  const keys=Object.keys(o);
+  for(const k of keys){
+    const ck=cleanKey(k);
+    const ok=palavras.every(p=>ck.includes(cleanKey(p)));
+    const bad=evitar.some(e=>ck.includes(cleanKey(e)));
+    if(ok && !bad) return num(o[k]);
+  }
+  return 0;
+}
+
+function nomeCampo(o){
+  return any(o,["nome","Nome","descricao","Descrição","descricao_alimento","Alimento","alimento","description","food_name","nome_alimento","nomeAlimento","nome_do_alimento"],"Sem nome");
+}
+function grupoCampo(o){
+  return any(o,["grupo","Grupo","categoria","Categoria","group","category","origem","classificacao","classificação"],"Sem grupo");
+}
+function rawNutrientes(o){
+  const proibidos=["id","codigo","cod","numero","nome","descricao","alimento","grupo","categoria","fonte","origem","classificacao"];
+  let lista=[];
+  Object.keys(o||{}).forEach(k=>{
+    const ck=cleanKey(k);
+    if(proibidos.some(p=>ck.includes(cleanKey(p)))) return;
+    const v=o[k];
+    if(v===null||v===undefined||v==="") return;
+    const n=num(v);
+    if(n!==0 || String(v)==="0" || v===0) lista.push({k,v:n});
+  });
+  return lista.slice(0,40);
+}
 
 function mapTaco(a,i){
- let nome=any(a,["descricao_alimento","nome","descricao","alimento"],"Sem nome");
- return {id:"taco_"+(a.numero||i),fonte:"TACO",nome,busca:norm(nome),grupo:any(a,["grupo","categoria"],"Sem grupo"),kcal:num(a.energia_kcal),proteina:num(a.proteina_g),carbo:num(a.carboidrato_g),gordura:num(a.lipideos_g),fibra:num(a.fibra_alimentar_g),sodio:num(a.sodio_mg),colesterol:num(a.colesterol_mg),calcio:num(a.calcio_mg),ferro:num(a.ferro_mg),vitamina_c:num(a.vitamina_c_mg)}
+ let nome=nomeCampo(a);
+ return {id:"taco_"+(a.numero||i),fonte:"TACO",nome,busca:norm(nome),grupo:grupoCampo(a),
+ kcal:num(a.energia_kcal),proteina:num(a.proteina_g),carbo:num(a.carboidrato_g),gordura:num(a.lipideos_g),fibra:num(a.fibra_alimentar_g),sodio:num(a.sodio_mg),colesterol:num(a.colesterol_mg),calcio:num(a.calcio_mg),ferro:num(a.ferro_mg),vitamina_c:num(a.vitamina_c_mg),raw:rawNutrientes(a)}
 }
 function mapTbca(a,i){
- let nome=any(a,["nome","Nome","descricao","Descrição","descricao_alimento","Alimento","alimento","description","food_name","nome_alimento"],"Sem nome");
- return {id:"tbca_"+any(a,["id","codigo","Código","cod","numero"],i),fonte:"TBCA",nome,busca:norm(nome),grupo:any(a,["grupo","Grupo","categoria","Categoria","group","category","origem","classificacao"],"Sem grupo"),kcal:num(any(a,["energia_kcal","Energia_kcal","kcal","Kcal","Energia","energia"],0)),proteina:num(any(a,["proteina_g","Proteina_g","Proteína","proteina","protein"],0)),carbo:num(any(a,["carboidrato_g","Carboidrato_g","Carboidrato","carboidrato","carbo","carbohydrate"],0)),gordura:num(any(a,["lipideos_g","lipidio_g","Lipidio_g","Lipídeos","gordura","Gordura","fat"],0)),fibra:num(any(a,["fibra_alimentar_g","fibra_g","Fibra","fibra"],0)),sodio:num(any(a,["sodio_mg","Sodio_mg","Sódio","sodio"],0)),colesterol:num(any(a,["colesterol_mg","Colesterol_mg","Colesterol","colesterol"],0)),calcio:num(any(a,["calcio_mg","Calcio_mg","Cálcio","calcio"],0)),ferro:num(any(a,["ferro_mg","Ferro_mg","Ferro","ferro"],0)),vitamina_c:num(any(a,["vitamina_c_mg","Vitamina_c_mg","Vitamina C","vitamina_c"],0))}
+ let nome=nomeCampo(a);
+ return {id:"tbca_"+any(a,["id","codigo","Código","cod","numero"],i),fonte:"TBCA",nome,busca:norm(nome),grupo:grupoCampo(a),
+ kcal:num(any(a,["energia_kcal","Energia_kcal","kcal","Kcal","Energia","energia","calorias","Calorias","valor_energetico","Valor energético","valorEnergetico"],0)) || fuzzy(a,["energia"],["kj"]) || fuzzy(a,["kcal"]) || fuzzy(a,["caloria"]),
+ proteina:num(any(a,["proteina_g","Proteina_g","Proteína","proteina","protein","proteinas","proteína_g"],0)) || fuzzy(a,["protein"]) || fuzzy(a,["proteina"]),
+ carbo:num(any(a,["carboidrato_g","Carboidrato_g","Carboidrato","carboidrato","carbo","carbohydrate","carboidratos"],0)) || fuzzy(a,["carbo"]),
+ gordura:num(any(a,["lipideos_g","lipidio_g","Lipidio_g","Lipídeos","lipideos","lipídios","gordura","Gordura","fat","total_lipid"],0)) || fuzzy(a,["lipid"]) || fuzzy(a,["gordura"]) || fuzzy(a,["fat"]),
+ fibra:num(any(a,["fibra_alimentar_g","fibra_g","Fibra","fibra","fibra alimentar","dietary_fiber"],0)) || fuzzy(a,["fibra"]),
+ sodio:num(any(a,["sodio_mg","Sodio_mg","Sódio","sodio","sodium"],0)) || fuzzy(a,["sodio"]) || fuzzy(a,["sodium"]),
+ colesterol:num(any(a,["colesterol_mg","Colesterol_mg","Colesterol","colesterol","cholesterol"],0)) || fuzzy(a,["colesterol"]) || fuzzy(a,["cholesterol"]),
+ calcio:num(any(a,["calcio_mg","Calcio_mg","Cálcio","calcio","calcium"],0)) || fuzzy(a,["calcio"]) || fuzzy(a,["calcium"]),
+ ferro:num(any(a,["ferro_mg","Ferro_mg","Ferro","ferro","iron"],0)) || fuzzy(a,["ferro"]) || fuzzy(a,["iron"]),
+ vitamina_c:num(any(a,["vitamina_c_mg","Vitamina_c_mg","Vitamina C","vitamina_c","vitamin_c"],0)) || fuzzy(a,["vitamina","c"]) || fuzzy(a,["vitamin","c"]),
+ raw:rawNutrientes(a)}
 }
 
 function atualizar(){todos=[...tbca,...taco];grupos();render()}
 function grupos(){let sel=document.getElementById("grupo"), val=sel.value;sel.innerHTML='<option value="">Todos os grupos</option>';[...new Set(todos.map(a=>a.grupo).filter(Boolean))].sort().forEach(g=>{let op=document.createElement("option");op.value=g;op.textContent=g;sel.appendChild(op)});sel.value=val}
 
 async function carregarAuto(){
- try{let r=await fetch(TBCA_URL,{cache:"no-store"});if(!r.ok)throw new Error(r.status);tbca=arr(await r.json()).map(mapTbca).filter(a=>a.nome!=="Sem nome");statusTbca.textContent="TBCA: "+tbca.length+" carregados automaticamente."}catch(e){statusTbca.textContent="TBCA: não carregou automático. Confirme tbca.json ou use manual."}
+ let ok=false, ultimo="";
+ for(const url of TBCA_URLS){try{let r=await fetch(url,{cache:"no-store"});if(!r.ok)throw new Error("status "+r.status);tbca=arr(await r.json()).map(mapTbca).filter(a=>a.nome!=="Sem nome");statusTbca.textContent="TBCA: "+tbca.length+" carregados de "+url;ok=true;break}catch(e){ultimo=url+" "+e.message}}
+ if(!ok)statusTbca.textContent="TBCA: não carregou automático. Último erro: "+ultimo;
  try{let r=await fetch(TACO_URL,{cache:"no-store"});if(!r.ok)throw new Error(r.status);taco=arr(await r.json()).map(mapTaco).filter(a=>a.nome!=="Sem nome");statusTaco.textContent="TACO: "+taco.length+" carregados automaticamente."}catch(e){statusTaco.textContent="TACO: não carregou automático. Confirme taco.json ou use manual."}
  atualizar()
 }
@@ -111,7 +160,6 @@ function manual(id,fonte){
   rd.readAsText(f,"UTF-8");
  })
 }
-
 function setModo(m){modo=m;document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));if(m==="todos")tabTodos.classList.add("active");if(m==="simples")tabSimples.classList.add("active");if(m==="preparados")tabPreparados.classList.add("active");render()}
 function preparado(a){let t=norm(a.nome+" "+a.grupo);return ["preparado","cozido","assado","frito","grelhado","refogado","molho","sopa","bolo","bife","estrogonofe","salada","cuscuz","feijoada"].some(x=>t.includes(x))}
 function filtro(base){
@@ -120,9 +168,13 @@ function filtro(base){
  out.sort((a,b)=>ord==="kcal"?b.kcal-a.kcal:ord==="proteina"?b.proteina-a.proteina:ord==="carbo"?b.carbo-a.carbo:ord==="gordura"?b.gordura-a.gordura:ord==="fibra"?b.fibra-a.fibra:a.nome.localeCompare(b.nome,"pt-BR"));
  return out;
 }
+function rawHtml(a){
+ if(!a.raw || !a.raw.length) return "";
+ return `<h4 style="margin:12px 0 8px">Nutrientes detectados no JSON original</h4><div class="rawGrid">${a.raw.map(x=>`<div class="rawItem"><b>${x.k}</b><span>${fmt(x.v)}</span></div>`).join("")}</div>`;
+}
 function card(a){
  let cls=a.fonte==="TBCA"?"tbca":"taco", id=("det_"+a.id).replace(/[^a-zA-Z0-9_]/g,"");
- return `<div class="food"><div class="foodTop"><div><div class="title">${a.nome}</div><div class="group">${a.grupo}</div></div><span class="source ${cls}">${a.fonte}</span></div><div class="macros"><span class="macro">${fmt(a.kcal)} kcal</span><span class="macro">P ${fmt(a.proteina)}g</span><span class="macro">C ${fmt(a.carbo)}g</span><span class="macro">G ${fmt(a.gordura)}g</span><span class="macro">Fibra ${fmt(a.fibra)}g</span></div><button class="light" onclick="document.getElementById('${id}').classList.toggle('open')">Ver detalhes</button><div id="${id}" class="details"><div class="detailGrid"><div class="detail"><b>${fmt(a.kcal)}</b><span>Energia kcal</span></div><div class="detail"><b>${fmt(a.proteina)}g</b><span>Proteína</span></div><div class="detail"><b>${fmt(a.carbo)}g</b><span>Carboidrato</span></div><div class="detail"><b>${fmt(a.gordura)}g</b><span>Gorduras</span></div><div class="detail"><b>${fmt(a.fibra)}g</b><span>Fibra</span></div><div class="detail"><b>${fmt(a.sodio)}mg</b><span>Sódio</span></div><div class="detail"><b>${fmt(a.colesterol)}mg</b><span>Colesterol</span></div><div class="detail"><b>${fmt(a.calcio)}mg</b><span>Cálcio</span></div><div class="detail"><b>${fmt(a.ferro)}mg</b><span>Ferro</span></div><div class="detail"><b>${fmt(a.vitamina_c)}mg</b><span>Vitamina C</span></div></div></div></div>`
+ return `<div class="food"><div class="foodTop"><div><div class="title">${a.nome}</div><div class="group">${a.grupo}</div></div><span class="source ${cls}">${a.fonte}</span></div><div class="macros"><span class="macro">${fmt(a.kcal)} kcal</span><span class="macro">P ${fmt(a.proteina)}g</span><span class="macro">C ${fmt(a.carbo)}g</span><span class="macro">G ${fmt(a.gordura)}g</span><span class="macro">Fibra ${fmt(a.fibra)}g</span></div><button class="light" onclick="document.getElementById('${id}').classList.toggle('open')">Ver detalhes</button><div id="${id}" class="details"><div class="detailGrid"><div class="detail"><b>${fmt(a.kcal)}</b><span>Energia kcal</span></div><div class="detail"><b>${fmt(a.proteina)}g</b><span>Proteína</span></div><div class="detail"><b>${fmt(a.carbo)}g</b><span>Carboidrato</span></div><div class="detail"><b>${fmt(a.gordura)}g</b><span>Gorduras</span></div><div class="detail"><b>${fmt(a.fibra)}g</b><span>Fibra</span></div><div class="detail"><b>${fmt(a.sodio)}mg</b><span>Sódio</span></div><div class="detail"><b>${fmt(a.colesterol)}mg</b><span>Colesterol</span></div><div class="detail"><b>${fmt(a.calcio)}mg</b><span>Cálcio</span></div><div class="detail"><b>${fmt(a.ferro)}mg</b><span>Ferro</span></div><div class="detail"><b>${fmt(a.vitamina_c)}mg</b><span>Vitamina C</span></div></div>${rawHtml(a)}</div></div>`
 }
 function bloco(titulo,lista,cls){return lista.length?`<div class="sectionTitle"><h3>${titulo}</h3><span class="source ${cls}">${lista.length} exibidos</span></div><div class="results">${lista.map(card).join("")}</div>`:""}
 function render(){
@@ -133,12 +185,11 @@ function render(){
  let h=bloco("Resultados TBCA",tr,"tbca")+bloco("Resultados TACO",ta,"taco");
  resultados.innerHTML=h||'<div class="empty">Nenhum alimento encontrado com esses filtros.</div>';
 }
-
 ["busca","fonte","grupo","ordem"].forEach(id=>document.getElementById(id).addEventListener("input",render));
 document.getElementById("fonte").addEventListener("change",render);
 document.getElementById("grupo").addEventListener("change",render);
 document.getElementById("ordem").addEventListener("change",render);
-manual("fileTbca","TBCA"); manual("fileTaco","TACO"); carregarAuto();
+manual("fileTbca","TBCA");manual("fileTaco","TACO");carregarAuto();
 </script>
 </body>
 </html>
