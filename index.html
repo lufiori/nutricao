@@ -6,17 +6,33 @@
 <title>NutriVida - Nova Home</title>
 
 <style>
+:root{
+  --bg:#f6f7f5;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --green:#22c55e;
+  --green2:#15803d;
+  --soft:#f3f7f2;
+  --shadow:0 8px 20px rgba(15,23,42,.06);
+}
+
+*{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:#f5f5f5;
-  color:#111827;
+  background:var(--bg);
+  color:var(--text);
 }
 
 .nv-home{
-  max-width:420px;
-  margin:auto;
-  padding:16px;
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  padding:18px;
+  min-height:100vh;
 }
 
 .nv-top{
@@ -28,40 +44,45 @@ body{
 
 .nv-top h1{
   margin:0;
-  font-size:34px;
+  font-size:30px;
+  line-height:1;
 }
 
 .nv-top p{
-  margin:4px 0 0;
-  color:#6b7280;
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:14px;
 }
 
 .nv-calendar-btn{
-  width:52px;
-  height:52px;
-  border-radius:18px;
-  border:none;
+  width:48px;
+  height:48px;
+  border-radius:17px;
+  border:1px solid var(--line);
   background:#fff;
-  font-size:22px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
+  font-size:21px;
+  box-shadow:var(--shadow);
 }
 
 .nv-summary-card{
-  background:#fff;
-  border-radius:28px;
-  padding:22px;
-  margin-bottom:18px;
-  box-shadow:0 8px 20px rgba(0,0,0,.05);
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:26px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
 }
 
 .nv-summary-header{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  margin-bottom:16px;
 }
 
 .nv-summary-header h2{
   margin:0;
+  font-size:18px;
 }
 
 .nv-summary-dots{
@@ -70,36 +91,17 @@ body{
 }
 
 .nv-summary-dots span{
-  width:8px;
-  height:8px;
+  width:7px;
+  height:7px;
   border-radius:50%;
-  background:#22c55e;
+  background:var(--green);
 }
 
 .nv-circle-wrap{
-  display:flex;
+  display:grid;
+  grid-template-columns:72px 1fr 72px;
   align-items:center;
-  justify-content:space-between;
-  margin-top:22px;
-}
-
-.nv-circle{
-  width:170px;
-  height:170px;
-  border-radius:50%;
-  border:14px solid #f0f0f0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.nv-circle-inner{
-  text-align:center;
-}
-
-.nv-circle-inner strong{
-  display:block;
-  font-size:42px;
+  gap:8px;
 }
 
 .nv-kcal-left,
@@ -110,14 +112,55 @@ body{
 .nv-kcal-left strong,
 .nv-kcal-right strong{
   display:block;
-  font-size:24px;
+  font-size:20px;
+}
+
+.nv-kcal-left span,
+.nv-kcal-right span{
+  font-size:12px;
+}
+
+.nv-circle{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  border:13px solid #f0f1ef;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  position:relative;
+}
+
+.nv-circle:after{
+  content:"";
+  position:absolute;
+  left:-13px;
+  bottom:25px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--green);
+}
+
+.nv-circle-inner{
+  text-align:center;
+}
+
+.nv-circle-inner strong{
+  display:block;
+  font-size:31px;
+}
+
+.nv-circle-inner span{
+  font-size:13px;
 }
 
 .nv-macros{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-top:22px;
+  gap:8px;
+  margin-top:20px;
 }
 
 .nv-macro{
@@ -125,84 +168,111 @@ body{
 }
 
 .nv-macro h3{
-  font-size:13px;
-  margin-bottom:8px;
+  font-size:12px;
+  margin:0 0 8px;
+  min-height:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .nv-macro-circle{
-  width:66px;
-  height:66px;
+  width:58px;
+  height:58px;
   border-radius:50%;
-  border:8px solid #f0f0f0;
+  border:7px solid #f0f1ef;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   margin:auto;
-  font-size:11px;
+  font-size:10px;
+  position:relative;
+}
+
+.nv-macro-circle:after{
+  content:"";
+  position:absolute;
+  bottom:-4px;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#8ee0be;
+}
+
+.nv-macro-circle strong{
+  font-size:14px;
 }
 
 .nv-meals{
   display:grid;
-  gap:14px;
+  gap:11px;
 }
 
 .nv-meal-card{
   width:100%;
-  border:none;
+  border:1px solid var(--line);
   background:#fff;
-  border-radius:22px;
-  padding:18px;
+  border-radius:18px;
+  padding:13px 14px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  box-shadow:0 6px 16px rgba(0,0,0,.05);
+  box-shadow:0 4px 14px rgba(15,23,42,.04);
+  cursor:pointer;
 }
 
 .nv-meal-left{
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:12px;
+  text-align:left;
 }
 
 .nv-meal-icon{
-  width:52px;
-  height:52px;
-  border-radius:18px;
+  width:44px;
+  height:44px;
+  border-radius:15px;
   background:#f7f7f7;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:28px;
+  font-size:25px;
 }
 
 .nv-meal-card h2{
   margin:0;
-  font-size:22px;
+  font-size:18px;
 }
 
 .nv-meal-card span{
-  color:#6b7280;
+  color:var(--muted);
+  font-size:13px;
 }
 
 .nv-plus{
-  width:42px;
-  height:42px;
+  width:39px;
+  height:39px;
   border-radius:50%;
-  background:#f3f4f6;
+  background:#f1f3f1;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:32px;
-  color:#6b7280;
+  font-size:30px;
+  line-height:1;
+  color:#75807a;
+  flex:none;
 }
 
 .nv-sheet-back{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.4);
+  background:rgba(15,23,42,.42);
   display:none;
+  z-index:999;
   align-items:flex-end;
+  justify-content:center;
+  padding:0;
 }
 
 .nv-sheet-back.open{
@@ -211,27 +281,32 @@ body{
 
 .nv-sheet{
   width:100%;
+  max-width:430px;
   background:#fff;
-  border-radius:28px 28px 0 0;
-  padding:20px;
-  max-height:85vh;
+  border-radius:26px 26px 0 0;
+  padding:18px;
+  max-height:82vh;
   overflow:auto;
+  box-shadow:0 -20px 60px rgba(15,23,42,.20);
 }
 
 .nv-sheet-head{
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
-  margin-bottom:16px;
+  gap:14px;
+  margin-bottom:14px;
 }
 
 .nv-sheet-head h2{
   margin:0;
+  font-size:22px;
 }
 
 .nv-sheet-head p{
   margin:4px 0 0;
-  color:#6b7280;
+  color:var(--muted);
+  font-size:13px;
 }
 
 .nv-sheet-head button{
@@ -241,38 +316,142 @@ body{
   height:42px;
   border-radius:14px;
   font-size:20px;
+  cursor:pointer;
 }
 
 .nv-food-search{
   width:100%;
-  padding:16px;
-  border-radius:18px;
-  border:1px solid #e5e7eb;
-  margin-bottom:14px;
-  font-size:16px;
+  padding:14px;
+  border-radius:17px;
+  border:1px solid var(--line);
+  margin-bottom:12px;
+  font-size:15px;
+  outline:none;
+}
+
+.nv-food-search:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(34,197,94,.12);
+}
+
+.nv-source-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.nv-source-row button{
+  border:1px solid var(--line);
+  background:#f9fafb;
+  padding:8px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.nv-source-row button.active{
+  background:#dcfce7;
+  border-color:#bbf7d0;
+  color:#15803d;
 }
 
 .nv-food-list{
   display:grid;
-  gap:10px;
+  gap:8px;
 }
 
 .nv-food-item{
-  border:none;
+  border:1px solid #eef0f2;
   background:#f9fafb;
-  border-radius:18px;
-  padding:16px;
+  border-radius:16px;
+  padding:12px;
   text-align:left;
+  cursor:pointer;
+}
+
+.nv-food-item:hover{
+  background:#f3f4f6;
 }
 
 .nv-food-item strong{
   display:block;
   margin-bottom:4px;
-  font-size:16px;
+  font-size:14px;
 }
 
 .nv-food-item span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.nv-empty{
+  background:#f9fafb;
+  border:1px dashed #d1d5db;
   color:#6b7280;
+  border-radius:16px;
+  padding:16px;
+  text-align:center;
+  font-size:13px;
+}
+
+.nv-selected{
+  display:none;
+  background:#f0fdf4;
+  border:1px solid #bbf7d0;
+  color:#14532d;
+  border-radius:17px;
+  padding:12px;
+  margin:12px 0;
+}
+
+.nv-selected.open{
+  display:block;
+}
+
+.nv-selected strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.nv-add-row{
+  display:grid;
+  grid-template-columns:1fr 110px;
+  gap:10px;
+  margin-top:10px;
+}
+
+.nv-add-row input{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+}
+
+.nv-add-btn{
+  border:none;
+  border-radius:14px;
+  background:#16a34a;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.nv-add-btn:disabled{
+  background:#d1d5db;
+  cursor:not-allowed;
+}
+
+@media(min-width:800px){
+  .nv-sheet-back{
+    align-items:center;
+    padding:20px;
+  }
+
+  .nv-sheet{
+    border-radius:26px;
+    max-height:80vh;
+  }
 }
 </style>
 </head>
@@ -296,22 +475,20 @@ body{
       <h2>Resumo</h2>
 
       <div class="nv-summary-dots">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </div>
     </div>
 
     <div class="nv-circle-wrap">
 
       <div class="nv-kcal-left">
-        <strong>1530</strong>
+        <strong id="metaKcal">1530</strong>
         <span>Meta</span>
       </div>
 
       <div class="nv-circle">
         <div class="nv-circle-inner">
-          <strong>0</strong>
+          <strong id="consumidoKcal">0</strong>
           <span>Consumido</span>
         </div>
       </div>
@@ -327,34 +504,22 @@ body{
 
       <div class="nv-macro">
         <h3>Proteína</h3>
-        <div class="nv-macro-circle">
-          <strong>0</strong>
-          <span>/100 g</span>
-        </div>
+        <div class="nv-macro-circle"><strong id="protTotal">0</strong><span>/100g</span></div>
       </div>
 
       <div class="nv-macro">
         <h3>Gordura</h3>
-        <div class="nv-macro-circle">
-          <strong>0</strong>
-          <span>/115 g</span>
-        </div>
+        <div class="nv-macro-circle"><strong id="gordTotal">0</strong><span>/115g</span></div>
       </div>
 
       <div class="nv-macro">
         <h3>Carbo</h3>
-        <div class="nv-macro-circle">
-          <strong>0</strong>
-          <span>/24 g</span>
-        </div>
+        <div class="nv-macro-circle"><strong id="carboTotal">0</strong><span>/240g</span></div>
       </div>
 
       <div class="nv-macro">
         <h3>Fibra</h3>
-        <div class="nv-macro-circle">
-          <strong>0</strong>
-          <span>/21 g</span>
-        </div>
+        <div class="nv-macro-circle"><strong id="fibraTotal">0</strong><span>/21g</span></div>
       </div>
 
     </div>
@@ -366,52 +531,32 @@ body{
     <button class="nv-meal-card" onclick="openMealSheet('Café da manhã')">
       <div class="nv-meal-left">
         <div class="nv-meal-icon">🥐</div>
-
-        <div>
-          <h2>Café da manhã</h2>
-          <span>0 kcal</span>
-        </div>
+        <div><h2>Café da manhã</h2><span id="mealCafe">0 kcal</span></div>
       </div>
-
       <div class="nv-plus">+</div>
     </button>
 
     <button class="nv-meal-card" onclick="openMealSheet('Almoço')">
       <div class="nv-meal-left">
         <div class="nv-meal-icon">🍝</div>
-
-        <div>
-          <h2>Almoço</h2>
-          <span>0 kcal</span>
-        </div>
+        <div><h2>Almoço</h2><span id="mealAlmoco">0 kcal</span></div>
       </div>
-
       <div class="nv-plus">+</div>
     </button>
 
     <button class="nv-meal-card" onclick="openMealSheet('Jantar')">
       <div class="nv-meal-left">
         <div class="nv-meal-icon">🥘</div>
-
-        <div>
-          <h2>Jantar</h2>
-          <span>0 kcal</span>
-        </div>
+        <div><h2>Jantar</h2><span id="mealJantar">0 kcal</span></div>
       </div>
-
       <div class="nv-plus">+</div>
     </button>
 
     <button class="nv-meal-card" onclick="openMealSheet('Lanches')">
       <div class="nv-meal-left">
         <div class="nv-meal-icon">🍿</div>
-
-        <div>
-          <h2>Lanches</h2>
-          <span>0 kcal</span>
-        </div>
+        <div><h2>Lanches</h2><span id="mealLanches">0 kcal</span></div>
       </div>
-
       <div class="nv-plus">+</div>
     </button>
 
@@ -419,14 +564,14 @@ body{
 
 </section>
 
-<div class="nv-sheet-back" id="mealSheet">
+<div class="nv-sheet-back" id="mealSheet" onclick="if(event.target.id==='mealSheet') closeMealSheet()">
 
   <div class="nv-sheet">
 
     <div class="nv-sheet-head">
       <div>
         <h2 id="sheetMealTitle">Adicionar alimento</h2>
-        <p>Escolha um alimento rapidamente</p>
+        <p id="sheetStatus">Carregando alimentos...</p>
       </div>
 
       <button onclick="closeMealSheet()">✕</button>
@@ -434,33 +579,27 @@ body{
 
     <input
       type="text"
+      id="foodSearch"
       class="nv-food-search"
       placeholder="Buscar alimento..."
+      oninput="renderFoodList()"
     >
 
-    <div class="nv-food-list">
+    <div class="nv-source-row">
+      <button id="filterAmbas" class="active" onclick="setFonteFiltro('ambas')">Todas</button>
+      <button id="filterTbca" onclick="setFonteFiltro('TBCA')">TBCA</button>
+      <button id="filterTaco" onclick="setFonteFiltro('TACO')">TACO</button>
+    </div>
 
-      <button class="nv-food-item">
-        <div>
-          <strong>Arroz branco cozido</strong>
-          <span>128 kcal • TBCA</span>
-        </div>
-      </button>
+    <div id="foodList" class="nv-food-list">
+      <div class="nv-empty">Carregando bases...</div>
+    </div>
 
-      <button class="nv-food-item">
-        <div>
-          <strong>Feijão carioca</strong>
-          <span>76 kcal • TACO</span>
-        </div>
-      </button>
+    <div id="selectedBox" class="nv-selected"></div>
 
-      <button class="nv-food-item">
-        <div>
-          <strong>Frango grelhado</strong>
-          <span>163 kcal • TBCA</span>
-        </div>
-      </button>
-
+    <div class="nv-add-row">
+      <input id="gramsInput" type="number" value="100" min="1">
+      <button id="addBtn" class="nv-add-btn" onclick="addSelectedFood()" disabled>Adicionar</button>
     </div>
 
   </div>
@@ -468,14 +607,216 @@ body{
 </div>
 
 <script>
+const TBCA_URLS = ["./tbca_pronto.json", "./tbca.json", "./alimentos_tbca.json"];
+const TACO_URL = "./taco.json";
+
+let alimentos = [];
+let selectedFood = null;
+let currentMeal = "Almoço";
+let fonteFiltro = "ambas";
+
+let diario = JSON.parse(localStorage.getItem("nutrivida_home_diario") || "[]");
+
+function norm(t){
+  return String(t || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim();
+}
+
+function num(v){
+  if(v === null || v === undefined || v === "" || v === "NA" || v === "Tr") return 0;
+  const n = parseFloat(String(v).replace(",", ".").replace(/[^\\d.-]/g,""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function fmt(v){
+  return num(v).toLocaleString("pt-BR", {maximumFractionDigits: 0});
+}
+
+function arr(json){
+  if(Array.isArray(json)) return json;
+  if(Array.isArray(json.alimentos)) return json.alimentos;
+  if(Array.isArray(json.data)) return json.data;
+  return [];
+}
+
+function mapTbca(a, i){
+  const n = a.nutrientes100g || {};
+  const nome = a.nome || a.descricao || "Sem nome";
+  return {
+    id: "tbca_" + (a.id || a.codigo || i),
+    fonte: "TBCA",
+    nome,
+    busca: norm(nome),
+    grupo: a.grupo || "",
+    kcal: num(n.kcal),
+    proteina: num(n.proteina),
+    carbo: num(n.carbo),
+    gordura: num(n.gordura),
+    fibra: num(n.fibra)
+  };
+}
+
+function mapTaco(a, i){
+  const nome = a.descricao_alimento || a.nome || "Sem nome";
+  return {
+    id: "taco_" + (a.numero || i),
+    fonte: "TACO",
+    nome,
+    busca: norm(nome),
+    grupo: a.grupo || "",
+    kcal: num(a.energia_kcal),
+    proteina: num(a.proteina_g),
+    carbo: num(a.carboidrato_g),
+    gordura: num(a.lipideos_g),
+    fibra: num(a.fibra_alimentar_g)
+  };
+}
+
+async function carregarBases(){
+  let tbcaOk = false;
+
+  for(const url of TBCA_URLS){
+    try{
+      const r = await fetch(url, {cache:"no-store"});
+      if(!r.ok) throw new Error("status " + r.status);
+      const json = await r.json();
+      alimentos.push(...arr(json).map(mapTbca).filter(a => a.nome !== "Sem nome"));
+      tbcaOk = true;
+      break;
+    }catch(e){}
+  }
+
+  try{
+    const r = await fetch(TACO_URL, {cache:"no-store"});
+    if(!r.ok) throw new Error("status " + r.status);
+    const json = await r.json();
+    alimentos.push(...arr(json).map(mapTaco).filter(a => a.nome !== "Sem nome"));
+  }catch(e){}
+
+  alimentos.sort((a,b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+  document.getElementById("sheetStatus").textContent = alimentos.length
+    ? alimentos.length + " alimentos disponíveis"
+    : "Não carregou as bases. Confira tbca_pronto.json e taco.json.";
+
+  renderFoodList();
+  renderResumo();
+}
+
+function setFonteFiltro(fonte){
+  fonteFiltro = fonte;
+
+  document.querySelectorAll(".nv-source-row button").forEach(b => b.classList.remove("active"));
+
+  if(fonte === "ambas") document.getElementById("filterAmbas").classList.add("active");
+  if(fonte === "TBCA") document.getElementById("filterTbca").classList.add("active");
+  if(fonte === "TACO") document.getElementById("filterTaco").classList.add("active");
+
+  renderFoodList();
+}
+
+function renderFoodList(){
+  const termo = norm(document.getElementById("foodSearch").value);
+  const box = document.getElementById("foodList");
+
+  let lista = alimentos.filter(a => {
+    const okBusca = !termo || a.busca.includes(termo);
+    const okFonte = fonteFiltro === "ambas" || a.fonte === fonteFiltro;
+    return okBusca && okFonte;
+  }).slice(0, 40);
+
+  if(!lista.length){
+    box.innerHTML = '<div class="nv-empty">Nenhum alimento encontrado.</div>';
+    return;
+  }
+
+  box.innerHTML = lista.map(a => `
+    <button class="nv-food-item" onclick="selectFood('${a.id}')">
+      <strong>${a.nome}</strong>
+      <span>${fmt(a.kcal)} kcal • ${a.fonte}</span>
+    </button>
+  `).join("");
+}
+
+function selectFood(id){
+  selectedFood = alimentos.find(a => String(a.id) === String(id));
+
+  if(!selectedFood) return;
+
+  const box = document.getElementById("selectedBox");
+  box.classList.add("open");
+  box.innerHTML = `
+    <strong>${selectedFood.nome}</strong>
+    ${fmt(selectedFood.kcal)} kcal por 100g • ${selectedFood.fonte}
+  `;
+
+  document.getElementById("addBtn").disabled = false;
+}
+
 function openMealSheet(meal){
-  document.getElementById('sheetMealTitle').innerText = meal;
-  document.getElementById('mealSheet').classList.add('open');
+  currentMeal = meal;
+  selectedFood = null;
+
+  document.getElementById("sheetMealTitle").innerText = meal;
+  document.getElementById("mealSheet").classList.add("open");
+  document.getElementById("foodSearch").value = "";
+  document.getElementById("selectedBox").classList.remove("open");
+  document.getElementById("addBtn").disabled = true;
+
+  setTimeout(() => document.getElementById("foodSearch").focus(), 150);
+  renderFoodList();
 }
 
 function closeMealSheet(){
-  document.getElementById('mealSheet').classList.remove('open');
+  document.getElementById("mealSheet").classList.remove("open");
 }
+
+function addSelectedFood(){
+  if(!selectedFood) return;
+
+  const gramas = Math.max(1, num(document.getElementById("gramsInput").value) || 100);
+  const fator = gramas / 100;
+
+  diario.push({
+    refeicao: currentMeal,
+    nome: selectedFood.nome,
+    fonte: selectedFood.fonte,
+    gramas,
+    kcal: selectedFood.kcal * fator,
+    proteina: selectedFood.proteina * fator,
+    carbo: selectedFood.carbo * fator,
+    gordura: selectedFood.gordura * fator,
+    fibra: selectedFood.fibra * fator
+  });
+
+  localStorage.setItem("nutrivida_home_diario", JSON.stringify(diario));
+  renderResumo();
+  closeMealSheet();
+}
+
+function soma(campo, refeicao){
+  return diario
+    .filter(i => !refeicao || i.refeicao === refeicao)
+    .reduce((t,i) => t + num(i[campo]), 0);
+}
+
+function renderResumo(){
+  document.getElementById("consumidoKcal").textContent = fmt(soma("kcal"));
+  document.getElementById("protTotal").textContent = fmt(soma("proteina"));
+  document.getElementById("gordTotal").textContent = fmt(soma("gordura"));
+  document.getElementById("carboTotal").textContent = fmt(soma("carbo"));
+  document.getElementById("fibraTotal").textContent = fmt(soma("fibra"));
+
+  document.getElementById("mealCafe").textContent = fmt(soma("kcal", "Café da manhã")) + " kcal";
+  document.getElementById("mealAlmoco").textContent = fmt(soma("kcal", "Almoço")) + " kcal";
+  document.getElementById("mealJantar").textContent = fmt(soma("kcal", "Jantar")) + " kcal";
+  document.getElementById("mealLanches").textContent = fmt(soma("kcal", "Lanches")) + " kcal";
+}
+
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape") closeMealSheet();
+});
+
+carregarBases();
 </script>
 
 </body>
