@@ -67,6 +67,192 @@ button.light:hover{background:#e5e7eb}
 .medida{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin-top:6px;font-size:12px}
 .medida b{display:block}
 .empty{background:#f9fafb;border:1px dashed #d1d5db;border-radius:18px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
+
+/* ===== FICHA MODAL DO ALIMENTO ===== */
+.food-modal-back{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.42);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.food-modal-back.open{
+  display:flex;
+}
+
+.food-modal{
+  width:min(760px, 96vw);
+  max-height:88vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:24px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 30px 80px rgba(15,23,42,.25);
+  padding:18px;
+}
+
+.food-modal-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+
+.food-modal-head h2{
+  margin:0;
+  font-size:22px;
+  line-height:1.2;
+  color:#111827;
+}
+
+.food-modal-sub{
+  margin:8px 0 0;
+  color:#64748b;
+  font-size:13px;
+}
+
+.modal-close{
+  background:#f3f4f6;
+  color:#111827;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:9px 12px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.modal-close:hover{
+  background:#e5e7eb;
+}
+
+.ficha-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:14px 0;
+}
+
+.ficha-box{
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:12px;
+  background:#fff;
+}
+
+.ficha-box span{
+  display:block;
+  font-size:12px;
+  color:#64748b;
+  margin-bottom:5px;
+}
+
+.ficha-box b{
+  font-size:17px;
+  color:#111827;
+}
+
+.ficha-chart{
+  background:#fbfdfb;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  padding:14px;
+  margin:12px 0;
+}
+
+.ficha-chart h3{
+  margin:0 0 12px;
+  font-size:17px;
+}
+
+.chart-row{
+  display:grid;
+  grid-template-columns:105px 1fr 62px;
+  gap:10px;
+  align-items:center;
+  margin:9px 0;
+  font-size:13px;
+}
+
+.chart-track{
+  height:12px;
+  background:#eef2ee;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.chart-fill{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:#16a34a;
+}
+
+.chart-fill.carbo{background:#f59e0b}
+.chart-fill.gordura{background:#dc6464}
+.chart-fill.fibra{background:#3b82f6}
+
+.ficha-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin:13px 0;
+}
+
+.ficha-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+.ficha-table th{
+  background:#f8fafc;
+  color:#0f172a;
+  text-align:left;
+  padding:10px;
+  font-size:13px;
+}
+
+.ficha-table td{
+  border-top:1px solid #e5e7eb;
+  padding:10px;
+  font-size:13px;
+}
+
+.ficha-medidas{
+  margin-top:14px;
+}
+
+.ficha-medida-item{
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:10px;
+  margin-top:8px;
+  background:#f9fafb;
+  font-size:13px;
+}
+
+@media(max-width:700px){
+  .food-modal{
+    max-height:92vh;
+    padding:14px;
+  }
+  .ficha-grid{
+    grid-template-columns:1fr 1fr;
+  }
+  .chart-row{
+    grid-template-columns:85px 1fr 52px;
+  }
+}
+
 @media(max-width:900px){
   header{position:static}.head{align-items:flex-start;flex-direction:column}
   main{padding:14px}.grid4,.grid2,.statusGrid{grid-template-columns:1fr}
@@ -143,6 +329,13 @@ button.light:hover{background:#e5e7eb}
   <div id="resultados"><div class="empty">Aguarde o carregamento automático ou use o carregamento manual.</div></div>
 </section>
 </main>
+
+
+<div class="food-modal-back" id="foodFichaModal" onclick="if(event.target.id==='foodFichaModal') closeFoodModal()">
+  <div class="food-modal">
+    <div id="foodFichaBody"></div>
+  </div>
+</div>
 
 <script>
 const TBCA_URLS = ["./tbca_pronto.json","./tbca.json","./TBCA.json","./alimentos_tbca.json","./tbca_amigavel.json"];
@@ -351,7 +544,6 @@ function medidasHtml(a){
 
 function card(a){
   const cls = a.fonte==="TBCA" ? "tbca" : "taco";
-  const id = ("det_"+a.id).replace(/[^a-zA-Z0-9_]/g,"");
 
   return `<div class="food">
     <div class="foodTop">
@@ -369,30 +561,97 @@ function card(a){
       <span class="macro">C ${fmt(a.carbo)}g</span>
       <span class="macro">G ${fmt(a.gordura)}g</span>
       <span class="macro">Fibra ${fmt(a.fibra)}g</span>
-    </div>
-
-    <button class="light" onclick="document.getElementById('${id}').classList.toggle('open')">Ver detalhes</button>
-
-    <div id="${id}" class="details">
-      <div class="detailGrid">
-        <div class="detail"><b>${fmt(a.kcal)}</b><span>Energia kcal</span></div>
-        <div class="detail"><b>${fmt(a.proteina)}g</b><span>Proteína</span></div>
-        <div class="detail"><b>${fmt(a.carbo)}g</b><span>Carboidrato</span></div>
-        <div class="detail"><b>${fmt(a.gordura)}g</b><span>Gorduras</span></div>
-        <div class="detail"><b>${fmt(a.fibra)}g</b><span>Fibra</span></div>
-        <div class="detail"><b>${fmt(a.sodio)}mg</b><span>Sódio</span></div>
-        <div class="detail"><b>${fmt(a.colesterol)}mg</b><span>Colesterol</span></div>
-        <div class="detail"><b>${fmt(a.calcio)}mg</b><span>Cálcio</span></div>
-        <div class="detail"><b>${fmt(a.ferro)}mg</b><span>Ferro</span></div>
-        <div class="detail"><b>${fmt(a.vitamina_c)}mg</b><span>Vitamina C</span></div>
-        <div class="detail"><b>${fmt(a.vitamina_b6)}mg</b><span>Vitamina B6</span></div>
-        <div class="detail"><b>${fmt(a.vitamina_b12)}mcg</b><span>Vitamina B12</span></div>
-        <div class="detail"><b>${fmt(a.zinco)}mg</b><span>Zinco</span></div>
-      </div>
-      ${medidasHtml(a)}
+      <button class="light" onclick="openFoodModal('${a.id}')">Ver ficha</button>
     </div>
   </div>`;
 }
+
+function pct(valor, max){
+  valor = num(valor);
+  max = Math.max(num(max), 1);
+  return Math.min(100, Math.round((valor / max) * 100));
+}
+
+function modalMedidasHtml(a){
+  if(a.fonte !== "TBCA" || !a.medidas || !a.medidas.length) return "";
+
+  const itens = a.medidas.slice(0,6).map(m=>{
+    const n = m.nutrientes || {};
+    return `<div class="ficha-medida-item">
+      <b>${m.rotulo || m.nome || "Medida"}</b>
+      kcal ${fmt(n.kcal)} | P ${fmt(n.proteina)}g | C ${fmt(n.carbo)}g | G ${fmt(n.gordura)}g | Fibra ${fmt(n.fibra)}g
+    </div>`;
+  }).join("");
+
+  return `<div class="ficha-medidas"><h3 style="font-size:17px;margin:0 0 8px;">Medidas caseiras</h3>${itens}</div>`;
+}
+
+function openFoodModal(id){
+  const a = todos.find(x => String(x.id) === String(id));
+  if(!a) return;
+
+  const maxMacro = Math.max(num(a.proteina), num(a.carbo), num(a.gordura), num(a.fibra), 1);
+
+  document.getElementById("foodFichaBody").innerHTML = `
+    <div class="food-modal-head">
+      <div>
+        <h2>${a.nome}</h2>
+        <p class="food-modal-sub">${a.grupo} • ${a.fonte} • valores aproximados por 100g</p>
+        ${a.tipo ? `<p class="food-modal-sub">${a.tipo}</p>` : ""}
+      </div>
+      <button class="modal-close" onclick="closeFoodModal()">Fechar</button>
+    </div>
+
+    <div class="ficha-grid">
+      <div class="ficha-box"><span>Calorias</span><b>${fmt(a.kcal)} kcal</b></div>
+      <div class="ficha-box"><span>Proteínas</span><b>${fmt(a.proteina)} g</b></div>
+      <div class="ficha-box"><span>Carboidratos</span><b>${fmt(a.carbo)} g</b></div>
+      <div class="ficha-box"><span>Gorduras</span><b>${fmt(a.gordura)} g</b></div>
+      <div class="ficha-box"><span>Fibras</span><b>${fmt(a.fibra)} g</b></div>
+      <div class="ficha-box"><span>Colesterol</span><b>${fmt(a.colesterol)} mg</b></div>
+    </div>
+
+    <div class="ficha-chart">
+      <h3>Gráfico nutricional</h3>
+      <div class="chart-row"><span>Proteínas</span><div class="chart-track"><div class="chart-fill" style="width:${pct(a.proteina,maxMacro)}%"></div></div><b>${fmt(a.proteina)}g</b></div>
+      <div class="chart-row"><span>Carboidratos</span><div class="chart-track"><div class="chart-fill carbo" style="width:${pct(a.carbo,maxMacro)}%"></div></div><b>${fmt(a.carbo)}g</b></div>
+      <div class="chart-row"><span>Gorduras</span><div class="chart-track"><div class="chart-fill gordura" style="width:${pct(a.gordura,maxMacro)}%"></div></div><b>${fmt(a.gordura)}g</b></div>
+      <div class="chart-row"><span>Fibras</span><div class="chart-track"><div class="chart-fill fibra" style="width:${pct(a.fibra,maxMacro)}%"></div></div><b>${fmt(a.fibra)}g</b></div>
+    </div>
+
+    <div class="ficha-actions">
+      <button onclick="closeFoodModal()">Voltar à lista</button>
+    </div>
+
+    <table class="ficha-table">
+      <thead><tr><th>Nutriente</th><th>Quantidade por 100g</th></tr></thead>
+      <tbody>
+        <tr><td>Energia</td><td>${fmt(a.kcal)} kcal</td></tr>
+        <tr><td>Proteínas</td><td>${fmt(a.proteina)} g</td></tr>
+        <tr><td>Carboidratos</td><td>${fmt(a.carbo)} g</td></tr>
+        <tr><td>Gorduras</td><td>${fmt(a.gordura)} g</td></tr>
+        <tr><td>Fibras</td><td>${fmt(a.fibra)} g</td></tr>
+        <tr><td>Sódio</td><td>${fmt(a.sodio)} mg</td></tr>
+        <tr><td>Colesterol</td><td>${fmt(a.colesterol)} mg</td></tr>
+        <tr><td>Cálcio</td><td>${fmt(a.calcio)} mg</td></tr>
+        <tr><td>Ferro</td><td>${fmt(a.ferro)} mg</td></tr>
+        <tr><td>Vitamina C</td><td>${fmt(a.vitamina_c)} mg</td></tr>
+        <tr><td>Vitamina B6</td><td>${fmt(a.vitamina_b6)} mg</td></tr>
+        <tr><td>Vitamina B12</td><td>${fmt(a.vitamina_b12)} mcg</td></tr>
+        <tr><td>Zinco</td><td>${fmt(a.zinco)} mg</td></tr>
+      </tbody>
+    </table>
+
+    ${modalMedidasHtml(a)}
+  `;
+
+  document.getElementById("foodFichaModal").classList.add("open");
+}
+
+function closeFoodModal(){
+  document.getElementById("foodFichaModal").classList.remove("open");
+}
+
 
 function render(){
   if(!todos.length){
@@ -437,6 +696,10 @@ function render(){
 manual("fileTbca","TBCA");
 manual("fileTaco","TACO");
 carregarAuto();
+
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape") closeFoodModal();
+});
 </script>
 </body>
 </html>
