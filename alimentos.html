@@ -29,7 +29,7 @@ h2{font-size:19px;margin:0 0 5px}
 input,select,button{font:inherit}
 input,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;outline:none}
 input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
-button{border:0;border-radius:14px;padding:10px 13px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}
+button{border:0;border-radius:14px;padding:8px 11px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}
 button:hover{background:var(--green2)}
 button.light{background:#f3f4f6;color:var(--text);border:1px solid var(--line)}
 button.light:hover{background:#e5e7eb}
@@ -45,18 +45,18 @@ button.light:hover{background:#e5e7eb}
 .count{color:var(--muted);font-size:13px}
 .sectionTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:18px 0 10px}
 .sectionTitle h3{margin:0;font-size:17px}
-.source{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid var(--line)}
+.source{padding:3px 7px;border-radius:999px;font-size:10.5px;font-weight:700;border:1px solid var(--line);opacity:.75}
 .tbca{background:var(--blueSoft);color:var(--blue);border-color:#bfdbfe}
 .taco{background:var(--orangeSoft);color:#c2410c;border-color:#fed7aa}
-.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.food{border:1px solid var(--line);background:#fff;border-radius:18px;padding:14px;display:grid;gap:10px}
+.results{display:grid;grid-template-columns:1fr;gap:7px}
+.food{border:1px solid var(--line);background:#fff;border-radius:13px;padding:9px 11px;display:grid;gap:6px}
 .food:hover{box-shadow:0 8px 20px rgba(15,23,42,.05)}
-.foodTop{display:flex;justify-content:space-between;gap:10px}
-.title{font-weight:900;line-height:1.25}
-.group{color:var(--muted);font-size:12.5px;margin-top:3px}
-.type{font-size:12px;color:#4b5563;margin-top:3px}
-.macros{display:flex;flex-wrap:wrap;gap:7px}
-.macro{background:#f9fafb;border:1px solid var(--line);padding:5px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.foodTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.title{font-weight:800;line-height:1.25;font-size:13.5px}
+.group{color:var(--muted);font-size:11.5px;margin-top:2px}
+.type{font-size:11px;color:#6b7280;margin-top:2px}
+.macros{display:flex;flex-wrap:wrap;gap:5px}
+.macro{background:#f9fafb;border:1px solid var(--line);padding:3px 7px;border-radius:999px;font-size:11px;font-weight:600}
 .details{display:none;background:#f9fafb;border:1px solid var(--line);border-radius:16px;padding:11px}
 .details.open{display:block}
 .detailGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -360,7 +360,7 @@ function card(a){
         <div class="group">${a.grupo}</div>
         ${a.tipo ? `<div class="type">${a.tipo}</div>` : ""}
       </div>
-      <span class="source ${cls}">${a.fonte}</span>
+      <span class="source ${cls}">Fonte: ${a.fonte}</span>
     </div>
 
     <div class="macros">
@@ -394,10 +394,6 @@ function card(a){
   </div>`;
 }
 
-function bloco(titulo,lista,cls){
-  return lista.length ? `<div class="sectionTitle"><h3>${titulo}</h3><span class="source ${cls}">${lista.length} exibidos</span></div><div class="results">${lista.map(card).join("")}</div>` : "";
-}
-
 function render(){
   if(!todos.length){
     document.getElementById("contador").textContent="Nenhuma base carregada.";
@@ -405,15 +401,31 @@ function render(){
     return;
   }
 
-  let tr = filtro(tbca).slice(0,80);
-  let ta = filtro(taco).slice(0,80);
+  let lista = [];
 
-  if(document.getElementById("fonte").value==="tbca") ta=[];
-  if(document.getElementById("fonte").value==="taco") tr=[];
+  if(document.getElementById("fonte").value === "tbca"){
+    lista = filtro(tbca);
+  }else if(document.getElementById("fonte").value === "taco"){
+    lista = filtro(taco);
+  }else{
+    lista = filtro(todos);
+  }
 
-  document.getElementById("contador").textContent=(tr.length+ta.length)+" resultado(s) exibido(s).";
+  lista.sort((a,b)=>{
+    const ord = document.getElementById("ordem").value;
+    if(ord==="kcal") return b.kcal-a.kcal;
+    if(ord==="proteina") return b.proteina-a.proteina;
+    if(ord==="carbo") return b.carbo-a.carbo;
+    if(ord==="gordura") return b.gordura-a.gordura;
+    if(ord==="fibra") return b.fibra-a.fibra;
+    return a.nome.localeCompare(b.nome,"pt-BR");
+  });
 
-  const html = bloco("Resultados TBCA",tr,"tbca") + bloco("Resultados TACO",ta,"taco");
+  lista = lista.slice(0,160);
+
+  document.getElementById("contador").textContent=lista.length+" resultado(s) exibido(s).";
+
+  const html = lista.length ? `<div class="results">${lista.map(card).join("")}</div>` : "";
   document.getElementById("resultados").innerHTML = html || '<div class="empty">Nenhum alimento encontrado com esses filtros.</div>';
 }
 
